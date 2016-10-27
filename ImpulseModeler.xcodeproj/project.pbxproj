@@ -17,6 +17,12 @@
 		D34094861DC2855900F1658B /* CoreInputDlog.xib in Resources */ = {isa = PBXBuildFile; fileRef = D34094841DC2855900F1658B /* CoreInputDlog.xib */; };
 		D34094881DC289FF00F1658B /* Core.swift in Sources */ = {isa = PBXBuildFile; fileRef = D34094871DC289FF00F1658B /* Core.swift */; };
 		D340948A1DC28A7000F1658B /* Coil.swift in Sources */ = {isa = PBXBuildFile; fileRef = D34094891DC28A7000F1658B /* Coil.swift */; };
+		D340948D1DC28F8600F1658B /* libgsl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D340948C1DC28F8600F1658B /* libgsl.a */; };
+		D34094951DC2904F00F1658B /* PCH_BlueBookFunctions.swift in Sources */ = {isa = PBXBuildFile; fileRef = D34094911DC2904F00F1658B /* PCH_BlueBookFunctions.swift */; };
+		D34094961DC2904F00F1658B /* PCH_DiskSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = D34094921DC2904F00F1658B /* PCH_DiskSection.swift */; };
+		D34094971DC2904F00F1658B /* PCH_Matrix.swift in Sources */ = {isa = PBXBuildFile; fileRef = D34094931DC2904F00F1658B /* PCH_Matrix.swift */; };
+		D34094981DC2904F00F1658B /* PCH_SectionData.swift in Sources */ = {isa = PBXBuildFile; fileRef = D34094941DC2904F00F1658B /* PCH_SectionData.swift */; };
+		D340949A1DC2926E00F1658B /* Phase.swift in Sources */ = {isa = PBXBuildFile; fileRef = D34094991DC2926E00F1658B /* Phase.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +38,13 @@
 		D34094841DC2855900F1658B /* CoreInputDlog.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CoreInputDlog.xib; sourceTree = "<group>"; };
 		D34094871DC289FF00F1658B /* Core.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Core.swift; sourceTree = "<group>"; };
 		D34094891DC28A7000F1658B /* Coil.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Coil.swift; sourceTree = "<group>"; };
+		D340948C1DC28F8600F1658B /* libgsl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgsl.a; path = ../GNU_Scientific_Library/lib/libgsl.a; sourceTree = "<group>"; };
+		D340948E1DC2901A00F1658B /* ImpulseModeler-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ImpulseModeler-Bridging-Header.h"; sourceTree = "<group>"; };
+		D34094911DC2904F00F1658B /* PCH_BlueBookFunctions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PCH_BlueBookFunctions.swift; path = ../../InductanceCalculator/InductanceCalculator/PCH_BlueBookFunctions.swift; sourceTree = "<group>"; };
+		D34094921DC2904F00F1658B /* PCH_DiskSection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PCH_DiskSection.swift; path = ../../InductanceCalculator/InductanceCalculator/PCH_DiskSection.swift; sourceTree = "<group>"; };
+		D34094931DC2904F00F1658B /* PCH_Matrix.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PCH_Matrix.swift; path = ../../InductanceCalculator/InductanceCalculator/PCH_Matrix.swift; sourceTree = "<group>"; };
+		D34094941DC2904F00F1658B /* PCH_SectionData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PCH_SectionData.swift; path = ../../InductanceCalculator/InductanceCalculator/PCH_SectionData.swift; sourceTree = "<group>"; };
+		D34094991DC2926E00F1658B /* Phase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Phase.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -39,6 +52,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D340948D1DC28F8600F1658B /* libgsl.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -50,6 +64,7 @@
 			children = (
 				D340944C1DC14BA200F1658B /* ImpulseModeler */,
 				D340944B1DC14BA200F1658B /* Products */,
+				D340948B1DC28F8600F1658B /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -70,13 +85,27 @@
 				D340947F1DC2762600F1658B /* AppController.swift */,
 				D34094871DC289FF00F1658B /* Core.swift */,
 				D34094891DC28A7000F1658B /* Coil.swift */,
+				D34094991DC2926E00F1658B /* Phase.swift */,
 				D34094831DC2855900F1658B /* CoreInputDlog.swift */,
 				D34094841DC2855900F1658B /* CoreInputDlog.xib */,
 				D340944F1DC14BA200F1658B /* Assets.xcassets */,
 				D34094511DC14BA200F1658B /* MainMenu.xib */,
 				D34094541DC14BA200F1658B /* Info.plist */,
+				D34094911DC2904F00F1658B /* PCH_BlueBookFunctions.swift */,
+				D34094921DC2904F00F1658B /* PCH_DiskSection.swift */,
+				D34094931DC2904F00F1658B /* PCH_Matrix.swift */,
+				D34094941DC2904F00F1658B /* PCH_SectionData.swift */,
+				D340948E1DC2901A00F1658B /* ImpulseModeler-Bridging-Header.h */,
 			);
 			path = ImpulseModeler;
+			sourceTree = "<group>";
+		};
+		D340948B1DC28F8600F1658B /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				D340948C1DC28F8600F1658B /* libgsl.a */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -111,6 +140,7 @@
 				TargetAttributes = {
 					D34094491DC14BA200F1658B = {
 						CreatedOnToolsVersion = 8.0;
+						LastSwiftMigration = 0800;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -151,13 +181,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D34094981DC2904F00F1658B /* PCH_SectionData.swift in Sources */,
+				D34094971DC2904F00F1658B /* PCH_Matrix.swift in Sources */,
+				D34094961DC2904F00F1658B /* PCH_DiskSection.swift in Sources */,
 				D34094881DC289FF00F1658B /* Core.swift in Sources */,
 				D340947E1DC2761400F1658B /* PCH_Defs.swift in Sources */,
 				D34094851DC2855900F1658B /* CoreInputDlog.swift in Sources */,
 				D340947D1DC2761400F1658B /* GlobalDefs.swift in Sources */,
+				D34094951DC2904F00F1658B /* PCH_BlueBookFunctions.swift in Sources */,
 				D340944E1DC14BA200F1658B /* AppDelegate.swift in Sources */,
 				D340948A1DC28A7000F1658B /* Coil.swift in Sources */,
 				D34094801DC2762600F1658B /* AppController.swift in Sources */,
+				D340949A1DC2926E00F1658B /* Phase.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -269,11 +304,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../GNU_Scientific_Library/include\"";
 				INFOPLIST_FILE = ImpulseModeler/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/../GNU_Scientific_Library/lib\"";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.huberis-tech.ImpulseModeler";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "ImpulseModeler/ImpulseModeler-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
@@ -282,11 +322,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
+				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../GNU_Scientific_Library/include\"";
 				INFOPLIST_FILE = ImpulseModeler/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/../GNU_Scientific_Library/lib\"";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.huberis-tech.ImpulseModeler";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "ImpulseModeler/ImpulseModeler-Bridging-Header.h";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Release;

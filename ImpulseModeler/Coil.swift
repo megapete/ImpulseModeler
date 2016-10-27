@@ -16,6 +16,9 @@ struct Coil
     /// The innerRadius of the coil
     let innerRadius:Double
     
+    /// The current of the coil in amperes
+    let amps:Double
+    
     /// The number of disks that make up the coil
     let numDisks:Int
     
@@ -24,10 +27,16 @@ struct Coil
     /// The number of disks that are interleaved at the bottom of the coil
     let numBottomInterleavedDisks:Int
     
+    let hasTopStaticRing:Bool
+    let hasBottomStaticRing:Bool
+    
     /// The size of the cross-section of a single disk
     let diskSize:NSSize
     
     /// The axial dimension between disks
     let interDiskDimn:Double
+    
+    /// The array of disks that actually holds the important info
+    var disks:[PCH_DiskSection]?
 
 }
