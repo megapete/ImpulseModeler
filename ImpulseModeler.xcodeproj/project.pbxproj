@@ -10,6 +10,13 @@
 		D340944E1DC14BA200F1658B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D340944D1DC14BA200F1658B /* AppDelegate.swift */; };
 		D34094501DC14BA200F1658B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D340944F1DC14BA200F1658B /* Assets.xcassets */; };
 		D34094531DC14BA200F1658B /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = D34094511DC14BA200F1658B /* MainMenu.xib */; };
+		D340947D1DC2761400F1658B /* GlobalDefs.swift in Sources */ = {isa = PBXBuildFile; fileRef = D340947B1DC2761400F1658B /* GlobalDefs.swift */; };
+		D340947E1DC2761400F1658B /* PCH_Defs.swift in Sources */ = {isa = PBXBuildFile; fileRef = D340947C1DC2761400F1658B /* PCH_Defs.swift */; };
+		D34094801DC2762600F1658B /* AppController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D340947F1DC2762600F1658B /* AppController.swift */; };
+		D34094851DC2855900F1658B /* CoreInputDlog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D34094831DC2855900F1658B /* CoreInputDlog.swift */; };
+		D34094861DC2855900F1658B /* CoreInputDlog.xib in Resources */ = {isa = PBXBuildFile; fileRef = D34094841DC2855900F1658B /* CoreInputDlog.xib */; };
+		D34094881DC289FF00F1658B /* Core.swift in Sources */ = {isa = PBXBuildFile; fileRef = D34094871DC289FF00F1658B /* Core.swift */; };
+		D340948A1DC28A7000F1658B /* Coil.swift in Sources */ = {isa = PBXBuildFile; fileRef = D34094891DC28A7000F1658B /* Coil.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -18,6 +25,13 @@
 		D340944F1DC14BA200F1658B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D34094521DC14BA200F1658B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		D34094541DC14BA200F1658B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D340947B1DC2761400F1658B /* GlobalDefs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GlobalDefs.swift; sourceTree = "<group>"; };
+		D340947C1DC2761400F1658B /* PCH_Defs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PCH_Defs.swift; sourceTree = "<group>"; };
+		D340947F1DC2762600F1658B /* AppController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppController.swift; sourceTree = "<group>"; };
+		D34094831DC2855900F1658B /* CoreInputDlog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreInputDlog.swift; sourceTree = "<group>"; };
+		D34094841DC2855900F1658B /* CoreInputDlog.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CoreInputDlog.xib; sourceTree = "<group>"; };
+		D34094871DC289FF00F1658B /* Core.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Core.swift; sourceTree = "<group>"; };
+		D34094891DC28A7000F1658B /* Coil.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Coil.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -51,6 +65,13 @@
 			isa = PBXGroup;
 			children = (
 				D340944D1DC14BA200F1658B /* AppDelegate.swift */,
+				D340947B1DC2761400F1658B /* GlobalDefs.swift */,
+				D340947C1DC2761400F1658B /* PCH_Defs.swift */,
+				D340947F1DC2762600F1658B /* AppController.swift */,
+				D34094871DC289FF00F1658B /* Core.swift */,
+				D34094891DC28A7000F1658B /* Coil.swift */,
+				D34094831DC2855900F1658B /* CoreInputDlog.swift */,
+				D34094841DC2855900F1658B /* CoreInputDlog.xib */,
 				D340944F1DC14BA200F1658B /* Assets.xcassets */,
 				D34094511DC14BA200F1658B /* MainMenu.xib */,
 				D34094541DC14BA200F1658B /* Info.plist */,
@@ -117,6 +138,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D34094861DC2855900F1658B /* CoreInputDlog.xib in Resources */,
 				D34094501DC14BA200F1658B /* Assets.xcassets in Resources */,
 				D34094531DC14BA200F1658B /* MainMenu.xib in Resources */,
 			);
@@ -129,7 +151,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D34094881DC289FF00F1658B /* Core.swift in Sources */,
+				D340947E1DC2761400F1658B /* PCH_Defs.swift in Sources */,
+				D34094851DC2855900F1658B /* CoreInputDlog.swift in Sources */,
+				D340947D1DC2761400F1658B /* GlobalDefs.swift in Sources */,
 				D340944E1DC14BA200F1658B /* AppDelegate.swift in Sources */,
+				D340948A1DC28A7000F1658B /* Coil.swift in Sources */,
+				D34094801DC2762600F1658B /* AppController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -282,6 +310,7 @@
 				D34094591DC14BA200F1658B /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
