@@ -12,6 +12,8 @@ class AppController: NSObject {
 
     var phaseDefinition:Phase?
     
+    
+    
     // Menu Handlers
     @IBAction func handleNew(_ sender: AnyObject)
     {
@@ -26,8 +28,14 @@ class AppController: NSObject {
         
         // Bring up the core dialog
         let coreDlog = CoreInputDlog()
-        let newCore = coreDlog.runDialog(nil)
+        guard let newCore = coreDlog.runDialog(nil)
+        else
+        {
+            DLog("No core defined!")
+            return
+        }
         
+        DLog("Core diameter: \(newCore.diameter), Window height: \(newCore.height), Height factor: \(newCore.htFactor)")
         
     }
 }

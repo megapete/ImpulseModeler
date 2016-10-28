@@ -20,6 +20,7 @@ class CoreInputDlog: NSWindowController {
     @IBOutlet var oneXbutton: NSButton!
     @IBOutlet var otherXbutton: NSButton!
     
+    // 1=1.0, 2=otherField, 3=3.0
     var htFactor:Int?
     
     
@@ -34,6 +35,21 @@ class CoreInputDlog: NSWindowController {
         super.windowDidLoad()
 
         // Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
+        
+        if (self.htFactor == 3)
+        {
+            threeXbutton.state = NSOnState
+        }
+        else if (self.htFactor == 1)
+        {
+            oneXbutton.state = NSOnState
+        }
+        else
+        {
+            otherXbutton.state = NSOnState
+            htFactorField.isEnabled = true
+        }
+
     }
     
     // This is the function that should be called to conduct the dialog
@@ -44,35 +60,36 @@ class CoreInputDlog: NSWindowController {
             coreDiameterField.stringValue = "\(oldCore.diameter)"
             windowHtField.stringValue = "\(oldCore.height)"
             
-            if (oldCore.htFactor == 3.0)
+            if oldCore.htFactor == 3.0
             {
-                threeXbutton.state = NSOnState
+                self.htFactor = 3
             }
-            else if (oldCore.htFactor == 1.0)
+            else if oldCore.htFactor == 1.0
             {
-                oneXbutton.state = NSOnState
+                self.htFactor = 1
             }
             else
             {
-                otherXbutton.state = NSOnState
-                htFactorField.stringValue = "\(oldCore.htFactor)"
+                self.htFactor = 2
             }
         }
         else
         {
-            threeXbutton.state = NSOnState
+            self.htFactor = 3
         }
         
         let result = NSApp.runModal(for: self.window!)
         
-        return core
+        return self.core
     }
     
     // Button handlers
     @IBAction func okButtonPushed(_ sender: AnyObject)
     {
         DLog("Ok button pushed")
-        self.core = nil
+        
+        self.core = Core(diameter: self.coreDiameterField.doubleValue, height: self.windowHtField.doubleValue, htFactor: (self.htFactor! == 2 ? self.htFactorField.doubleValue : Double(self.htFactor!)))
+        
         NSApp.stopModal()
         self.window!.orderOut(self)
     }
@@ -87,6 +104,26 @@ class CoreInputDlog: NSWindowController {
     
     @IBAction func handleHtFactorGroup(_ sender: AnyObject)
     {
+        guard let wButton:NSButton = sender as? NSButton else
+        {
+            return
+        }
+        
+        if (wButton == self.threeXbutton)
+        {
+            self.htFactor = 3
+            self.htFactorField.isEnabled = false
+        }
+        else if (wButton == self.oneXbutton)
+        {
+            self.htFactor = 1
+            self.htFactorField.isEnabled = false
+        }
+        else if (wButton == self.otherXbutton)
+        {
+            self.htFactor = 2
+            self.htFactorField.isEnabled = true
+        }
     }
     
 }
