@@ -7,6 +7,14 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="CoilDlog" customModule="ImpulseModeler" customModuleProvider="target">
             <connections>
+                <outlet property="ampsField" destination="vp2-tp-UNa" id="s3D-Cq-pUG"/>
+                <outlet property="coilNameField" destination="Nax-yp-pND" id="6aO-AZ-2Rx"/>
+                <outlet property="innerDiameterField" destination="jFP-VE-BR4" id="HSV-Pg-yfa"/>
+                <outlet property="negativeCurrentButton" destination="gVh-Yi-vnA" id="Iah-d4-qOR"/>
+                <outlet property="noCurrentButton" destination="HxG-cT-1IP" id="JEi-MJ-Jth"/>
+                <outlet property="positiveCurrentButton" destination="1xI-bQ-Prd" id="xtc-sD-04V"/>
+                <outlet property="radialCapacitanceField" destination="csJ-tG-uJr" id="TLu-YS-ehD"/>
+                <outlet property="radialPositionField" destination="Vlr-Oe-mUf" id="s1e-7i-rkO"/>
                 <outlet property="window" destination="F0z-JX-Cv5" id="gIp-Ho-8D9"/>
             </connections>
         </customObject>
@@ -156,6 +164,9 @@
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
+                        <connections>
+                            <action selector="doneButtonPushed:" target="-2" id="i8G-Uq-3cZ"/>
+                        </connections>
                     </button>
                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="LTj-aL-QQt">
                         <rect key="frame" x="304" y="13" width="81" height="32"/>
@@ -164,6 +175,9 @@
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
+                        <connections>
+                            <action selector="nextButtonPushed:" target="-2" id="U0L-r2-Gd9"/>
+                        </connections>
                     </button>
                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="sq8-ee-ZVa">
                         <rect key="frame" x="223" y="13" width="81" height="32"/>
@@ -172,6 +186,9 @@
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
+                        <connections>
+                            <action selector="previousButtonPushed:" target="-2" id="zzg-QY-oL9"/>
+                        </connections>
                     </button>
                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gNp-1j-LCe">
                         <rect key="frame" x="142" y="13" width="81" height="32"/>
@@ -183,6 +200,9 @@
 Gw
 </string>
                         </buttonCell>
+                        <connections>
+                            <action selector="cancelButtonPushed:" target="-2" id="gZf-XK-BLG"/>
+                        </connections>
                     </button>
                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tjb-pR-Mg5">
                         <rect key="frame" x="218" y="74" width="168" height="32"/>
@@ -191,6 +211,9 @@ Gw
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
+                        <connections>
+                            <action selector="defineSectionsButtonPushed:" target="-2" id="LsT-8O-mO3"/>
+                        </connections>
                     </button>
                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="HxG-cT-1IP">
                         <rect key="frame" x="183" y="174" width="57" height="18"/>

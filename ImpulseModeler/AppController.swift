@@ -28,16 +28,10 @@ class AppController: NSObject {
         
         // Bring up the core dialog
         let coreDlog = CoreInputDlog()
+        let newCore = coreDlog.runDialog(nil)
         
-        let testCore = Core(diameter:20.0, height:50.0, htFactor:3.0, coilCenterOffset:3.5)
-        guard let newCore = coreDlog.runDialog(testCore)
-        else
-        {
-            DLog("No core defined!")
-            return
-        }
         
-        DLog("Core diameter: \(newCore.diameter), Window height: \(newCore.height), Height factor: \(newCore.htFactor)")
-        
+        let newCoil = CoilDlog()
+        let result = newCoil.runDialog(0, usingCoil: nil)
     }
 }
