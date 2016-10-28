@@ -10,7 +10,7 @@ import Cocoa
 
 class AxialSectionDlog: NSWindowController {
 
-    var coilReference = 0
+    var coilReference = ""
     @IBOutlet weak var coilRefField: NSTextField!
     
     var sectionReference = 0
@@ -44,6 +44,11 @@ class AxialSectionDlog: NSWindowController {
     @IBOutlet weak var interleavedBox: NSButton!
     var isInterleaved = false
     
+    @IBOutlet var previousButton: NSButton!
+    
+    var returnedSection:AxialSection? = nil
+    var returnValue = DlogResult.cancel
+    
     override var windowNibName: String!
     {
         return "AxialSectionDlog"
@@ -72,18 +77,73 @@ class AxialSectionDlog: NSWindowController {
         topStaticRingBox.state = (hasTopStaticRing ? NSOnState : NSOffState)
         bottomStaticRingBox.state = (hasBottomStaticRing ? NSOnState : NSOffState)
         interleavedBox.state = (isInterleaved ? NSOnState : NSOffState)
+        
+        previousButton.isEnabled = (sectionReference == 0 ? false : true)
     }
     
     enum DlogResult {case cancel, done, previous, next}
-    func runDialog(_ parentCoil:Int, sectionNum:Int, usingSection:AxialSection?) -> (section:AxialSection, result:DlogResult)
+    func runDialog(_ parentCoil:Coil, sectionNum:Int, usingSection:AxialSection?) -> (section:AxialSection?, result:DlogResult)
     {
-        self.coilReference = parentCoil
+        // Note: We pass the parent coil for its name, but also for the future possibility of calculating the capacitances between disks
+        
+        self.coilReference = parentCoil.coilName
         self.sectionReference = sectionNum
         
         if let oldSection = usingSection
         {
-            
+            self.totalTurns = oldSection.turns
+            self.totalDisks = oldSection.numDisks
+            self.topDiskCap = oldSection.topDiskSerialCapacitance
+            self.commonDiskCap = oldSection.commonDiskSerialCapacitance
+            self.bottomDiskCap = oldSection.bottomDiskSerialCapacitance
+            self.diskResistance = oldSection.diskResistance
+            self.diskHeight = Double(oldSection.diskSize.height)
+            self.diskRB = Double(oldSection.diskSize.width)
+            self.interdisk = oldSection.interDiskDimn
+            self.overTopDisk = oldSection.overTopDiskDimn
+            self.hasTopStaticRing = oldSection.topStaticRing
+            self.hasBottomStaticRing = oldSection.bottomStaticRing
+            self.isInterleaved = oldSection.isInterleaved
         }
+        
+        NSApp.runModal(for: self.window!)
+        
+        return (self.returnedSection, self.returnValue)
     }
+    
+    func saveSectionAndClose()
+    {
+        let diskSize:NSSize = NSSize(width: self.diskRBField.doubleValue, height: self.diskHeightField.doubleValue)
+        
+        self.returnedSection = AxialSection(sectionAxialPosition: self.sectionReference, turns: self.totalTurnsField.doubleValue, numDisks: self.totalDisksField.doubleValue, topDiskSerialCapacitance: self.topDiskCapField.doubleValue, bottomDiskSerialCapacitance: self.bottomDiskCapField.doubleValue, commonDiskSerialCapacitance: self.commonDiskCapField.doubleValue, topStaticRing: self.topStaticRingBox.state == NSOnState, bottomStaticRing: self.bottomStaticRingBox.state == NSOffState, isInterleaved: self.interleavedBox.state == NSOnState, diskResistance: self.diskResistanceField.doubleValue, diskSize: diskSize, interDiskDimn: self.interdiskField.doubleValue, overTopDiskDimn: self.overTopDiskField.doubleValue)
+        
+        NSApp.stopModal()
+        self.window!.orderOut(self)
+    }
+
+    @IBAction func doneButtonPushed(_ sender: AnyObject)
+    {
+        self.returnValue = DlogResult.done
+        saveSectionAndClose()
+    }
+    
+    @IBAction func nextButtonPushed(_ sender: AnyObject)
+    {
+        self.returnValue = DlogResult.next
+        saveSectionAndClose()
+    }
+    
+    @IBAction func previousButtonPushed(_ sender: AnyObject)
+    {
+        self.returnValue = DlogResult.previous
+        saveSectionAndClose()
+    }
+    
+    @IBAction func cancelButtonPushed(_ sender: AnyObject)
+    {
+        NSApp.stopModal()
+        self.window!.orderOut(self)
+    }
+    
     
 }

@@ -28,14 +28,18 @@ struct Coil
     /// The innerRadius of the coil
     let innerRadius:Double
     
-    var sections:[AxialSection]
+    var sections:[AxialSection]?
     
     func Height() -> Double
     {
         var result = 0.0
-        for nextSection in sections
+        
+        if let axialSections = sections
         {
-            result += nextSection.Height()
+            for nextSection in axialSections
+            {
+                result += nextSection.Height()
+            }
         }
         
         return result
@@ -51,7 +55,7 @@ struct AxialSection
     let turns:Double
     
     /// The number of disks that make up the section
-    let numDisks:Int
+    let numDisks:Double
     
     /// Capacitances
     let topDiskSerialCapacitance:Double

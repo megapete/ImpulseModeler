@@ -17,6 +17,7 @@
                 <outlet property="interdiskField" destination="J7j-0H-svG" id="mbO-6q-Hey"/>
                 <outlet property="interleavedBox" destination="gKT-Tx-BuT" id="5jh-md-Nb2"/>
                 <outlet property="overTopDiskField" destination="de4-wH-wta" id="9dX-jy-IpI"/>
+                <outlet property="previousButton" destination="lc3-WZ-8Oo" id="tqI-Es-IS6"/>
                 <outlet property="sectionRefField" destination="htL-Ws-4zc" id="tiB-FE-jyD"/>
                 <outlet property="topDiskCapField" destination="eIl-0N-J7G" id="1Bh-uI-CDY"/>
                 <outlet property="topStaticRingBox" destination="z6v-hU-dDL" id="2O0-mx-NAy"/>
@@ -31,7 +32,7 @@
             <windowStyleMask key="styleMask" titled="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="196" y="240" width="480" height="571"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1177"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <view key="contentView" wantsLayer="YES" id="se5-gp-TjO">
                 <rect key="frame" x="0.0" y="0.0" width="480" height="571"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -175,6 +176,9 @@
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
+                        <connections>
+                            <action selector="nextButtonPushed:" target="-2" id="oAs-Ju-Yvr"/>
+                        </connections>
                     </button>
                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="lc3-WZ-8Oo">
                         <rect key="frame" x="225" y="13" width="81" height="32"/>
@@ -183,6 +187,9 @@
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
+                        <connections>
+                            <action selector="previousButtonPushed:" target="-2" id="pjx-Cg-c6W"/>
+                        </connections>
                     </button>
                     <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Jtd-kd-78L">
                         <rect key="frame" x="144" y="13" width="81" height="32"/>
@@ -194,6 +201,9 @@
 Gw
 </string>
                         </buttonCell>
+                        <connections>
+                            <action selector="cancelButtonPushed:" target="-2" id="Gaa-BM-xMa"/>
+                        </connections>
                     </button>
                     <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="BZz-FK-OCr">
                         <rect key="frame" x="250" y="450" width="96" height="22"/>
@@ -302,6 +312,9 @@ Gw
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
+                        <connections>
+                            <action selector="doneButtonPushed:" target="-2" id="AuR-Z8-VV0"/>
+                        </connections>
                     </button>
                 </subviews>
             </view>
