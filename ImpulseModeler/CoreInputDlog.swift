@@ -12,10 +12,14 @@ class CoreInputDlog: NSWindowController {
 
     var core:Core?
     
-    @IBOutlet var coreDiameterField: NSTextField!
-    @IBOutlet var windowHtField: NSTextField!
-    @IBOutlet var htFactorField: NSTextField!
+    @IBOutlet weak var coreDiameterField: NSTextField!
+    var coreDiameter = 0.0
+    @IBOutlet weak var windowHtField: NSTextField!
+    var windowHt = 0.0
+    @IBOutlet weak var htFactorField: NSTextField!
+    var heightFactor = 0.0
     @IBOutlet weak var coilCtrOffsetField: NSTextField!
+    var coilCtrOffset = 0.0
     
     @IBOutlet var threeXbutton: NSButton!
     @IBOutlet var oneXbutton: NSButton!
@@ -50,6 +54,11 @@ class CoreInputDlog: NSWindowController {
             otherXbutton.state = NSOnState
             htFactorField.isEnabled = true
         }
+        
+        coreDiameterField.doubleValue = coreDiameter
+        windowHtField.doubleValue = windowHt
+        coilCtrOffsetField.doubleValue = coilCtrOffset
+        htFactorField.doubleValue = heightFactor
 
     }
     
@@ -58,8 +67,10 @@ class CoreInputDlog: NSWindowController {
     {
         if let oldCore = usingCore
         {
-            coreDiameterField.stringValue = "\(oldCore.diameter)"
-            windowHtField.stringValue = "\(oldCore.height)"
+            coreDiameter = oldCore.diameter
+            windowHt = oldCore.height
+            coilCtrOffset = oldCore.coilCenterOffset
+            heightFactor = oldCore.htFactor
             
             if oldCore.htFactor == 3.0
             {
@@ -79,7 +90,7 @@ class CoreInputDlog: NSWindowController {
             self.htFactor = 3
         }
         
-        let result = NSApp.runModal(for: self.window!)
+        NSApp.runModal(for: self.window!)
         
         return self.core
     }
@@ -90,7 +101,7 @@ class CoreInputDlog: NSWindowController {
         DLog("Ok button pushed")
         
         self.core = Core(diameter: self.coreDiameterField.doubleValue, height: self.windowHtField.doubleValue, htFactor: (self.htFactor! == 2 ? self.htFactorField.doubleValue : Double(self.htFactor!)), coilCenterOffset: self.coilCtrOffsetField.doubleValue)
-        
+                
         NSApp.stopModal()
         self.window!.orderOut(self)
     }

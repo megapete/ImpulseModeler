@@ -28,7 +28,9 @@ class AppController: NSObject {
         
         // Bring up the core dialog
         let coreDlog = CoreInputDlog()
-        guard let newCore = coreDlog.runDialog(nil)
+        
+        let testCore = Core(diameter:20.0, height:50.0, htFactor:3.0, coilCenterOffset:3.5)
+        guard let newCore = coreDlog.runDialog(testCore)
         else
         {
             DLog("No core defined!")

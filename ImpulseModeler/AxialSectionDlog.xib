@@ -7,6 +7,21 @@
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="AxialSectionDlog" customModule="ImpulseModeler" customModuleProvider="target">
             <connections>
+                <outlet property="bottomDiskCapField" destination="82H-vB-Vlg" id="1jn-Lz-YCW"/>
+                <outlet property="bottomStaticRingBox" destination="OAy-nX-rKd" id="49s-hb-1wZ"/>
+                <outlet property="coilRefField" destination="dOX-IH-guT" id="TSd-JE-5dh"/>
+                <outlet property="commonDiskCapField" destination="rAS-hZ-XnD" id="813-l5-yRj"/>
+                <outlet property="diskHeightField" destination="eYY-DW-hdx" id="oK0-IO-aqJ"/>
+                <outlet property="diskRBField" destination="6cc-Lw-Q6W" id="ATK-9e-FzN"/>
+                <outlet property="diskResistanceField" destination="kzm-xa-6e7" id="ugS-Nb-oTP"/>
+                <outlet property="interdiskField" destination="J7j-0H-svG" id="mbO-6q-Hey"/>
+                <outlet property="interleavedBox" destination="gKT-Tx-BuT" id="5jh-md-Nb2"/>
+                <outlet property="overTopDiskField" destination="de4-wH-wta" id="9dX-jy-IpI"/>
+                <outlet property="sectionRefField" destination="htL-Ws-4zc" id="tiB-FE-jyD"/>
+                <outlet property="topDiskCapField" destination="eIl-0N-J7G" id="1Bh-uI-CDY"/>
+                <outlet property="topStaticRingBox" destination="z6v-hU-dDL" id="2O0-mx-NAy"/>
+                <outlet property="totalDisksField" destination="0gM-Xu-y6u" id="7IA-Zy-U3f"/>
+                <outlet property="totalTurnsField" destination="BZz-FK-OCr" id="dTD-NG-WMK"/>
                 <outlet property="window" destination="F0z-JX-Cv5" id="gIp-Ho-8D9"/>
             </connections>
         </customObject>
@@ -87,7 +102,7 @@
                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="z6v-hU-dDL">
                         <rect key="frame" x="357" y="401" width="88" height="18"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="check" title="Static Ring" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="BPa-mM-XTQ">
+                        <buttonCell key="cell" type="check" title="Static Ring" bezelStyle="regularSquare" imagePosition="left" inset="2" id="BPa-mM-XTQ">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
@@ -95,7 +110,7 @@
                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="OAy-nX-rKd">
                         <rect key="frame" x="357" y="353" width="88" height="13"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="check" title="Static Ring" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="JeX-Es-bs8">
+                        <buttonCell key="cell" type="check" title="Static Ring" bezelStyle="regularSquare" imagePosition="left" inset="2" id="JeX-Es-bs8">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
@@ -103,7 +118,7 @@
                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gKT-Tx-BuT">
                         <rect key="frame" x="41" y="327" width="96" height="18"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="check" title="Interleaved" bezelStyle="regularSquare" imagePosition="left" state="on" inset="2" id="U1t-zG-2qR">
+                        <buttonCell key="cell" type="check" title="Interleaved" bezelStyle="regularSquare" imagePosition="left" inset="2" id="U1t-zG-2qR">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
