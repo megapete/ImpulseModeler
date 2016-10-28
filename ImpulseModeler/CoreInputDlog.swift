@@ -15,6 +15,7 @@ class CoreInputDlog: NSWindowController {
     @IBOutlet var coreDiameterField: NSTextField!
     @IBOutlet var windowHtField: NSTextField!
     @IBOutlet var htFactorField: NSTextField!
+    @IBOutlet weak var coilCtrOffsetField: NSTextField!
     
     @IBOutlet var threeXbutton: NSButton!
     @IBOutlet var oneXbutton: NSButton!
@@ -88,7 +89,7 @@ class CoreInputDlog: NSWindowController {
     {
         DLog("Ok button pushed")
         
-        self.core = Core(diameter: self.coreDiameterField.doubleValue, height: self.windowHtField.doubleValue, htFactor: (self.htFactor! == 2 ? self.htFactorField.doubleValue : Double(self.htFactor!)))
+        self.core = Core(diameter: self.coreDiameterField.doubleValue, height: self.windowHtField.doubleValue, htFactor: (self.htFactor! == 2 ? self.htFactorField.doubleValue : Double(self.htFactor!)), coilCenterOffset: self.coilCtrOffsetField.doubleValue)
         
         NSApp.stopModal()
         self.window!.orderOut(self)

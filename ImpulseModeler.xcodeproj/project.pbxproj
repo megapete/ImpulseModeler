@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D32896961DC3888100984012 /* AxialSectionDlog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D32896941DC3888100984012 /* AxialSectionDlog.swift */; };
+		D32896971DC3888100984012 /* AxialSectionDlog.xib in Resources */ = {isa = PBXBuildFile; fileRef = D32896951DC3888100984012 /* AxialSectionDlog.xib */; };
 		D340944E1DC14BA200F1658B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D340944D1DC14BA200F1658B /* AppDelegate.swift */; };
 		D34094501DC14BA200F1658B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D340944F1DC14BA200F1658B /* Assets.xcassets */; };
 		D34094531DC14BA200F1658B /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = D34094511DC14BA200F1658B /* MainMenu.xib */; };
@@ -26,6 +28,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		D32896941DC3888100984012 /* AxialSectionDlog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AxialSectionDlog.swift; sourceTree = "<group>"; };
+		D32896951DC3888100984012 /* AxialSectionDlog.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AxialSectionDlog.xib; sourceTree = "<group>"; };
 		D340944A1DC14BA200F1658B /* ImpulseModeler.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ImpulseModeler.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		D340944D1DC14BA200F1658B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		D340944F1DC14BA200F1658B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -88,6 +92,8 @@
 				D34094991DC2926E00F1658B /* Phase.swift */,
 				D34094831DC2855900F1658B /* CoreInputDlog.swift */,
 				D34094841DC2855900F1658B /* CoreInputDlog.xib */,
+				D32896941DC3888100984012 /* AxialSectionDlog.swift */,
+				D32896951DC3888100984012 /* AxialSectionDlog.xib */,
 				D340944F1DC14BA200F1658B /* Assets.xcassets */,
 				D34094511DC14BA200F1658B /* MainMenu.xib */,
 				D34094541DC14BA200F1658B /* Info.plist */,
@@ -171,6 +177,7 @@
 				D34094861DC2855900F1658B /* CoreInputDlog.xib in Resources */,
 				D34094501DC14BA200F1658B /* Assets.xcassets in Resources */,
 				D34094531DC14BA200F1658B /* MainMenu.xib in Resources */,
+				D32896971DC3888100984012 /* AxialSectionDlog.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -192,6 +199,7 @@
 				D340944E1DC14BA200F1658B /* AppDelegate.swift in Sources */,
 				D340948A1DC28A7000F1658B /* Coil.swift in Sources */,
 				D34094801DC2762600F1658B /* AppController.swift in Sources */,
+				D32896961DC3888100984012 /* AxialSectionDlog.swift in Sources */,
 				D340949A1DC2926E00F1658B /* Phase.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

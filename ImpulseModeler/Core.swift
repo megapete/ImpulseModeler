@@ -15,4 +15,6 @@ struct Core
     let height:Double
     
     let htFactor:Double
+    
+    let coilCenterOffset:Double
 }
