@@ -49,6 +49,7 @@ class CoilDlog: NSWindowController {
         radialPositionField.integerValue = radialPosition
         ampsField.doubleValue = amps
         radialCapacitanceField.doubleValue = radialCapacitance
+        
         innerDiameterField.doubleValue = innerDiameter
         
         if currentDirection > 0
