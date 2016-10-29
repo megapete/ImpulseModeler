@@ -27,6 +27,8 @@ class CoilDlog: NSWindowController {
     @IBOutlet var positiveCurrentButton: NSButton!
     var currentDirection = 1
     
+    @IBOutlet var prevButton: NSButton!
+    
     enum DlogResult {case cancel, done, previous, next}
     var returnValue:DlogResult = DlogResult.cancel
     var returnedCoil:Coil? = nil
@@ -61,9 +63,11 @@ class CoilDlog: NSWindowController {
         {
             noCurrentButton.state = NSOnState
         }
+        
+        prevButton.isEnabled = (radialPosition != 0)
     }
     
-    func runDialog(_ coilPos:Int, usingCoil:Coil?) -> (section:Coil?, result:DlogResult)
+    func runDialog(_ coilPos:Int, usingCoil:Coil?) -> (coil:Coil?, result:DlogResult)
     {
         if let oldCoil = usingCoil
         {
@@ -75,6 +79,10 @@ class CoilDlog: NSWindowController {
             self.currentDirection = oldCoil.currentDirection
             
             self.sections = oldCoil.sections
+        }
+        else
+        {
+            self.radialPosition = coilPos
         }
         
         NSApp.runModal(for: self.window!)
@@ -146,7 +154,10 @@ class CoilDlog: NSWindowController {
     
     func saveCoilAndClose()
     {
+        returnedCoil = Coil(coilName: coilNameField.stringValue, coilRadialPosition: radialPositionField.integerValue, amps: ampsField.doubleValue, currentDirection: (positiveCurrentButton.state == NSOnState ? 1 : (negativeCurrentButton.state == NSOnState ? -1 : 0)), capacitanceToPreviousCoil: radialCapacitanceField.doubleValue, innerRadius: innerDiameterField.doubleValue / 2.0, sections: self.sections)
         
+        NSApp.stopModal()
+        self.window!.orderOut(self)
     }
     
     @IBAction func doneButtonPushed(_ sender: AnyObject)

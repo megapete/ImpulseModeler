@@ -13,6 +13,7 @@
                 <outlet property="negativeCurrentButton" destination="gVh-Yi-vnA" id="Iah-d4-qOR"/>
                 <outlet property="noCurrentButton" destination="HxG-cT-1IP" id="JEi-MJ-Jth"/>
                 <outlet property="positiveCurrentButton" destination="1xI-bQ-Prd" id="xtc-sD-04V"/>
+                <outlet property="prevButton" destination="sq8-ee-ZVa" id="qh7-Op-8s0"/>
                 <outlet property="radialCapacitanceField" destination="csJ-tG-uJr" id="TLu-YS-ehD"/>
                 <outlet property="radialPositionField" destination="Vlr-Oe-mUf" id="s1e-7i-rkO"/>
                 <outlet property="window" destination="F0z-JX-Cv5" id="gIp-Ho-8D9"/>
