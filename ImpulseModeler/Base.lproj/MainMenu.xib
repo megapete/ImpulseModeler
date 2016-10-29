@@ -345,12 +345,28 @@
                 </menuItem>
                 <menuItem title="Units" id="jxT-CU-nIS">
                     <modifierMask key="keyEquivalentModifierMask"/>
-                    <menu key="submenu" title="Units" id="GEO-Iw-cKr">
+                    <menu key="submenu" title="Units" id="Wt7-Fh-Egy">
                         <items>
-                            <menuItem title="Inch" id="MWe-ll-lgF">
+                            <menuItem title="Inch" id="ssa-Or-PRz">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                             </menuItem>
-                            <menuItem title="Metric (mm)" id="XLn-5v-bQN">
+                            <menuItem title="Metric (mm)" id="Mj6-PL-WCz">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+                <menuItem title="Model" id="8by-Uz-OER">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <menu key="submenu" title="Model" id="diQ-ls-URm">
+                        <items>
+                            <menuItem title="Create model..." id="LBY-cF-aK0">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="handleCreateModel:" target="Ubf-fF-CrH" id="RHy-GX-cUU"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Save &quot;.cir&quot; file" id="20v-JI-QLD">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                             </menuItem>
                         </items>
@@ -432,7 +448,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="335" y="390" width="980" height="687"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1177"/>
             <view key="contentView" wantsLayer="YES" id="EiT-Mj-1SZ">
                 <rect key="frame" x="0.0" y="0.0" width="980" height="687"/>
                 <autoresizingMask key="autoresizingMask"/>

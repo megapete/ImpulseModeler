@@ -24,11 +24,56 @@ struct Coil
     
     /// The full coil-height capacitance to the previous coil
     let capacitanceToPreviousCoil:Double
+    
+    /// Capacitance to the tank or other ground (usually 0, except for the last coil, or capacitance to a shield)
+    let capacitanceToGround:Double
 
     /// The innerRadius of the coil
     let innerRadius:Double
     
     var sections:[AxialSection]?
+    
+    /// The total number of disks in the coil
+    var numDisks:Double {
+        get
+        {
+            var result = 0.0
+            if let sects = self.sections
+            {
+                for nextSection in sects
+                {
+                    result += nextSection.numDisks
+                }
+            }
+            
+            return result
+        }
+    }
+    
+    /// The total number of turns in the coil
+    var turns:Double {
+        get
+        {
+            var result = 0.0
+            if let sects = self.sections
+            {
+                for nextSection in sects
+                {
+                    result += nextSection.turns
+                }
+            }
+            
+            return result
+        }
+    }
+    
+    /// The dimension of the bottom of the coil (assumes that the bottom yoke is at 0
+    func CoilBottom(_ forWindowHt:Double, centerOffset:Double) -> Double
+    {
+        let result = forWindowHt / 2.0 + centerOffset - self.Height() / 2.0
+        
+        return result
+    }
     
     func Height() -> Double
     {

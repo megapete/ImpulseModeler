@@ -21,6 +21,8 @@ class CoilDlog: NSWindowController {
     var radialCapacitance = 0.0
     @IBOutlet var innerDiameterField: NSTextField!
     var innerDiameter = 0.0
+    @IBOutlet weak var capacitanceToGroundField: NSTextField!
+    var capToGround = 0.0
     
     @IBOutlet var negativeCurrentButton: NSButton!
     @IBOutlet var noCurrentButton: NSButton!
@@ -49,8 +51,8 @@ class CoilDlog: NSWindowController {
         radialPositionField.integerValue = radialPosition
         ampsField.doubleValue = amps
         radialCapacitanceField.doubleValue = radialCapacitance
-        
         innerDiameterField.doubleValue = innerDiameter
+        capacitanceToGroundField.doubleValue = capToGround
         
         if currentDirection > 0
         {
@@ -78,7 +80,7 @@ class CoilDlog: NSWindowController {
             self.radialCapacitance = oldCoil.capacitanceToPreviousCoil
             self.innerDiameter = oldCoil.innerRadius * 2.0
             self.currentDirection = oldCoil.currentDirection
-            
+            self.capToGround = oldCoil.capacitanceToGround
             self.sections = oldCoil.sections
         }
         else
@@ -96,7 +98,7 @@ class CoilDlog: NSWindowController {
     {
         var doneSections = false
         
-        let currentCoil = Coil(coilName: coilNameField.stringValue, coilRadialPosition: radialPositionField.integerValue, amps: ampsField.doubleValue, currentDirection: (positiveCurrentButton.state == NSOnState ? 1 : (negativeCurrentButton.state == NSOnState ? -1 : 0)), capacitanceToPreviousCoil: radialCapacitanceField.doubleValue, innerRadius: innerDiameterField.doubleValue / 2.0, sections: sections)
+        let currentCoil = Coil(coilName: coilNameField.stringValue, coilRadialPosition: radialPositionField.integerValue, amps: ampsField.doubleValue, currentDirection: (positiveCurrentButton.state == NSOnState ? 1 : (negativeCurrentButton.state == NSOnState ? -1 : 0)), capacitanceToPreviousCoil: radialCapacitanceField.doubleValue, capacitanceToGround:capacitanceToGroundField.doubleValue, innerRadius: innerDiameterField.doubleValue / 2.0, sections: sections)
         
         var currentSectionReferenceNumber = 0
         
@@ -155,7 +157,7 @@ class CoilDlog: NSWindowController {
     
     func saveCoilAndClose()
     {
-        returnedCoil = Coil(coilName: coilNameField.stringValue, coilRadialPosition: radialPositionField.integerValue, amps: ampsField.doubleValue, currentDirection: (positiveCurrentButton.state == NSOnState ? 1 : (negativeCurrentButton.state == NSOnState ? -1 : 0)), capacitanceToPreviousCoil: radialCapacitanceField.doubleValue, innerRadius: innerDiameterField.doubleValue / 2.0, sections: self.sections)
+        returnedCoil = Coil(coilName: coilNameField.stringValue, coilRadialPosition: radialPositionField.integerValue, amps: ampsField.doubleValue, currentDirection: (positiveCurrentButton.state == NSOnState ? 1 : (negativeCurrentButton.state == NSOnState ? -1 : 0)), capacitanceToPreviousCoil: radialCapacitanceField.doubleValue, capacitanceToGround:capacitanceToGroundField.doubleValue, innerRadius: innerDiameterField.doubleValue / 2.0, sections: self.sections)
         
         NSApp.stopModal()
         self.window!.orderOut(self)

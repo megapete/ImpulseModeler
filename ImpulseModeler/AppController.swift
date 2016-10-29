@@ -10,9 +10,16 @@ import Cocoa
 
 class AppController: NSObject {
 
+    // The physical and capacitance data for one phase of the transformer
     var phaseDefinition:Phase?
     
+    // The special "Ground" section used in the model
+    let gndSection = PCH_DiskSection(coilRef: -1, diskRect: NSMakeRect(0, 0, 0, 0), N: 0, J: 0, windHt: 0, coreRadius: 0, secData: PCH_SectionData(sectionID: "GND", serNum: -1, inNode:-1, outNode:-1))
     
+    @IBAction func handleCreateModel(_ sender: AnyObject)
+    {
+        
+    }
     
     // Menu Handlers
     @IBAction func handleNew(_ sender: AnyObject)
