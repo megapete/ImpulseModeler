@@ -8,7 +8,12 @@
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication"/>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <customObject id="Ubf-fF-CrH" customClass="AppController" customModule="ImpulseModeler" customModuleProvider="target"/>
+        <customObject id="Ubf-fF-CrH" customClass="AppController" customModule="ImpulseModeler" customModuleProvider="target">
+            <connections>
+                <outlet property="inchItem" destination="ssa-Or-PRz" id="tRU-Ck-Kts"/>
+                <outlet property="metricItem" destination="Mj6-PL-WCz" id="GhT-v2-1xc"/>
+            </connections>
+        </customObject>
         <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="ImpulseModeler" customModuleProvider="target">
             <connections>
                 <outlet property="window" destination="QvC-M9-y7g" id="gIp-Ho-8D9"/>
@@ -347,11 +352,17 @@
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <menu key="submenu" title="Units" id="Wt7-Fh-Egy">
                         <items>
-                            <menuItem title="Inch" id="ssa-Or-PRz">
+                            <menuItem title="Inch" state="on" id="ssa-Or-PRz">
                                 <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="handleUnitsMenu:" target="Ubf-fF-CrH" id="VLk-J9-kwv"/>
+                                </connections>
                             </menuItem>
                             <menuItem title="Metric (mm)" id="Mj6-PL-WCz">
                                 <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="handleUnitsMenu:" target="Ubf-fF-CrH" id="Z4i-hD-Scg"/>
+                                </connections>
                             </menuItem>
                         </items>
                     </menu>
