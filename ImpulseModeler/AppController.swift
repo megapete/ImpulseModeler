@@ -107,7 +107,7 @@ class AppController: NSObject {
                     zCurrent += (Double(nextAxialSection.diskSize.height) + nextAxialSection.interDiskDimn) * unitFactor
                 }
                 
-                zCurrent += (Double(nextAxialSection.diskSize.height) + nextAxialSection.overTopDiskDimn) * unitFactor
+                zCurrent += (nextAxialSection.overTopDiskDimn - nextAxialSection.interDiskDimn) * unitFactor
             }
             
             DLog("Done creating disks.")

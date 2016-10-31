@@ -8,7 +8,7 @@
         <customObject id="-2" userLabel="File's Owner" customClass="CoilDlog" customModule="ImpulseModeler" customModuleProvider="target">
             <connections>
                 <outlet property="ampsField" destination="vp2-tp-UNa" id="s3D-Cq-pUG"/>
-                <outlet property="capacitanceToTankField" destination="QBx-hT-ADJ" id="ncK-cj-2HL"/>
+                <outlet property="capacitanceToGroundField" destination="QBx-hT-ADJ" id="cAF-Cg-VeK"/>
                 <outlet property="coilNameField" destination="Nax-yp-pND" id="6aO-AZ-2Rx"/>
                 <outlet property="innerDiameterField" destination="jFP-VE-BR4" id="HSV-Pg-yfa"/>
                 <outlet property="negativeCurrentButton" destination="gVh-Yi-vnA" id="Iah-d4-qOR"/>
