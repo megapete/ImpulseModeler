@@ -176,7 +176,7 @@ class PCH_BlueBookModel: NSObject {
 
     }
     
-    func SimulateWithConnections(_ connections:[(fromNode:Int, toNode:Int)], sourceConnection:(source:PCH_Source, toNode:Int)) -> PCH_Matrix?
+    func SimulateWithConnections(_ connections:[(fromNode:Int, toNode:Int)], sourceConnection:(source:PCH_Source, toNode:Int), simTimeStep:Double, saveTimeStep:Double, totalTime:Double) -> (V:PCH_Matrix, I:PCH_Matrix)?
     {
         // Connecting nodes together is not yet implemented.
         // Nodes can be connected to ground or to the source (they cannot be connected "from" ground).
@@ -197,14 +197,26 @@ class PCH_BlueBookModel: NSObject {
                 ALog("Connections between non-grounded terminals is not yet implemented!")
                 return nil
             }
-            
-            var newRow = [Double](repeatElement(0.0, count: C.numCols))
-            newRow[nextConnection.fromNode] = 1.0
-            
-            newC.SetRow(nextConnection.fromNode, buffer: newRow)
+            else
+            {
+                var newRow = [Double](repeatElement(0.0, count: C.numCols))
+                newRow[nextConnection.fromNode] = 1.0
+                newC.SetRow(nextConnection.fromNode, buffer: newRow)
+            }
         }
         
+        // Set the row for the node connected to the source
+        var newRow = [Double](repeatElement(0.0, count: C.numCols))
+        newRow[sourceConnection.toNode] = 1.0
+        newC.SetRow(sourceConnection.toNode, buffer: newRow)
         
-        return newC
+        let sectionCount = self.A.numCols
+        let nodeCount = self.A.numRows
+        
+        var I = PCH_Matrix(numVectorElements: sectionCount, vectorPrecision: PCH_Matrix.precisions.doublePrecision)
+        var V = PCH_Matrix(numVectorElements: nodeCount, vectorPrecision: PCH_Matrix.precisions.doublePrecision)
+        
+        
+    
     }
 }
