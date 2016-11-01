@@ -175,4 +175,36 @@ class PCH_BlueBookModel: NSObject {
         }
 
     }
+    
+    func SimulateWithConnections(_ connections:[(fromNode:Int, toNode:Int)], sourceConnection:(source:PCH_Source, toNode:Int)) -> PCH_Matrix?
+    {
+        // Connecting nodes together is not yet implemented.
+        // Nodes can be connected to ground or to the source (they cannot be connected "from" ground).
+        
+        var newC = self.C
+        
+        for nextConnection in connections
+        {
+            if (nextConnection.fromNode == -1)
+            {
+                ALog("Cannot set the 'from' node as ground!")
+                return nil
+            }
+            
+            // TODO: Fix this so that connections between terminals is allowed.
+            if (nextConnection.toNode != -1)
+            {
+                ALog("Connections between non-grounded terminals is not yet implemented!")
+                return nil
+            }
+            
+            var newRow = [Double](repeatElement(0.0, count: C.numCols))
+            newRow[nextConnection.fromNode] = 1.0
+            
+            newC.SetRow(nextConnection.fromNode, buffer: newRow)
+        }
+        
+        
+        return newC
+    }
 }

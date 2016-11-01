@@ -28,6 +28,7 @@
 		D37146911DC3D5FC00823F20 /* CoilDlog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D371468F1DC3D5FC00823F20 /* CoilDlog.swift */; };
 		D37146921DC3D5FC00823F20 /* CoilDlog.xib in Resources */ = {isa = PBXBuildFile; fileRef = D37146901DC3D5FC00823F20 /* CoilDlog.xib */; };
 		D37146941DC9161600823F20 /* PCH_BlueBookModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D37146931DC9161600823F20 /* PCH_BlueBookModel.swift */; };
+		D371469C1DC9284800823F20 /* PCH_Source.swift in Sources */ = {isa = PBXBuildFile; fileRef = D371469B1DC9284800823F20 /* PCH_Source.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -55,6 +56,7 @@
 		D371468F1DC3D5FC00823F20 /* CoilDlog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoilDlog.swift; sourceTree = "<group>"; };
 		D37146901DC3D5FC00823F20 /* CoilDlog.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CoilDlog.xib; sourceTree = "<group>"; };
 		D37146931DC9161600823F20 /* PCH_BlueBookModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PCH_BlueBookModel.swift; sourceTree = "<group>"; };
+		D371469B1DC9284800823F20 /* PCH_Source.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PCH_Source.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -94,6 +96,7 @@
 				D340947C1DC2761400F1658B /* PCH_Defs.swift */,
 				D340947F1DC2762600F1658B /* AppController.swift */,
 				D37146931DC9161600823F20 /* PCH_BlueBookModel.swift */,
+				D371469B1DC9284800823F20 /* PCH_Source.swift */,
 				D34094871DC289FF00F1658B /* Core.swift */,
 				D34094891DC28A7000F1658B /* Coil.swift */,
 				D34094991DC2926E00F1658B /* Phase.swift */,
@@ -204,6 +207,7 @@
 				D34094961DC2904F00F1658B /* PCH_DiskSection.swift in Sources */,
 				D34094881DC289FF00F1658B /* Core.swift in Sources */,
 				D340947E1DC2761400F1658B /* PCH_Defs.swift in Sources */,
+				D371469C1DC9284800823F20 /* PCH_Source.swift in Sources */,
 				D34094851DC2855900F1658B /* CoreInputDlog.swift in Sources */,
 				D340947D1DC2761400F1658B /* GlobalDefs.swift in Sources */,
 				D34094951DC2904F00F1658B /* PCH_BlueBookFunctions.swift in Sources */,
