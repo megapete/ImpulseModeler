@@ -27,6 +27,7 @@
 		D340949A1DC2926E00F1658B /* Phase.swift in Sources */ = {isa = PBXBuildFile; fileRef = D34094991DC2926E00F1658B /* Phase.swift */; };
 		D37146911DC3D5FC00823F20 /* CoilDlog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D371468F1DC3D5FC00823F20 /* CoilDlog.swift */; };
 		D37146921DC3D5FC00823F20 /* CoilDlog.xib in Resources */ = {isa = PBXBuildFile; fileRef = D37146901DC3D5FC00823F20 /* CoilDlog.xib */; };
+		D37146941DC9161600823F20 /* PCH_BlueBookModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D37146931DC9161600823F20 /* PCH_BlueBookModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -53,6 +54,7 @@
 		D34094991DC2926E00F1658B /* Phase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Phase.swift; sourceTree = "<group>"; };
 		D371468F1DC3D5FC00823F20 /* CoilDlog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoilDlog.swift; sourceTree = "<group>"; };
 		D37146901DC3D5FC00823F20 /* CoilDlog.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CoilDlog.xib; sourceTree = "<group>"; };
+		D37146931DC9161600823F20 /* PCH_BlueBookModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PCH_BlueBookModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -91,6 +93,7 @@
 				D340947B1DC2761400F1658B /* GlobalDefs.swift */,
 				D340947C1DC2761400F1658B /* PCH_Defs.swift */,
 				D340947F1DC2762600F1658B /* AppController.swift */,
+				D37146931DC9161600823F20 /* PCH_BlueBookModel.swift */,
 				D34094871DC289FF00F1658B /* Core.swift */,
 				D34094891DC28A7000F1658B /* Coil.swift */,
 				D34094991DC2926E00F1658B /* Phase.swift */,
@@ -196,6 +199,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D34094981DC2904F00F1658B /* PCH_SectionData.swift in Sources */,
+				D37146941DC9161600823F20 /* PCH_BlueBookModel.swift in Sources */,
 				D34094971DC2904F00F1658B /* PCH_Matrix.swift in Sources */,
 				D34094961DC2904F00F1658B /* PCH_DiskSection.swift in Sources */,
 				D34094881DC289FF00F1658B /* Core.swift in Sources */,

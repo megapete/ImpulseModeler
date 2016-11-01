@@ -31,6 +31,9 @@ struct Coil
     /// The innerRadius of the coil
     let innerRadius:Double
     
+    /// The average eddy-loss percentage of dc resistance for the coil
+    let eddyLossPercentage:Double
+    
     var sections:[AxialSection]?
     
     /// The total number of disks in the coil
@@ -67,7 +70,7 @@ struct Coil
         }
     }
     
-    /// The dimension of the bottom of the coil (assumes that the bottom yoke is at 0
+    /// The dimension of the bottom of the coil (assumes that the bottom yoke is at 0). Note that the core dimensions must be in the same units as the coil
     func CoilBottom(_ forWindowHt:Double, centerOffset:Double) -> Double
     {
         let result = forWindowHt / 2.0 + centerOffset - self.Height() / 2.0

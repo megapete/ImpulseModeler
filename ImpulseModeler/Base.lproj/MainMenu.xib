@@ -10,8 +10,10 @@
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <customObject id="Ubf-fF-CrH" customClass="AppController" customModule="ImpulseModeler" customModuleProvider="target">
             <connections>
+                <outlet property="createModelMenuItem" destination="LBY-cF-aK0" id="HPe-zd-zTv"/>
                 <outlet property="inchItem" destination="ssa-Or-PRz" id="tRU-Ck-Kts"/>
                 <outlet property="metricItem" destination="Mj6-PL-WCz" id="GhT-v2-1xc"/>
+                <outlet property="saveCirFileMenuItem" destination="20v-JI-QLD" id="nho-A8-gOq"/>
             </connections>
         </customObject>
         <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="ImpulseModeler" customModuleProvider="target">
@@ -379,6 +381,9 @@
                             </menuItem>
                             <menuItem title="Save &quot;.cir&quot; file" id="20v-JI-QLD">
                                 <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="handleCreateCirFile:" target="Ubf-fF-CrH" id="sX8-4V-zX7"/>
+                                </connections>
                             </menuItem>
                         </items>
                     </menu>
@@ -459,7 +464,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="335" y="390" width="980" height="687"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1177"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <view key="contentView" wantsLayer="YES" id="EiT-Mj-1SZ">
                 <rect key="frame" x="0.0" y="0.0" width="980" height="687"/>
                 <autoresizingMask key="autoresizingMask"/>

@@ -13,12 +13,22 @@ class AppController: NSObject {
     // The physical and capacitance data for one phase of the transformer
     var phaseDefinition:Phase?
     
+    // An array of resistance factors, each one to be used for its respective disk. Eventually, the idea will be to calculate the resistance factor for each disk by running the simulation once withe some initial factor, do a Fourier analysis on the current through each resistance, then recalculate the eddy-loss contribution using the results of teh analysis.
+    var eddyLossFactors:[Double]?
+    
+    // The Bluebook talks about multiplying the DC resistance by "around 3000" to reflect the higher effective resistance at high frequencies of the eddy loss. I have (for now) decided to use an assumed "equivalent" frequency of 10kHz, which yields a factor of (10000/50)^2 = 40000x the eddy loss component of the resistance at 60Hz.
+    let initialEddyLossFactor = 40000.0
+    
     // The special "Ground" section used in the model
     let gndSection = PCH_DiskSection(coilRef: -1, diskRect: NSMakeRect(0, 0, 0, 0), N: 0, J: 0, windHt: 0, coreRadius: 0, secData: PCH_SectionData(sectionID: "GND", serNum: -1, inNode:-1, outNode:-1))
     
     @IBOutlet weak var inchItem: NSMenuItem!
     @IBOutlet weak var metricItem: NSMenuItem!
     var unitFactor = 25.4 / 1000.0
+    
+    @IBOutlet weak var createModelMenuItem: NSMenuItem!
+    @IBOutlet weak var saveCirFileMenuItem: NSMenuItem!
+
     
     // The model in the format required by the routine for making a spice ".cir" file
     var theModel:[PCH_DiskSection]?
@@ -56,6 +66,9 @@ class AppController: NSObject {
         // we reserve some capacity in an attempt to help performance
         theModel!.reserveCapacity(totalSectionsInPhase(phase))
         
+        // Initialize the eddy-loss factors for the sections
+        eddyLossFactors = Array(repeating: initialEddyLossFactor, count: totalSectionsInPhase(phase))
+        
         // This is used for the in/out nodes in PCH_SectionData but doesn't do anything yet
         var nodeSerialNumber = 0
         var sectionSerialNumber = 0
@@ -68,36 +81,43 @@ class AppController: NSObject {
             guard let axialSections = nextCoil.sections
             else
             {
-                // fatal error
-                ALog("Coil has no sections!")
-                return
+                // The coil has no sections (probably the user pressed "Next" when he did not mean to actually add another coil
+                DLog("Coil has no sections!")
+                continue
             }
             
-            var zCurrent = nextCoil.CoilBottom(phase.core.height * unitFactor, centerOffset: phase.core.coilCenterOffset * unitFactor)
+            var zCurrent = nextCoil.CoilBottom(phase.core.height, centerOffset: phase.core.coilCenterOffset) * unitFactor
             let coilID = nextCoil.coilName
             
             DLog("Creating disks")
+            
+            let coilAvgEddyLossPercentage = nextCoil.eddyLossPercentage
+            
+            var sectionNumberOffset = 0
             for nextAxialSection in axialSections
             {
+                // This will work even if the user accidentally pressed "Next" when he didn't want to add another section, as long as he didn't enter a non-zero value for "number of disks" (the dolt).
                 for currentSection in 0..<Int(nextAxialSection.numDisks)
                 {
                     let diskRect = NSRect(x: nextCoil.innerRadius * unitFactor, y: zCurrent, width: Double(nextAxialSection.diskSize.width) * unitFactor, height: Double(nextAxialSection.diskSize.height) * unitFactor)
                     
                     let diskArea = Double(nextAxialSection.diskSize.width * nextAxialSection.diskSize.height) * unitFactor * unitFactor
                     
-                    var sectionData = PCH_SectionData(sectionID: String(format: "%@%03d", coilID, currentSection+1), serNum: sectionSerialNumber, inNode: nodeSerialNumber, outNode: nodeSerialNumber + 1)
+                    var sectionData = PCH_SectionData(sectionID: String(format: "%@%03d", coilID, sectionNumberOffset + currentSection + 1), serNum: sectionSerialNumber, inNode: nodeSerialNumber, outNode: nodeSerialNumber + 1)
                     
                     let seriesCap = (currentSection == 0 ? nextAxialSection.bottomDiskSerialCapacitance : (currentSection == Int(nextAxialSection.numDisks) - 1) ? nextAxialSection.topDiskSerialCapacitance : nextAxialSection.commonDiskSerialCapacitance)
                     
                     sectionData.seriesCapacitance = seriesCap
                     
-                    let diskResistance = nextAxialSection.diskResistance
+                    let currentDiskEddyMultiplier = eddyLossFactors![sectionSerialNumber]
+                    let diskResistance = nextAxialSection.diskResistance * (1 + coilAvgEddyLossPercentage * currentDiskEddyMultiplier / 100.0)
                     
                     sectionData.resistance = diskResistance
                     
-                    let theNewSection = PCH_DiskSection(coilRef: nextCoil.coilRadialPosition, diskRect: diskRect, N: nextAxialSection.turns / nextAxialSection.numDisks, J: nextCoil.amps / diskArea, windHt: phase.core.height * unitFactor, coreRadius: phase.core.diameter * unitFactor / 2.0, secData: sectionData)
+                    let turnsPerDisk = nextAxialSection.turns / nextAxialSection.numDisks
+                    let theNewSection = PCH_DiskSection(coilRef: nextCoil.coilRadialPosition, diskRect: diskRect, N: turnsPerDisk, J: turnsPerDisk * nextCoil.amps / diskArea, windHt: phase.core.height * unitFactor, coreRadius: phase.core.diameter * unitFactor / 2.0, secData: sectionData)
                     
-                    theNewSection.data.selfInductance = theNewSection.SelfInductance()
+                    theNewSection.data.selfInductance = theNewSection.SelfInductance(phase.core.htFactor)
                     
                     theModel!.append(theNewSection)
                     
@@ -107,6 +127,7 @@ class AppController: NSObject {
                     zCurrent += (Double(nextAxialSection.diskSize.height) + nextAxialSection.interDiskDimn) * unitFactor
                 }
                 
+                sectionNumberOffset += Int(nextAxialSection.numDisks)
                 zCurrent += (nextAxialSection.overTopDiskDimn - nextAxialSection.interDiskDimn) * unitFactor
             }
             
@@ -187,11 +208,11 @@ class AppController: NSObject {
         {
             let nDisk = diskArray.remove(at: 0)
             
-            DLog("Checking \(nDisk.data.sectionID)")
+            DLog("Calculating to: \(nDisk.data.sectionID)")
             
             for otherDisk in diskArray
             {
-                let mutInd = fabs(nDisk.MutualInductanceTo(otherDisk))
+                let mutInd = fabs(nDisk.MutualInductanceTo(otherDisk, windHtFactor:phase.core.htFactor))
                 
                 let mutIndCoeff = mutInd / sqrt(nDisk.data.selfInductance * otherDisk.data.selfInductance)
                 if (mutIndCoeff < 0.0 || mutIndCoeff > 1.0)
@@ -213,6 +234,172 @@ class AppController: NSObject {
         }
         
         DLog("Done!")
+    }
+    
+    override func validateMenuItem(_ menuItem: NSMenuItem) -> Bool
+    {
+        if (menuItem == self.createModelMenuItem)
+        {
+            return self.phaseDefinition != nil
+        }
+        
+        if (menuItem == self.saveCirFileMenuItem)
+        {
+            return self.theModel != nil
+        }
+        
+        return true
+    }
+    
+    @IBAction func handleCreateCirFile(_ sender: AnyObject)
+    {
+        var fString = "Description goes here\n"
+        var mutSerNum = 1
+        var dSections = [String]()
+        
+        let diskArray = self.theModel!
+        let coilArray = self.phaseDefinition!.coils
+        
+        for nextDisk in diskArray
+        {
+            // Separate the disk ID into the coil name and the disk number
+            let nextSectionID = nextDisk.data.sectionID
+            dSections.append(nextSectionID)
+            
+            let coilName = PCH_StrLeft(nextSectionID, length: 2)
+            
+            let diskNum = PCH_StrRight(nextSectionID, length: 3)
+            
+            let nextDiskNum = String(format: "%03d", Int(diskNum)! + 1)
+            
+            let inNode = coilName + "I" + diskNum
+            let outNode = coilName + "I" + nextDiskNum
+            let midNode = coilName + "M" + diskNum
+            let resName = "R" + nextSectionID
+            let selfIndName = "L" + nextSectionID
+            let indParResName = "RPL" + nextSectionID
+            let seriesCapName = "CS" + nextSectionID
+            
+            fString += String(format: "* Definitions for section: %@\n", nextSectionID)
+            fString += selfIndName + " " + inNode + " " + midNode + String(format: " %.4E\n", nextDisk.data.selfInductance)
+            // Calculate the resistance that we need to put in parallel with the inductance to reducing ringing (according to ATPDraw: ind * 2.0 * 7.5 * 1000.0 / 1E9). Note that the model still rings in LTSpice, regardless of how low I set this value.
+            fString += indParResName + " " + inNode + " " + midNode + String(format: " %.4E\n", nextDisk.data.selfInductance * 2.0 * 7.5 * 1000.0 / 1.0E-9)
+            
+            fString += resName + " " + midNode + " " + outNode + String(format: " %.4E\n", nextDisk.data.resistance)
+            fString += seriesCapName + " " + inNode + " " + outNode + String(format: " %.4E\n", nextDisk.data.seriesCapacitance)
+            
+            var shuntCapSerialNum = 1
+            for nextShuntCap in nextDisk.data.shuntCaps
+            {
+                // We ignore inner coils because they've already been done (note that we need to consider the core, though)
+                if ((nextShuntCap.key.coilRef < nextDisk.coilRef) && (nextShuntCap.key.coilRef != -1))
+                {
+                    continue
+                }
+                
+                let nsName = String(format: "CP%@%03d", nextSectionID, shuntCapSerialNum)
+                
+                /*
+                 let shuntID = nextShuntCap.0
+                 
+                 // make sure that this capacitance is not already done
+                 if dSections.contains(shuntID)
+                 {
+                 continue
+                 }
+                 */
+                
+                var shuntNode = String()
+                if (nextShuntCap.key.coilRef == -1)
+                {
+                    shuntNode = "0"
+                }
+                else
+                {
+                    shuntNode = coilArray[nextShuntCap.key.coilRef].coilName
+                    shuntNode += "I"
+                    let nodeNum = PCH_StrRight(nextShuntCap.key.data.sectionID, length: 3)
+                    shuntNode += nodeNum
+                }
+                
+                fString += nsName + " " + inNode + " " + shuntNode + String(format: " %.4E\n", nextShuntCap.value)
+                
+                shuntCapSerialNum += 1
+            }
+            
+            for nextMutualInd in nextDisk.data.mutIndCoeff
+            {
+                let miName = String(format: "K%05d", mutSerNum)
+                
+                let miID = nextMutualInd.0
+                
+                if (dSections.contains(miID))
+                {
+                    continue
+                }
+                
+                fString += miName + " " + selfIndName + " L" + miID + String(format: " %.4E\n", nextMutualInd.1)
+                
+                mutSerNum += 1
+            }
+        }
+        
+        // We connect the coil ends and centers to their nodes using very small resistances
+        fString += "\n* Coil ends and centers\n"
+        
+        
+        for i in 0..<coilArray.count
+        {
+            let nextID = coilArray[i].coilName
+            
+            fString += "R" + nextID + "BOT " + nextID + "BOT " + nextID + "I001 1.0E-9\n"
+            fString += "R" + nextID + "CEN " + nextID + "CEN " + nextID + String(format: "I%03d 1.0E-9\n", Int(round(coilArray[i].numDisks)) / 2 + 1)
+            fString += "R" + nextID + "TOP " + nextID + "TOP " + nextID + String(format: "I%03d 1.0E-9\n", Int(round(coilArray[i].numDisks)) + 1)
+        }
+        
+        
+        // TODO: Add code for the connection that interests us
+        fString += "\n* Connections\n\n"
+        
+        // The shot
+        fString += "* Impulse shot\nVBIL HVTOP 0 EXP(0 555k 0 2.2E-7 1.0E-6 7.0E-5)\n\n"
+        
+        // Options required to make this work most of the time
+        fString += "* options for LTSpice\n.OPTIONS reltol=0.02 trtol=7 abstol=1e-6 vntol=1e-4 method=gear\n\n"
+        
+        fString += ".TRAN 1.0ns 100us\n\n.END"
+        
+        self.saveFileWithString(fString)
+    }
+    
+    func saveFileWithString(_ fileString:String)
+    {
+        let saveFilePanel = NSSavePanel()
+        
+        saveFilePanel.title = "Save Spice data"
+        saveFilePanel.canCreateDirectories = true
+        saveFilePanel.allowedFileTypes = ["cir", "txt"]
+        saveFilePanel.allowsOtherFileTypes = false
+        
+        if (saveFilePanel.runModal() == NSFileHandlingPanelOKButton)
+        {
+            guard let newFileURL = saveFilePanel.url
+                else
+            {
+                DLog("Bad file name")
+                return
+            }
+            
+            do {
+                try fileString.write(to: newFileURL, atomically: true, encoding: String.Encoding.utf8)
+            }
+            catch {
+                ALog("Could not write file!")
+            }
+            
+            DLog("Finished writing file")
+        }
+        
     }
     
     @IBAction func handleUnitsMenu(_ sender: AnyObject)
