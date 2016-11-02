@@ -79,7 +79,24 @@ class AppController: NSObject {
     
     @IBAction func handleOpenModel(_ sender: AnyObject)
     {
+        let openFilePanel = NSOpenPanel()
         
+        openFilePanel.title = "Open Model"
+        
+        if (openFilePanel.runModal() == NSFileHandlingPanelOKButton)
+        {
+            if (self.theModel != nil)
+            {
+                // TODO: Give the user a chance to save the model
+                DLog("Note: This will destroy the existing model")
+            }
+
+            let archive = NSKeyedUnarchiver.unarchiveObject(withFile: openFilePanel.url!.path) as! PhaseModel
+            
+            self.theModel = archive.model
+            self.phaseDefinition = archive.phase
+            
+        }
     }
     
     @IBAction func handleSaveModel(_ sender: AnyObject)
@@ -98,7 +115,9 @@ class AppController: NSObject {
                 return
             }
             
-            let archiveResult = NSKeyedArchiver.archiveRootObject(self.theModel!, toFile: newFileURL.path)
+            let archive = PhaseModel(phase: self.phaseDefinition!, model: self.theModel!)
+            
+            let archiveResult = NSKeyedArchiver.archiveRootObject(archive, toFile: newFileURL.path)
             
             if (!archiveResult)
             {
