@@ -176,7 +176,7 @@ class PCH_BlueBookModel: NSObject {
 
     }
     
-    func SimulateWithConnections(_ connections:[(fromNode:Int, toNode:Int)], sourceConnection:(source:PCH_Source, toNode:Int), simTimeStep:Double, saveTimeStep:Double, totalTime:Double) -> (V:PCH_Matrix, I:PCH_Matrix)?
+    func SimulateWithConnections(_ connections:[(fromNode:Int, toNode:Int)], sourceConnection:(source:PCH_Source, toNode:Int), simTimeStep:Double, saveTimeStep:Double, totalTime:Double) -> (V:PCH_Matrix, I:PCH_Matrix?)?
     {
         // Connecting nodes together is not yet implemented.
         // Nodes can be connected to ground or to the source (they cannot be connected "from" ground).
@@ -216,7 +216,48 @@ class PCH_BlueBookModel: NSObject {
         var I = PCH_Matrix(numVectorElements: sectionCount, vectorPrecision: PCH_Matrix.precisions.doublePrecision)
         var V = PCH_Matrix(numVectorElements: nodeCount, vectorPrecision: PCH_Matrix.precisions.doublePrecision)
         
+        let numSavedTimeSteps = Int(round(totalTime / saveTimeStep)) + 1
         
+        var savedValuesV = PCH_Matrix(numRows: numSavedTimeSteps, numCols: nodeCount, matrixPrecision: PCH_Matrix.precisions.doublePrecision, matrixType: PCH_Matrix.types.generalMatrix)
+        
+        var simTime = 0.0
+        
+        while simTime <= totalTime
+        {
+            let AI = (A * I)!
+            
+            // Fix the "connected" nodes
+            for nextConnection in connections
+            {
+                // TODO: Fix this so that connections between terminals is allowed.
+                if (nextConnection.toNode != -1)
+                {
+                    ALog("Connections between non-grounded terminals is not yet implemented!")
+                    return nil
+                }
+                else
+                {
+                    AI[nextConnection.fromNode, 0] = 0.0
+                }
+            }
+            
+            // Now the shot, uisng Runge-Kutta
+            AI[sourceConnection.toNode, 0] = sourceConnection.source.dV(simTime)
+            let an = newC.SolveWith(AI)!
+            
+            AI[sourceConnection.toNode, 0] = sourceConnection.source.dV(simTime + simTimeStep / 2.0)
+            let bn = newC.SolveWith(AI)!
+            let cn = bn
+            
+            AI[sourceConnection.toNode, 0] = sourceConnection.source.dV(simTime + simTimeStep)
+            let dn = newC.SolveWith(AI)!
+            
+            let newV = V + simTimeStep/6.0 * (an + 2.0 * bn + 2.0 * cn + dn)
+            
+            
+        }
+        
+        return (savedValuesV, nil)
     
     }
 }
