@@ -176,12 +176,12 @@ class PCH_BlueBookModel: NSObject {
 
     }
     
-    func SimulateWithConnections(_ connections:[(fromNode:Int, toNode:Int)], sourceConnection:(source:PCH_Source, toNode:Int), simTimeStep:Double, saveTimeStep:Double, totalTime:Double) -> (V:PCH_Matrix, I:PCH_Matrix?)?
+    func SimulateWithConnections(_ connections:[(fromNode:Int, toNode:Int)], sourceConnection:(source:PCH_Source, toNode:Int), simTimeStep:Double, saveTimeStep:Double, totalTime:Double) -> (V:PCH_Matrix, I:PCH_Matrix)?
     {
         // Connecting nodes together is not yet implemented.
         // Nodes can be connected to ground or to the source (they cannot be connected "from" ground).
         
-        var newC = self.C
+        let newC = self.C
         
         for nextConnection in connections
         {
@@ -213,18 +213,26 @@ class PCH_BlueBookModel: NSObject {
         let sectionCount = self.A.numCols
         let nodeCount = self.A.numRows
         
-        var I = PCH_Matrix(numVectorElements: sectionCount, vectorPrecision: PCH_Matrix.precisions.doublePrecision)
-        var V = PCH_Matrix(numVectorElements: nodeCount, vectorPrecision: PCH_Matrix.precisions.doublePrecision)
+        let I = PCH_Matrix(numVectorElements: sectionCount, vectorPrecision: PCH_Matrix.precisions.doublePrecision)
+        let V = PCH_Matrix(numVectorElements: nodeCount, vectorPrecision: PCH_Matrix.precisions.doublePrecision)
         
         let numSavedTimeSteps = Int(round(totalTime / saveTimeStep)) + 1
         
-        var savedValuesV = PCH_Matrix(numRows: numSavedTimeSteps, numCols: nodeCount, matrixPrecision: PCH_Matrix.precisions.doublePrecision, matrixType: PCH_Matrix.types.generalMatrix)
+        let savedValuesV = PCH_Matrix(numRows: numSavedTimeSteps, numCols: nodeCount, matrixPrecision: PCH_Matrix.precisions.doublePrecision, matrixType: PCH_Matrix.types.generalMatrix)
+        let savedValuesI = PCH_Matrix(numRows: numSavedTimeSteps, numCols: sectionCount, matrixPrecision: PCH_Matrix.precisions.doublePrecision, matrixType: PCH_Matrix.types.generalMatrix)
         
         var simTime = 0.0
+        var timeStepCount = 0
+        let saveStepInterval = Int(round(saveTimeStep / simTimeStep))
         
         while simTime <= totalTime
         {
-            let AI = (A * I)!
+            guard let AI = (A * I)
+            else
+            {
+                ALog("A*I multiply failed")
+                return nil
+            }
             
             // Fix the "connected" nodes
             for nextConnection in connections
@@ -254,10 +262,51 @@ class PCH_BlueBookModel: NSObject {
             
             let newV = V + simTimeStep/6.0 * (an + 2.0 * bn + 2.0 * cn + dn)
             
+            guard let BV = (B * newV)
+            else
+            {
+                ALog("B*V multiply failed")
+                return nil
+            }
             
+            guard let RI = (R * I)
+            else
+            {
+                ALog("R*I multiply failed")
+                return nil
+            }
+            
+            var rtSide = BV - RI
+            
+            // The current derivative dI/dt _is_ a function of I, so this is a more "traditional" calculation using Runge-Kutta.
+            let aan = M.SolveWith(rtSide)!
+            
+            var newI = I + (simTimeStep/2.0 * aan)
+            rtSide = BV - (R * newI)!
+            let bbn = M.SolveWith(rtSide)!
+            
+            newI = I + (simTimeStep/2.0 * bbn)
+            rtSide = BV - (R * newI)!
+            let ccn = M.SolveWith(rtSide)!
+            
+            newI = I + (simTimeStep * ccn)
+            rtSide = BV - (R * newI)!
+            let ddn = M.SolveWith(rtSide)!
+            
+            newI = I + simTimeStep/6.0 * (aan + 2.0 * bbn + 2.0 * ccn + ddn)
+            
+            if (timeStepCount % saveStepInterval == 0)
+            {
+                DLog("Saving step: \(timeStepCount)")
+                savedValuesV.SetRow(timeStepCount / saveStepInterval, vector: newV)
+                savedValuesI.SetRow(timeStepCount / saveStepInterval, vector: newI)
+            }
+            
+            simTime += simTimeStep
+            timeStepCount += 1
         }
         
-        return (savedValuesV, nil)
+        return (savedValuesV, savedValuesI)
     
     }
 }

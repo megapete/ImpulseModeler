@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct Coil
+class Coil:NSObject, NSCoding
 {
     /// The name to which we will refer to the coil (the node and device names will also incorporate this string, which is usually in the form "LV", "HV", etc.
     let coilName:String
@@ -35,6 +35,47 @@ struct Coil
     let eddyLossPercentage:Double
     
     var sections:[AxialSection]?
+    
+    init(coilName:String, coilRadialPosition:Int, amps:Double, currentDirection:Int, capacitanceToPreviousCoil:Double, capacitanceToGround:Double, innerRadius:Double, eddyLossPercentage:Double, sections:[AxialSection]? = nil)
+    {
+        self.coilName = coilName
+        self.coilRadialPosition = coilRadialPosition
+        self.amps = amps
+        self.currentDirection = currentDirection
+        self.capacitanceToPreviousCoil = capacitanceToPreviousCoil
+        self.capacitanceToGround = capacitanceToGround
+        self.innerRadius = innerRadius
+        self.eddyLossPercentage = eddyLossPercentage
+        self.sections = sections
+    }
+    
+    convenience required init?(coder aDecoder: NSCoder)
+    {
+        let coilName = aDecoder.decodeObject(forKey: "CoilName") as! String
+        let coilRadialPosition = aDecoder.decodeInteger(forKey: "CoilRadialPosition")
+        let amps = aDecoder.decodeDouble(forKey: "Amps")
+        let currentDirection = aDecoder.decodeInteger(forKey: "CurrentDirection")
+        let capacitanceToPreviousCoil = aDecoder.decodeDouble(forKey: "CapToPreviousCoil")
+        let capacitanceToGround = aDecoder.decodeDouble(forKey: "CapToGround")
+        let innerRadius = aDecoder.decodeDouble(forKey: "InnerRadius")
+        let eddyLossPercentage = aDecoder.decodeDouble(forKey: "EddyLossPercentage")
+        let sections = aDecoder.decodeObject(forKey: "Sections") as! [AxialSection]?
+        
+        self.init(coilName:coilName, coilRadialPosition:coilRadialPosition, amps:amps, currentDirection:currentDirection, capacitanceToPreviousCoil:capacitanceToPreviousCoil, capacitanceToGround:capacitanceToGround, innerRadius:innerRadius, eddyLossPercentage:eddyLossPercentage, sections:sections)
+    }
+    
+    func encode(with aCoder: NSCoder) {
+        
+        aCoder.encode(self.coilName, forKey: "CoilName")
+        aCoder.encode(self.coilRadialPosition, forKey: "CoilRadialPosition")
+        aCoder.encode(self.amps, forKey: "Amps")
+        aCoder.encode(self.currentDirection, forKey: "CurrentDirection")
+        aCoder.encode(self.capacitanceToPreviousCoil, forKey: "CapToPreviousCoil")
+        aCoder.encode(self.capacitanceToGround, forKey: "CapToGround")
+        aCoder.encode(self.innerRadius, forKey: "InnerRadius")
+        aCoder.encode(self.eddyLossPercentage, forKey: "EddyLossPercentage")
+        aCoder.encode(self.sections, forKey: "Sections")
+    }
     
     /// The total number of disks in the coil
     var numDisks:Double {
@@ -94,7 +135,7 @@ struct Coil
     }
 }
 
-struct AxialSection
+class AxialSection:NSObject, NSCoding
 {
     /// sectionAxialPosition is relative to the bottom yoke: 0 is closest (lowest), 1 is next, etc.
     let sectionAxialPosition:Int
@@ -127,6 +168,59 @@ struct AxialSection
     
     /// The spacer on top of this section (0.0 for the topmost section of a coil)
     let overTopDiskDimn:Double
+    
+    init(sectionAxialPosition:Int, turns:Double, numDisks:Double, topDiskSerialCapacitance:Double, bottomDiskSerialCapacitance:Double, commonDiskSerialCapacitance:Double, topStaticRing:Bool, bottomStaticRing:Bool, isInterleaved:Bool, diskResistance:Double, diskSize:NSSize, interDiskDimn:Double, overTopDiskDimn:Double)
+    {
+        self.sectionAxialPosition = sectionAxialPosition
+        self.turns = turns
+        self.numDisks = numDisks
+        self.topDiskSerialCapacitance = topDiskSerialCapacitance
+        self.bottomDiskSerialCapacitance = bottomDiskSerialCapacitance
+        self.commonDiskSerialCapacitance = commonDiskSerialCapacitance
+        self.topStaticRing = topStaticRing
+        self.bottomStaticRing = bottomStaticRing
+        self.isInterleaved = isInterleaved
+        self.diskResistance = diskResistance
+        self.diskSize = diskSize
+        self.interDiskDimn = interDiskDimn
+        self.overTopDiskDimn = overTopDiskDimn
+    }
+    
+    convenience required init?(coder aDecoder: NSCoder) {
+        
+        let sectionAxialPosition = aDecoder.decodeInteger(forKey: "AxialPosition")
+        let turns = aDecoder.decodeDouble(forKey: "Turns")
+        let numDisks = aDecoder.decodeDouble(forKey: "NumDisks")
+        let topDiskSerialCapacitance = aDecoder.decodeDouble(forKey: "TopSerCap")
+        let bottomDiskSerialCapacitance = aDecoder.decodeDouble(forKey: "BottomSerCap")
+        let commonDiskSerialCapacitance = aDecoder.decodeDouble(forKey: "CommonSerCap")
+        let topStaticRing = aDecoder.decodeBool(forKey: "TopStaticRing")
+        let bottomStaticRing = aDecoder.decodeBool(forKey: "BottomStaticRing")
+        let isInterleaved = aDecoder.decodeBool(forKey: "IsInterleaved")
+        let diskResistance = aDecoder.decodeDouble(forKey: "DiskResistance")
+        let diskSize = aDecoder.decodeSize(forKey: "DiskSize")
+        let interDiskDimn = aDecoder.decodeDouble(forKey: "InterDiskDimn")
+        let overTopDiskDimn = aDecoder.decodeDouble(forKey: "OverTopDiskDimn")
+        
+        self.init(sectionAxialPosition:sectionAxialPosition, turns:turns, numDisks:numDisks, topDiskSerialCapacitance:topDiskSerialCapacitance, bottomDiskSerialCapacitance:bottomDiskSerialCapacitance, commonDiskSerialCapacitance:commonDiskSerialCapacitance, topStaticRing:topStaticRing, bottomStaticRing:bottomStaticRing, isInterleaved:isInterleaved, diskResistance:diskResistance, diskSize:diskSize, interDiskDimn:interDiskDimn, overTopDiskDimn:overTopDiskDimn)
+    }
+    
+    func encode(with aCoder: NSCoder) {
+        
+        aCoder.encode(self.sectionAxialPosition, forKey: "AxialPosition")
+        aCoder.encode(self.turns, forKey: "Turns")
+        aCoder.encode(self.numDisks, forKey: "NumDisks")
+        aCoder.encode(self.topDiskSerialCapacitance, forKey: "TopSerCap")
+        aCoder.encode(self.bottomDiskSerialCapacitance, forKey: "BottomSerCap")
+        aCoder.encode(self.commonDiskSerialCapacitance, forKey: "CommonSerCap")
+        aCoder.encode(self.topStaticRing, forKey: "TopStaticRing")
+        aCoder.encode(self.bottomStaticRing, forKey: "BottomStaticRing")
+        aCoder.encode(self.isInterleaved, forKey: "IsInterleaved")
+        aCoder.encode(self.diskResistance, forKey: "DiskResistance")
+        aCoder.encode(self.diskSize, forKey: "DiskSize")
+        aCoder.encode(self.interDiskDimn, forKey: "InterDiskDimn")
+        aCoder.encode(self.overTopDiskDimn, forKey: "OverTopDiskDimn")
+    }
     
     func Height() -> Double
     {

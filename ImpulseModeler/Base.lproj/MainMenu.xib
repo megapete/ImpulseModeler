@@ -13,7 +13,9 @@
                 <outlet property="createModelMenuItem" destination="LBY-cF-aK0" id="HPe-zd-zTv"/>
                 <outlet property="inchItem" destination="ssa-Or-PRz" id="tRU-Ck-Kts"/>
                 <outlet property="metricItem" destination="Mj6-PL-WCz" id="GhT-v2-1xc"/>
+                <outlet property="runSimMenuItem" destination="SYD-vz-rAL" id="k1O-4g-yIy"/>
                 <outlet property="saveCirFileMenuItem" destination="20v-JI-QLD" id="nho-A8-gOq"/>
+                <outlet property="saveModelMenuItem" destination="pxx-59-PXV" id="KTL-9a-vMo"/>
             </connections>
         </customObject>
         <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="ImpulseModeler" customModuleProvider="target">
@@ -79,7 +81,7 @@
                             </menuItem>
                             <menuItem title="Open…" keyEquivalent="o" id="IAo-SY-fd9">
                                 <connections>
-                                    <action selector="openDocument:" target="-1" id="bVn-NM-KNZ"/>
+                                    <action selector="handleOpenModel:" target="Ubf-fF-CrH" id="rns-Tm-IPk"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Open Recent" id="tXI-mr-wws">
@@ -103,7 +105,7 @@
                             </menuItem>
                             <menuItem title="Save…" keyEquivalent="s" id="pxx-59-PXV">
                                 <connections>
-                                    <action selector="saveDocument:" target="-1" id="teZ-XB-qJY"/>
+                                    <action selector="handleSaveModel:" target="Ubf-fF-CrH" id="mBX-PS-H0c"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Save As…" keyEquivalent="S" id="Bw7-FT-i3A">
@@ -383,6 +385,19 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="handleCreateCirFile:" target="Ubf-fF-CrH" id="sX8-4V-zX7"/>
+                                </connections>
+                            </menuItem>
+                        </items>
+                    </menu>
+                </menuItem>
+                <menuItem title="Simulate" id="RhU-AB-Wpk">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <menu key="submenu" title="Simulate" id="hba-Mh-tue">
+                        <items>
+                            <menuItem title="Run..." id="SYD-vz-rAL">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="handleRunSimulation:" target="Ubf-fF-CrH" id="k5F-SF-pXS"/>
                                 </connections>
                             </menuItem>
                         </items>

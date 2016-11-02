@@ -8,6 +8,34 @@
 
 import Cocoa
 
+// A helper class to allow saving to and restoring from files
+class PhaseModel:NSObject, NSCoding
+{
+    let phase:Phase
+    let model:[PCH_DiskSection]
+    
+    init(phase:Phase, model:[PCH_DiskSection])
+    {
+        
+        self.phase = phase
+        self.model = model
+    }
+    
+    convenience required init?(coder aDecoder: NSCoder) {
+        
+        let phase = aDecoder.decodeObject(forKey: "Phase") as! Phase
+        let model = aDecoder.decodeObject(forKey: "Model") as! [PCH_DiskSection]
+        
+        self.init(phase:phase, model:model)
+    }
+    
+    func encode(with aCoder: NSCoder) {
+        
+        aCoder.encode(self.phase, forKey: "Phase")
+        aCoder.encode(self.model, forKey: "Model")
+    }
+}
+
 class AppController: NSObject {
 
     // The physical and capacitance data for one phase of the transformer
@@ -28,6 +56,8 @@ class AppController: NSObject {
     
     @IBOutlet weak var createModelMenuItem: NSMenuItem!
     @IBOutlet weak var saveCirFileMenuItem: NSMenuItem!
+    @IBOutlet weak var runSimMenuItem: NSMenuItem!
+    @IBOutlet weak var saveModelMenuItem: NSMenuItem!
 
     
     // The model in the format required by the routine for making a spice ".cir" file
@@ -46,6 +76,52 @@ class AppController: NSObject {
     }
     
     // Menu Handlers
+    
+    @IBAction func handleOpenModel(_ sender: AnyObject)
+    {
+        
+    }
+    
+    @IBAction func handleSaveModel(_ sender: AnyObject)
+    {
+        let saveFilePanel = NSSavePanel()
+        
+        saveFilePanel.title = "Save Model"
+        saveFilePanel.canCreateDirectories = true
+        
+        if (saveFilePanel.runModal() == NSFileHandlingPanelOKButton)
+        {
+            guard let newFileURL = saveFilePanel.url
+                else
+            {
+                DLog("Bad file name")
+                return
+            }
+            
+            let archiveResult = NSKeyedArchiver.archiveRootObject(self.theModel!, toFile: newFileURL.path)
+            
+            if (!archiveResult)
+            {
+                DLog("Couldn't write the file!")
+            }
+            
+            DLog("Finished writing file")
+        }
+    }
+    
+    
+    @IBAction func handleRunSimulation(_ sender: AnyObject)
+    {
+        // hardcoded BIL level during testing, need to add a dialog or something for this
+        let testSource = PCH_Source(type: PCH_Source.Types.FullWave, pkVoltage: 125000.0)
+        
+        let bbModel = PCH_BlueBookModel(theModel: self.theModel!, phase: self.phaseDefinition!)
+        
+        // Hardcoded connections, this will obviously need to be made more fancy
+        let theConnections = [(0, -1), (20, -1), (21, -1)]
+        
+        let resultMatrices = bbModel.SimulateWithConnections(theConnections, sourceConnection: (testSource, 41), simTimeStep: 10.0E-9, saveTimeStep: 100.0E-9, totalTime: 100.0E-6)
+    }
     
     @IBAction func handleCreateModel(_ sender: AnyObject)
     {
@@ -243,7 +319,7 @@ class AppController: NSObject {
             return self.phaseDefinition != nil
         }
         
-        if (menuItem == self.saveCirFileMenuItem)
+        if (menuItem == self.saveCirFileMenuItem) || (menuItem == self.runSimMenuItem) || (menuItem == self.saveModelMenuItem)
         {
             return self.theModel != nil
         }
@@ -362,7 +438,7 @@ class AppController: NSObject {
         fString += "\n* Connections\n\n"
         
         // The shot
-        fString += "* Impulse shot\nVBIL HVTOP 0 EXP(0 555k 0 2.2E-7 1.0E-6 7.0E-5)\n\n"
+        fString += "* Impulse shot\nVBIL HVTOP 0 EXP(0 128.75k 0 2.2E-7 1.0E-6 7.0E-5)\n\n"
         
         // Options required to make this work most of the time
         fString += "* options for LTSpice\n.OPTIONS reltol=0.02 trtol=7 abstol=1e-6 vntol=1e-4 method=gear\n\n"
