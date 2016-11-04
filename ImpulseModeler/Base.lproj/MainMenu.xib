@@ -14,7 +14,7 @@
                 <outlet property="inchItem" destination="ssa-Or-PRz" id="tRU-Ck-Kts"/>
                 <outlet property="metricItem" destination="Mj6-PL-WCz" id="GhT-v2-1xc"/>
                 <outlet property="runSimMenuItem" destination="SYD-vz-rAL" id="k1O-4g-yIy"/>
-                <outlet property="saveCirFileMenuItem" destination="20v-JI-QLD" id="nho-A8-gOq"/>
+                <outlet property="saveCirFileMenuItem" destination="CMY-na-8SV" id="kPF-Ea-rkO"/>
                 <outlet property="saveModelMenuItem" destination="pxx-59-PXV" id="KTL-9a-vMo"/>
             </connections>
         </customObject>
@@ -103,12 +103,17 @@
                                     <action selector="performClose:" target="-1" id="HmO-Ls-i7Q"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Save…" keyEquivalent="s" id="pxx-59-PXV">
+                            <menuItem title="Save Model…" keyEquivalent="s" id="pxx-59-PXV">
                                 <connections>
                                     <action selector="handleSaveModel:" target="Ubf-fF-CrH" id="mBX-PS-H0c"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Save As…" keyEquivalent="S" id="Bw7-FT-i3A">
+                            <menuItem title="Save '.cir' File…" keyEquivalent="s" id="CMY-na-8SV">
+                                <connections>
+                                    <action selector="handleCreateCirFile:" target="Ubf-fF-CrH" id="IA5-iA-5bL"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Save Model As…" keyEquivalent="S" id="Bw7-FT-i3A">
                                 <connections>
                                     <action selector="saveDocumentAs:" target="-1" id="mDf-zr-I0C"/>
                                 </connections>
@@ -379,12 +384,6 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="handleCreateModel:" target="Ubf-fF-CrH" id="RHy-GX-cUU"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Save &quot;.cir&quot; file" id="20v-JI-QLD">
-                                <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="handleCreateCirFile:" target="Ubf-fF-CrH" id="sX8-4V-zX7"/>
                                 </connections>
                             </menuItem>
                         </items>

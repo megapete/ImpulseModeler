@@ -26,7 +26,27 @@ class PhaseModel:NSObject, NSCoding
         let phase = aDecoder.decodeObject(forKey: "Phase") as! Phase
         var model = aDecoder.decodeObject(forKey: "Model") as! [PCH_DiskSection]
         
-        model.remove(at: model.index(of: AppController.gndSection)!)
+        // For some reason, setting hashvalues and whatnot caused all sorts of problems with NSArchiver. That means that when reloading model files, it is necessary to change all PCH_SectionData shuntCaps fields that point to ground (from the incomimg file) to point to the one and only "gndSection" defined by AppController.
+        
+        var gndCount = 0
+        
+        for nextSection in model
+        {
+            for (sectionKey, value) in nextSection.data.shuntCaps
+            {
+                gndCount += 1
+                nextSection.data.shuntCaps[AppController.gndSection] = value
+                nextSection.data.shuntCaps.removeValue(forKey: sectionKey)
+            }
+        }
+        
+        DLog("Changed \(gndCount) ground references")
+        
+        // Now get rid of the saved ground section
+        if let gndIndex = model.index(where: {$0.data.sectionID == "GND"})
+        {
+            model.remove(at: gndIndex)
+        }
 
         self.init(phase:phase, model:model)
     }
@@ -81,18 +101,29 @@ class AppController: NSObject {
     
     @IBAction func handleOpenModel(_ sender: AnyObject)
     {
+        if (self.theModel != nil)
+        {
+            let saveYesOrNo = NSAlert()
+            saveYesOrNo.messageText = "This will destroy the current model! Do you wish to save it before proceeding?"
+            saveYesOrNo.alertStyle = NSAlertStyle.warning
+            saveYesOrNo.addButton(withTitle: "Yes")
+            saveYesOrNo.addButton(withTitle: "No")
+            
+            if (saveYesOrNo.runModal() == NSAlertFirstButtonReturn)
+            {
+                self.handleSaveModel(self)
+            }
+        }
+        
         let openFilePanel = NSOpenPanel()
         
         openFilePanel.title = "Open Model"
+        openFilePanel.message = "Select the model to open"
+        openFilePanel.allowedFileTypes = ["impmdl"]
+        openFilePanel.allowsOtherFileTypes = false
         
         if (openFilePanel.runModal() == NSFileHandlingPanelOKButton)
         {
-            if (self.theModel != nil)
-            {
-                // TODO: Give the user a chance to save the model
-                DLog("Note: This will destroy the existing model")
-            }
-
             let archive = NSKeyedUnarchiver.unarchiveObject(withFile: openFilePanel.url!.path) as! PhaseModel
             
             self.theModel = archive.model
@@ -107,6 +138,8 @@ class AppController: NSObject {
         
         saveFilePanel.title = "Save Model"
         saveFilePanel.canCreateDirectories = true
+        saveFilePanel.allowedFileTypes = ["impmdl"]
+        saveFilePanel.allowsOtherFileTypes = false
         
         if (saveFilePanel.runModal() == NSFileHandlingPanelOKButton)
         {
@@ -155,6 +188,17 @@ class AppController: NSObject {
         if (theModel != nil)
         {
             // TODO: Give the user a chance to save the model
+            let saveYesOrNo = NSAlert()
+            saveYesOrNo.messageText = "This will destroy the current model! Do you wish to save it before proceeding?"
+            saveYesOrNo.alertStyle = NSAlertStyle.warning
+            saveYesOrNo.addButton(withTitle: "Yes")
+            saveYesOrNo.addButton(withTitle: "No")
+            
+            if (saveYesOrNo.runModal() == NSAlertFirstButtonReturn)
+            {
+                self.handleSaveModel(self)
+            }
+            
             DLog("Note: This will destroy the existing model")
         }
         
@@ -475,7 +519,7 @@ class AppController: NSObject {
         
         saveFilePanel.title = "Save Spice data"
         saveFilePanel.canCreateDirectories = true
-        saveFilePanel.allowedFileTypes = ["cir", "txt"]
+        saveFilePanel.allowedFileTypes = ["cir"]
         saveFilePanel.allowsOtherFileTypes = false
         
         if (saveFilePanel.runModal() == NSFileHandlingPanelOKButton)
