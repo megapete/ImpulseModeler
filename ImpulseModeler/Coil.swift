@@ -59,7 +59,7 @@ class Coil:NSObject, NSCoding
         let capacitanceToGround = aDecoder.decodeDouble(forKey: "CapToGround")
         let innerRadius = aDecoder.decodeDouble(forKey: "InnerRadius")
         let eddyLossPercentage = aDecoder.decodeDouble(forKey: "EddyLossPercentage")
-        let sections = aDecoder.decodeObject(forKey: "Sections") as! [AxialSection]?
+        let sections = aDecoder.decodeObject(forKey: "Sections") as! [AxialSection]
         
         self.init(coilName:coilName, coilRadialPosition:coilRadialPosition, amps:amps, currentDirection:currentDirection, capacitanceToPreviousCoil:capacitanceToPreviousCoil, capacitanceToGround:capacitanceToGround, innerRadius:innerRadius, eddyLossPercentage:eddyLossPercentage, sections:sections)
     }

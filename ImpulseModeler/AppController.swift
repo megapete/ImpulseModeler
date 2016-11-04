@@ -16,16 +16,18 @@ class PhaseModel:NSObject, NSCoding
     
     init(phase:Phase, model:[PCH_DiskSection])
     {
-        
         self.phase = phase
-        self.model = model
+        let gndSectionArray = [AppController.gndSection]
+        self.model = model + gndSectionArray
     }
     
     convenience required init?(coder aDecoder: NSCoder) {
         
         let phase = aDecoder.decodeObject(forKey: "Phase") as! Phase
-        let model = aDecoder.decodeObject(forKey: "Model") as! [PCH_DiskSection]
+        var model = aDecoder.decodeObject(forKey: "Model") as! [PCH_DiskSection]
         
+        model.remove(at: model.index(of: AppController.gndSection)!)
+
         self.init(phase:phase, model:model)
     }
     
@@ -48,7 +50,7 @@ class AppController: NSObject {
     let initialEddyLossFactor = 40000.0
     
     // The special "Ground" section used in the model. By convention, its coilRef, serNum, inNode, and outNode are equal to "-1". It's sectionID is "GND".
-    let gndSection = PCH_DiskSection(coilRef: -1, diskRect: NSMakeRect(0, 0, 0, 0), N: 0, J: 0, windHt: 0, coreRadius: 0, secData: PCH_SectionData(sectionID: "GND", serNum: -1, inNode:-1, outNode:-1))
+    static let gndSection = PCH_DiskSection(coilRef: -1, diskRect: NSMakeRect(0, 0, 0, 0), N: 0, J: 0, windHt: 0, coreRadius: 0, secData: PCH_SectionData(sectionID: "GND", serNum: -1, inNode:-1, outNode:-1))
     
     @IBOutlet weak var inchItem: NSMenuItem!
     @IBOutlet weak var metricItem: NSMenuItem!
@@ -262,7 +264,7 @@ class AppController: NSObject {
                     
                     let diskCapToGnd = coilCapacitanceToGround / round(theCoil.numDisks)
                     
-                    currentSection.data.shuntCaps[gndSection] = diskCapToGnd
+                    currentSection.data.shuntCaps[AppController.gndSection] = diskCapToGnd
                     
                 }
             }
