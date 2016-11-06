@@ -17,37 +17,15 @@ class PhaseModel:NSObject, NSCoding
     init(phase:Phase, model:[PCH_DiskSection])
     {
         self.phase = phase
-        let gndSectionArray = [AppController.gndSection]
-        self.model = model + gndSectionArray
+        // let gndSectionArray = [AppController.gndSection]
+        self.model = model // + gndSectionArray
     }
     
     convenience required init?(coder aDecoder: NSCoder) {
         
         let phase = aDecoder.decodeObject(forKey: "Phase") as! Phase
-        var model = aDecoder.decodeObject(forKey: "Model") as! [PCH_DiskSection]
+        let model = aDecoder.decodeObject(forKey: "Model") as! [PCH_DiskSection]
         
-        // For some reason, setting hashvalues and whatnot caused all sorts of problems with NSArchiver. That means that when reloading model files, it is necessary to change all PCH_SectionData shuntCaps fields that point to ground (from the incomimg file) to point to the one and only "gndSection" defined by AppController.
-        
-        var gndCount = 0
-        
-        for nextSection in model
-        {
-            for (sectionKey, value) in nextSection.data.shuntCaps
-            {
-                gndCount += 1
-                nextSection.data.shuntCaps[AppController.gndSection] = value
-                nextSection.data.shuntCaps.removeValue(forKey: sectionKey)
-            }
-        }
-        
-        DLog("Changed \(gndCount) ground references")
-        
-        // Now get rid of the saved ground section
-        if let gndIndex = model.index(where: {$0.data.sectionID == "GND"})
-        {
-            model.remove(at: gndIndex)
-        }
-
         self.init(phase:phase, model:model)
     }
     
@@ -56,6 +34,30 @@ class PhaseModel:NSObject, NSCoding
         aCoder.encode(self.phase, forKey: "Phase")
         aCoder.encode(self.model, forKey: "Model")
     }
+}
+
+// This utility function is used to get the PCH_DiskSection that corresponds to the given sectionID (String)
+func DiskSectionUsingID(_ sectID:String, inModel:[PCH_DiskSection]) -> PCH_DiskSection?
+{
+    var result:PCH_DiskSection? = nil
+    
+    if sectID == "GND"
+    {
+        result = AppController.gndSection
+    }
+    else
+    {
+        for nextSection in inModel
+        {
+            if nextSection.data.sectionID == sectID
+            {
+                result = nextSection
+                break
+            }
+        }
+    }
+    
+    return result
 }
 
 class AppController: NSObject {
@@ -308,7 +310,8 @@ class AppController: NSObject {
                     
                     let diskCapToGnd = coilCapacitanceToGround / round(theCoil.numDisks)
                     
-                    currentSection.data.shuntCaps[AppController.gndSection] = diskCapToGnd
+                    currentSection.data.shuntCapacitances[AppController.gndSection.data.sectionID] = diskCapToGnd
+                    // currentSection.data.shuntCaps[AppController.gndSection] = diskCapToGnd
                     
                 }
             }
@@ -327,8 +330,11 @@ class AppController: NSObject {
                 
                 for j in 0..<Int(maxSections)
                 {
-                    theModel![leftSectionIndex].data.shuntCaps[theModel![rightSectionIndex]] = capPerSection
-                    theModel![rightSectionIndex].data.shuntCaps[theModel![leftSectionIndex]] = capPerSection
+                    theModel![leftSectionIndex].data.shuntCapacitances[theModel![rightSectionIndex].data.sectionID] = capPerSection
+                    theModel![rightSectionIndex].data.shuntCapacitances[theModel![leftSectionIndex].data.sectionID] = capPerSection
+                    
+                    // theModel![leftSectionIndex].data.shuntCaps[theModel![rightSectionIndex]] = capPerSection
+                    // theModel![rightSectionIndex].data.shuntCaps[theModel![leftSectionIndex]] = capPerSection
 
                     leftSectionIndex = previousStartIndex + Int(Double(j+1) * (round(phase.coils[theCoilNum-1].numDisks) / maxSections))
                     rightSectionIndex = currentStartIndex + Int(Double(j+1) * (round(phase.coils[theCoilNum].numDisks) / maxSections))
@@ -339,6 +345,7 @@ class AppController: NSObject {
             
             currentStartIndex = currentEndIndex + 1
         }
+        
         DLog("Done!")
         
         // And now we calculate the mutual inductances
@@ -365,8 +372,8 @@ class AppController: NSObject {
                 otherDisk.data.mutualInductances[nDisk.data.sectionID] = mutInd
                 
                 // This ends up being the important thing to do
-                nDisk.data.mutInd[otherDisk] = mutInd
-                otherDisk.data.mutInd[nDisk] = mutInd
+                // nDisk.data.mutInd[otherDisk] = mutInd
+                // otherDisk.data.mutInd[nDisk] = mutInd
                 
                 nDisk.data.mutIndCoeff[otherDisk.data.sectionID] = mutIndCoeff
                 otherDisk.data.mutIndCoeff[nDisk.data.sectionID] = mutIndCoeff
@@ -391,6 +398,8 @@ class AppController: NSObject {
         
         return true
     }
+    
+    
     
     @IBAction func handleCreateCirFile(_ sender: AnyObject)
     {
@@ -430,10 +439,17 @@ class AppController: NSObject {
             fString += seriesCapName + " " + inNode + " " + outNode + String(format: " %.4E\n", nextDisk.data.seriesCapacitance)
             
             var shuntCapSerialNum = 1
-            for nextShuntCap in nextDisk.data.shuntCaps
+            for nextShuntCap in nextDisk.data.shuntCapacitances
             {
+                
+                guard let nextShuntSection = DiskSectionUsingID(nextShuntCap.key, inModel: self.theModel!)
+                else
+                {
+                    continue
+                }
+                
                 // We ignore inner coils because they've already been done (note that we need to consider the core, though)
-                if ((nextShuntCap.key.coilRef < nextDisk.coilRef) && (nextShuntCap.key.coilRef != -1))
+                if ((nextShuntSection.coilRef < nextDisk.coilRef) && (nextShuntSection.coilRef != -1))
                 {
                     continue
                 }
@@ -451,15 +467,15 @@ class AppController: NSObject {
                  */
                 
                 var shuntNode = String()
-                if (nextShuntCap.key.coilRef == -1)
+                if (nextShuntSection.coilRef == -1)
                 {
                     shuntNode = "0"
                 }
                 else
                 {
-                    shuntNode = coilArray[nextShuntCap.key.coilRef].coilName
+                    shuntNode = coilArray[nextShuntSection.coilRef].coilName
                     shuntNode += "I"
-                    let nodeNum = PCH_StrRight(nextShuntCap.key.data.sectionID, length: 3)
+                    let nodeNum = PCH_StrRight(nextShuntCap.key, length: 3)
                     shuntNode += nodeNum
                 }
                 

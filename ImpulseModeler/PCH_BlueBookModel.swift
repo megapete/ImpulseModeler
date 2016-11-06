@@ -71,12 +71,19 @@ class PCH_BlueBookModel: NSObject {
             // start with the inductance matrix
             M[currentSectionNumber, currentSectionNumber] = nextSection.data.selfInductance
             
-            for (section, mutInd) in nextSection.data.mutInd
+            for (sectionID, mutInd) in nextSection.data.mutualInductances
             {
-                // only add the mutual inductances once (the matrix is symmetric)
-                if (section.data.serialNumber > currentSectionNumber)
+                guard let mutSection = DiskSectionUsingID(sectionID, inModel: theModel)
+                else
                 {
-                    M[currentSectionNumber, section.data.serialNumber] = mutInd
+                    DLog("Bad Section ID!")
+                    continue
+                }
+                
+                // only add the mutual inductances once (the matrix is symmetric)
+                if (mutSection.data.serialNumber > currentSectionNumber)
+                {
+                    M[currentSectionNumber, mutSection.data.serialNumber] = mutInd
                     // M[section.data.serialNumber, currentSectionNumber] = mutInd
                 }
             }
@@ -97,14 +104,21 @@ class PCH_BlueBookModel: NSObject {
             {
                 Cj = prevSection!.data.seriesCapacitance
                 
-                for (section, shuntC) in prevSection!.data.shuntCaps
+                for (sectionID, shuntC) in prevSection!.data.shuntCapacitances
                 {
+                    guard let shuntCapSection = DiskSectionUsingID(sectionID, inModel: theModel)
+                    else
+                    {
+                        DLog("Bad sectionID!")
+                        continue
+                    }
+                    
                     sumKip += shuntC / 2.0
                     
                     // we don't include ground nodes in this part
-                    if (section.data.sectionID != "GND")
+                    if (sectionID != "GND")
                     {
-                        C[prevSection!.data.nodes.outNode, section.data.nodes.outNode] = -shuntC / 2.0
+                        C[prevSection!.data.nodes.outNode, shuntCapSection.data.nodes.outNode] = -shuntC / 2.0
                     }
                 }
                 
@@ -115,13 +129,20 @@ class PCH_BlueBookModel: NSObject {
             
             let Cj1 = nextSection.data.seriesCapacitance
             
-            for (section, shuntC) in nextSection.data.shuntCaps
+            for (sectionID, shuntC) in nextSection.data.shuntCapacitances
             {
+                guard let shuntCapSection = DiskSectionUsingID(sectionID, inModel: theModel)
+                    else
+                {
+                    DLog("Bad sectionID!")
+                    continue
+                }
+                
                 sumKip += shuntC / 2.0
                 
-                if (section.data.sectionID != "GND")
+                if (sectionID != "GND")
                 {
-                    C[nextSection.data.nodes.inNode, section.data.nodes.inNode] += -shuntC / 2.0
+                    C[nextSection.data.nodes.inNode, shuntCapSection.data.nodes.inNode] += -shuntC / 2.0
                 }
             }
             
@@ -149,14 +170,22 @@ class PCH_BlueBookModel: NSObject {
             if (endNodes.contains(nextSection.data.nodes.outNode))
             {
                 sumKip = 0.0
-                for (section, shuntC) in nextSection.data.shuntCaps
+                
+                for (sectionID, shuntC) in nextSection.data.shuntCapacitances
                 {
+                    guard let shuntCapSection = DiskSectionUsingID(sectionID, inModel: theModel)
+                        else
+                    {
+                        DLog("Bad sectionID!")
+                        continue
+                    }
+                    
                     sumKip += shuntC / 2.0
                     
-                    if (section.data.sectionID != "GND")
+                    if (sectionID != "GND")
                     {
                         // Cbase[nextSection.data.nodes.outNode, section.data.nodes.inNode] += -shuntC / 2.0
-                        C[nextSection.data.nodes.outNode, section.data.nodes.outNode] += -shuntC / 2.0
+                        C[nextSection.data.nodes.outNode, shuntCapSection.data.nodes.outNode] += -shuntC / 2.0
                     }
                 }
                 
