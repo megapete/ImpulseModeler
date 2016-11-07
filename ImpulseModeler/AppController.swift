@@ -176,7 +176,84 @@ class AppController: NSObject {
         // Hardcoded connections, this will obviously need to be made more fancy
         let theConnections = [(0, -1), (20, -1), (21, -1)]
         
-        let resultMatrices = bbModel.SimulateWithConnections(theConnections, sourceConnection: (testSource, 41), simTimeStep: 10.0E-9, saveTimeStep: 100.0E-9, totalTime: 100.0E-6)
+        let simTimeStep = 10.0E-9
+        let saveTimeStep = 100.0E-9
+        let totalSimTime = 100.0E-6
+        
+        guard let resultMatrices = bbModel.SimulateWithConnections(theConnections, sourceConnection: (testSource, 41), simTimeStep: simTimeStep, saveTimeStep: saveTimeStep, totalTime: totalSimTime)
+        else
+        {
+            DLog("Simulation failed!")
+            return
+        }
+        
+        // Set up the array for the simulation times
+        let numTimeSteps = Int(totalSimTime / saveTimeStep) + 1
+        var timeArray = Array(repeating: 0.0, count: numTimeSteps)
+        var nextTime = 0.0
+        for i in 0..<numTimeSteps
+        {
+            timeArray[i] = nextTime
+            nextTime += saveTimeStep
+        }
+        
+        // Set up the arrays for the node and section names
+        let sectionCount = theModel!.count
+        let nodeCount = sectionCount + self.phaseDefinition!.coils.count
+        var nodeNames = Array(repeating: "", count: nodeCount)
+        var deviceNames = Array(repeating: "", count: sectionCount)
+        var currentNodeIndex = 0
+        var currentDeviceIndex = 0
+        var lastCoilName = self.phaseDefinition!.coils[0].coilName
+        var lastDiskNum = ""
+        
+        for nextSection in self.theModel!
+        {
+            let nextSectionID = nextSection.data.sectionID
+            deviceNames[currentDeviceIndex] = nextSectionID
+            currentDeviceIndex += 1
+            
+            let coilName = PCH_StrLeft(nextSectionID, length: 2)
+            if (coilName != lastCoilName)
+            {
+                nodeNames[currentNodeIndex] = lastCoilName + "I" + lastDiskNum
+                currentNodeIndex += 1
+            }
+            
+            let diskNum = PCH_StrRight(nextSectionID, length: 3)
+            nodeNames[currentNodeIndex] = coilName + "I" + diskNum
+            currentNodeIndex += 1
+            lastCoilName = coilName
+            lastDiskNum = "\(Int(diskNum)! + 1)"
+        }
+        
+        let bbModelOutput = PCH_BlueBookModelOutput(timeArray: timeArray, voltageNodes: nodeNames, voltsMatrix: resultMatrices.V, deviceIDs: deviceNames, ampsMatrix: resultMatrices.I)
+        
+        let saveFilePanel = NSSavePanel()
+        
+        saveFilePanel.title = "Save Impulse Simulation Results"
+        saveFilePanel.canCreateDirectories = true
+        saveFilePanel.allowedFileTypes = ["impres"]
+        saveFilePanel.allowsOtherFileTypes = false
+        
+        if (saveFilePanel.runModal() == NSFileHandlingPanelOKButton)
+        {
+            guard let newFileURL = saveFilePanel.url
+                else
+            {
+                DLog("Bad file name")
+                return
+            }
+            
+            let archiveResult = NSKeyedArchiver.archiveRootObject(bbModelOutput, toFile: newFileURL.path)
+            
+            if (!archiveResult)
+            {
+                DLog("Couldn't write the file!")
+            }
+            
+            DLog("Finished writing file")
+        }
     }
     
     @IBAction func handleCreateModel(_ sender: AnyObject)
