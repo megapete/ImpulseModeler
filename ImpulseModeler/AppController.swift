@@ -245,6 +245,7 @@ class AppController: NSObject {
                 return
             }
             
+            NSKeyedArchiver.setClassName("ImpulseResult", for: PCH_BlueBookModelOutput.self)
             let archiveResult = NSKeyedArchiver.archiveRootObject(bbModelOutput, toFile: newFileURL.path)
             
             if (!archiveResult)

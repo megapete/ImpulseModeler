@@ -15,9 +15,11 @@ class PCH_BlueBookModelOutput: NSObject, NSCoding {
     let timeArray:[Double]
     
     let voltageNodes:[String]
+    // The first index is the time index, followed by the node index
     var voltsArray:[[Double]]
     
     let deviceIDs:[String]
+    // The first index is the time index, followed by the device index
     var ampsArray:[[Double]]
     
     init(timeArray:[Double], voltageNodes:[String], voltsArray:[[Double]], deviceIDs:[String], ampsArray:[[Double]])
