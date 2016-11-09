@@ -47,7 +47,9 @@ class PCH_Source: NSObject {
             
             let v0 = 1.03 * pkVoltage
             
-            return v0 * (k2 * e(-k2 * t) - k1 * e(-k1 * t))
+            let result = v0 * (k2 * e(-k2 * t) - k1 * e(-k1 * t))
+            
+            return result
         }
         
         ALog("Undefined waveform")

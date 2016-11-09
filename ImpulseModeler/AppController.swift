@@ -227,6 +227,10 @@ class AppController: NSObject {
             lastDiskNum = "\(Int(diskNum)! + 1)"
         }
         
+        // Add the name of the last disk
+        nodeNames[currentNodeIndex] = lastCoilName + "I" + lastDiskNum
+        
+        
         let bbModelOutput = PCH_BlueBookModelOutput(timeArray: timeArray, voltageNodes: nodeNames, voltsMatrix: resultMatrices.V, deviceIDs: deviceNames, ampsMatrix: resultMatrices.I)
         
         let saveFilePanel = NSSavePanel()

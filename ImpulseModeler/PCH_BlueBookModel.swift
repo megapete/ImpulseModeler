@@ -239,11 +239,26 @@ class PCH_BlueBookModel: NSObject {
         newRow[sourceConnection.toNode] = 1.0
         newC.SetRow(sourceConnection.toNode, buffer: newRow)
         
+        /*
+        DLog("C: \(newC)")
+        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+        let docDir = paths[0]
+        let capFile = URL(string: "AMatrix.txt", relativeTo: docDir)
+        
+        do {
+            try A.description.write(to: capFile!, atomically: true, encoding: String.Encoding.utf8)
+        }
+        catch
+        {
+            ALog("Error!")
+        }
+         */
+        
         let sectionCount = self.A.numCols
         let nodeCount = self.A.numRows
         
-        let I = PCH_Matrix(numVectorElements: sectionCount, vectorPrecision: PCH_Matrix.precisions.doublePrecision)
-        let V = PCH_Matrix(numVectorElements: nodeCount, vectorPrecision: PCH_Matrix.precisions.doublePrecision)
+        var I = PCH_Matrix(numVectorElements: sectionCount, vectorPrecision: PCH_Matrix.precisions.doublePrecision)
+        var V = PCH_Matrix(numVectorElements: nodeCount, vectorPrecision: PCH_Matrix.precisions.doublePrecision)
         
         let numSavedTimeSteps = Int(round(totalTime / saveTimeStep)) + 1
         
@@ -277,6 +292,13 @@ class PCH_BlueBookModel: NSObject {
                     AI[nextConnection.fromNode, 0] = 0.0
                 }
             }
+            
+            /*
+            if timeStepCount == 120
+            {
+                DLog("We are here")
+            }
+            */
             
             // Now the shot, uisng Runge-Kutta
             AI[sourceConnection.toNode, 0] = sourceConnection.source.dV(simTime)
@@ -330,6 +352,9 @@ class PCH_BlueBookModel: NSObject {
                 savedValuesV.SetRow(timeStepCount / saveStepInterval, vector: newV)
                 savedValuesI.SetRow(timeStepCount / saveStepInterval, vector: newI)
             }
+            
+            V = newV
+            I = newI
             
             simTime += simTimeStep
             timeStepCount += 1
