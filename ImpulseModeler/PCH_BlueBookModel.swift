@@ -205,7 +205,7 @@ class PCH_BlueBookModel: NSObject {
 
     }
     
-    func SimulateWithConnections(_ connections:[(fromNode:Int, toNode:Int)], sourceConnection:(source:PCH_Source, toNode:Int), simTimeStep:Double, saveTimeStep:Double, totalTime:Double) -> (V:PCH_Matrix, I:PCH_Matrix)?
+    func SimulateWithConnections(_ connections:[(fromNode:Int, toNodes:[Int])], sourceConnection:(source:PCH_Source, toNode:Int), simTimeStep:Double, saveTimeStep:Double, totalTime:Double) -> (V:PCH_Matrix, I:PCH_Matrix)?
     {
         // Connecting nodes together is not yet implemented.
         // Nodes can be connected to ground or to the source (they cannot be connected "from" ground).
@@ -220,17 +220,31 @@ class PCH_BlueBookModel: NSObject {
                 return nil
             }
             
-            // TODO: Fix this so that connections between terminals is allowed.
-            if (nextConnection.toNode != -1)
+            var fromRow = newC.Submatrix(fromRow: nextConnection.fromNode, toRow: nextConnection.fromNode, fromCol: 0, toCol: newC.numCols - 1)
+            var addRow = PCH_Matrix(numRows: 1, numCols: newC.numCols, matrixPrecision: PCH_Matrix.precisions.doublePrecision, matrixType: PCH_Matrix.types.generalMatrix)
+            
+            var connectToGround = false
+            for toNode in nextConnection.toNodes
             {
-                ALog("Connections between non-grounded terminals is not yet implemented!")
-                return nil
+                if toNode == -1
+                {
+                    connectToGround = true
+                }
+                
+                let newRowToAdd = newC.Submatrix(fromRow: toNode, toRow: toNode, fromCol: 0, toCol: newC.numCols - 1)
+                
+                addRow += newRowToAdd
             }
-            else
+            
+            if connectToGround
             {
                 var newRow = [Double](repeatElement(0.0, count: C.numCols))
                 newRow[nextConnection.fromNode] = 1.0
                 newC.SetRow(nextConnection.fromNode, buffer: newRow)
+            }
+            else
+            {
+                newC.SetRow(nextConnection.fromNode, vector: fromRow + addRow)
             }
         }
         
