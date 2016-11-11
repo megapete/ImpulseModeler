@@ -212,6 +212,8 @@ class PCH_BlueBookModel: NSObject {
         
         let newC = self.C
         
+        var groundedNodes = Set<Int>()
+        
         for nextConnection in connections
         {
             if (nextConnection.fromNode == -1)
@@ -226,9 +228,10 @@ class PCH_BlueBookModel: NSObject {
             var connectToGround = false
             for toNode in nextConnection.toNodes
             {
-                if toNode == -1
+                if toNode == -1 || groundedNodes.contains(toNode)
                 {
                     connectToGround = true
+                    break
                 }
                 
                 let newRowToAdd = newC.Submatrix(fromRow: toNode, toRow: toNode, fromCol: 0, toCol: newC.numCols - 1)
@@ -238,9 +241,26 @@ class PCH_BlueBookModel: NSObject {
             
             if connectToGround
             {
+                // If any one of the toNodes is ground, them ALL the other toNodes will also go to ground
+                // first set the fromNode
                 var newRow = [Double](repeatElement(0.0, count: C.numCols))
                 newRow[nextConnection.fromNode] = 1.0
                 newC.SetRow(nextConnection.fromNode, buffer: newRow)
+                groundedNodes.insert(nextConnection.fromNode)
+                
+                for toNode in nextConnection.toNodes
+                {
+                    if (toNode != -1)
+                    {
+                        if !groundedNodes.contains(toNode)
+                        {
+                            newRow = [Double](repeatElement(0.0, count: C.numCols))
+                            newRow[toNode] = 1.0
+                            newC.SetRow(toNode, buffer: newRow)
+                            groundedNodes.insert(toNode)
+                        }
+                    }
+                }
             }
             else
             {
@@ -292,19 +312,22 @@ class PCH_BlueBookModel: NSObject {
                 return nil
             }
             
+            for nextGroundedNode in groundedNodes
+            {
+                AI[nextGroundedNode, 0] = 0.0
+            }
+            
             // Fix the "connected" nodes
             for nextConnection in connections
             {
-                // TODO: Fix this so that connections between terminals is allowed.
-                if (nextConnection.toNode != -1)
+                // Grounded nodes were taken care of immediately above
+                if (nextConnection.toNodes.contains(-1))
                 {
-                    ALog("Connections between non-grounded terminals is not yet implemented!")
-                    return nil
+                    continue
                 }
-                else
-                {
-                    AI[nextConnection.fromNode, 0] = 0.0
-                }
+                
+                
+                
             }
             
             /*
