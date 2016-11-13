@@ -207,7 +207,6 @@ class PCH_BlueBookModel: NSObject {
     
     func SimulateWithConnections(_ connections:[(fromNode:Int, toNodes:[Int])], sourceConnection:(source:PCH_Source, toNode:Int), simTimeStep:Double, saveTimeStep:Double, totalTime:Double) -> (V:PCH_Matrix, I:PCH_Matrix)?
     {
-        // Connecting nodes together is not yet implemented.
         // Nodes can be connected to ground or to the source (they cannot be connected "from" ground).
         
         let newC = self.C
@@ -279,21 +278,6 @@ class PCH_BlueBookModel: NSObject {
         newRow[sourceConnection.toNode] = 1.0
         newC.SetRow(sourceConnection.toNode, buffer: newRow)
         
-        /*
-        DLog("C: \(newC)")
-        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-        let docDir = paths[0]
-        let capFile = URL(string: "AMatrix.txt", relativeTo: docDir)
-        
-        do {
-            try A.description.write(to: capFile!, atomically: true, encoding: String.Encoding.utf8)
-        }
-        catch
-        {
-            ALog("Error!")
-        }
-         */
-        
         let sectionCount = self.A.numCols
         let nodeCount = self.A.numRows
         
@@ -343,13 +327,6 @@ class PCH_BlueBookModel: NSObject {
                 
                 AI[nextConnection.fromNode, 0] = newAI
             }
-            
-            /*
-            if timeStepCount == 120
-            {
-                DLog("We are here")
-            }
-            */
             
             // Now the shot, uisng Runge-Kutta
             AI[sourceConnection.toNode, 0] = sourceConnection.source.dV(simTime)

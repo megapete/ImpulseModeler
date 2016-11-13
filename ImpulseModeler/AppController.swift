@@ -65,7 +65,7 @@ class AppController: NSObject {
     // The physical and capacitance data for one phase of the transformer
     var phaseDefinition:Phase?
     
-    // An array of resistance factors, each one to be used for its respective disk. Eventually, the idea will be to calculate the resistance factor for each disk by running the simulation once withe some initial factor, do a Fourier analysis on the current through each resistance, then recalculate the eddy-loss contribution using the results of teh analysis.
+    // An array of resistance factors, each one to be used for its respective disk. Eventually, the idea will be to calculate the resistance factor for each disk by running the simulation once withe some initial factor, do a Fourier analysis on the current through each resistance, then recalculate the eddy-loss contribution using the results of the analysis.
     var eddyLossFactors:[Double]?
     
     // The Bluebook talks about multiplying the DC resistance by "around 3000" to reflect the higher effective resistance at high frequencies of the eddy loss. I have (for now) decided to use an assumed "equivalent" frequency of 10kHz, which yields a factor of (10000/50)^2 = 40000x the eddy loss component of the resistance at 60Hz.
