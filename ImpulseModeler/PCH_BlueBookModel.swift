@@ -222,7 +222,7 @@ class PCH_BlueBookModel: NSObject {
                 return nil
             }
             
-            var fromRow = newC.Submatrix(fromRow: nextConnection.fromNode, toRow: nextConnection.fromNode, fromCol: 0, toCol: newC.numCols - 1)
+            let fromRow = newC.Submatrix(fromRow: nextConnection.fromNode, toRow: nextConnection.fromNode, fromCol: 0, toCol: newC.numCols - 1)
             var addRow = PCH_Matrix(numRows: 1, numCols: newC.numCols, matrixPrecision: PCH_Matrix.precisions.doublePrecision, matrixType: PCH_Matrix.types.generalMatrix)
             
             var connectToGround = false
@@ -234,9 +234,15 @@ class PCH_BlueBookModel: NSObject {
                     break
                 }
                 
+                // get the equation for toNode and add it to the running sum
                 let newRowToAdd = newC.Submatrix(fromRow: toNode, toRow: toNode, fromCol: 0, toCol: newC.numCols - 1)
-                
                 addRow += newRowToAdd
+                
+                // now we change row 's' so that dVs/dt - dVi/dt = 0 (the zero will be handled in the AI calculation below)
+                var newSrow = [Double](repeatElement(0.0, count: C.numCols))
+                newSrow[toNode] = 1.0
+                newSrow[nextConnection.fromNode] = -1.0
+                newC.SetRow(toNode, buffer: newSrow)
             }
             
             if connectToGround
@@ -312,6 +318,8 @@ class PCH_BlueBookModel: NSObject {
                 return nil
             }
             
+            // AI.matrixPrecision = PCH_Matrix.precisions.doublePrecision
+            
             for nextGroundedNode in groundedNodes
             {
                 AI[nextGroundedNode, 0] = 0.0
@@ -326,8 +334,14 @@ class PCH_BlueBookModel: NSObject {
                     continue
                 }
                 
+                var newAI:Double = AI[nextConnection.fromNode, 0]
+                for nextToNode in nextConnection.toNodes
+                {
+                    newAI += AI[nextToNode,0]
+                    AI[nextToNode, 0] = 0.0
+                }
                 
-                
+                AI[nextConnection.fromNode, 0] = newAI
             }
             
             /*
