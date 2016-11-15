@@ -153,6 +153,9 @@
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
+                        <connections>
+                            <action selector="handleCurrDirGroup:" target="-2" id="wN9-h5-L2f"/>
+                        </connections>
                     </button>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="rSm-u3-Wd5">
                         <rect key="frame" x="117" y="277" width="37" height="17"/>
@@ -266,6 +269,9 @@ Gw
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
+                        <connections>
+                            <action selector="handleCurrDirGroup:" target="-2" id="JfX-1a-ESB"/>
+                        </connections>
                     </button>
                 </subviews>
             </view>
