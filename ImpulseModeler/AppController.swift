@@ -412,7 +412,7 @@ class AppController: NSObject {
                     
                     let diskArea = Double(nextAxialSection.diskSize.width * nextAxialSection.diskSize.height) * unitFactor * unitFactor
                     
-                    var sectionData = PCH_SectionData(sectionID: String(format: "%@%03d", coilID, sectionNumberOffset + currentSection + 1), serNum: sectionSerialNumber, inNode: nodeSerialNumber, outNode: nodeSerialNumber + 1)
+                    let sectionData = PCH_SectionData(sectionID: String(format: "%@%03d", coilID, sectionNumberOffset + currentSection + 1), serNum: sectionSerialNumber, inNode: nodeSerialNumber, outNode: nodeSerialNumber + 1)
                     
                     let seriesCap = (currentSection == 0 ? nextAxialSection.bottomDiskSerialCapacitance : (currentSection == Int(nextAxialSection.numDisks) - 1) ? nextAxialSection.topDiskSerialCapacitance : nextAxialSection.commonDiskSerialCapacitance)
                     
@@ -436,13 +436,14 @@ class AppController: NSObject {
                     zCurrent += (Double(nextAxialSection.diskSize.height) + nextAxialSection.interDiskDimn) * unitFactor
                 }
                 
+                // we increment the node serial number after each axial section, which allows us to connect center-connected taps, etc.
+                nodeSerialNumber += 1
+                
                 sectionNumberOffset += Int(nextAxialSection.numDisks)
                 zCurrent += (nextAxialSection.overTopDiskDimn - nextAxialSection.interDiskDimn) * unitFactor
             }
             
             DLog("Done creating disks.")
-            
-            nodeSerialNumber += 1
         }
         
         // Shunt capacitances are either to ground or to the previous coil. The first coil has capacitance to the core, which is always to ground. We go through the coil array once more now that all of the sections have been created (this could possibly be made somewhat more efficient by doing it in the previous loop).
