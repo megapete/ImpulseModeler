@@ -175,7 +175,7 @@ class AppController: NSObject {
         let bbModel = PCH_BlueBookModel(theModel: self.theModel!, phase: self.phaseDefinition!)
         
         // Hardcoded connections, this will obviously need to be made more fancy
-        let theConnections = [(0, [-1, 20, 21])]
+        let theConnections = [(0, [-1, 20, 42]), (21, [62])]
         
         let simTimeStep = 10.0E-9
         let saveTimeStep = 100.0E-9
