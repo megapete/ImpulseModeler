@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11201" systemVersion="16B2555" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11542" systemVersion="16B2555" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11201"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11542"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication"/>
@@ -13,6 +14,7 @@
                 <outlet property="createModelMenuItem" destination="LBY-cF-aK0" id="HPe-zd-zTv"/>
                 <outlet property="inchItem" destination="ssa-Or-PRz" id="tRU-Ck-Kts"/>
                 <outlet property="metricItem" destination="Mj6-PL-WCz" id="GhT-v2-1xc"/>
+                <outlet property="modifyModelMenuItem" destination="6Mh-zH-hUk" id="mH7-Eg-XaM"/>
                 <outlet property="runSimMenuItem" destination="SYD-vz-rAL" id="k1O-4g-yIy"/>
                 <outlet property="saveCirFileMenuItem" destination="CMY-na-8SV" id="kPF-Ea-rkO"/>
                 <outlet property="saveModelMenuItem" destination="pxx-59-PXV" id="KTL-9a-vMo"/>
@@ -384,6 +386,12 @@
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="handleCreateModel:" target="Ubf-fF-CrH" id="RHy-GX-cUU"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Modify model..." id="6Mh-zH-hUk">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="handleModifyModel:" target="Ubf-fF-CrH" id="DBE-XK-m4E"/>
                                 </connections>
                             </menuItem>
                         </items>

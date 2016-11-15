@@ -207,7 +207,7 @@ class PCH_BlueBookModel: NSObject {
     
     func SimulateWithConnections(_ connections:[(fromNode:Int, toNodes:[Int])], sourceConnection:(source:PCH_Source, toNode:Int), simTimeStep:Double, saveTimeStep:Double, totalTime:Double) -> (V:PCH_Matrix, I:PCH_Matrix)?
     {
-        // Nodes can be connected to ground or to the source (they cannot be connected "from" ground).
+        // Nodes can be connected to ground (they cannot be connected "from" ground), to other nodes, or to the source.
         
         let newC = self.C
         

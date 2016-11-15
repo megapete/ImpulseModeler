@@ -82,6 +82,7 @@ class AppController: NSObject {
     @IBOutlet weak var saveCirFileMenuItem: NSMenuItem!
     @IBOutlet weak var runSimMenuItem: NSMenuItem!
     @IBOutlet weak var saveModelMenuItem: NSMenuItem!
+    @IBOutlet weak var modifyModelMenuItem: NSMenuItem!
 
     
     // The model in the format required by the routine for making a spice ".cir" file
@@ -261,6 +262,85 @@ class AppController: NSObject {
         }
     }
     
+    @IBAction func handleModifyModel(_ sender: Any)
+    {
+        let oldPhase = self.phaseDefinition!
+        
+        // Bring up the core dialog
+        let coreDlog = CoreInputDlog()
+        
+        var newCore = coreDlog.runDialog(oldPhase.core)
+        if newCore == nil
+        {
+            newCore = oldPhase.core
+        }
+        
+        var doneCoils = false
+        var currentCoilRefNum = 0
+        
+        var coils:[Coil]? = oldPhase.coils
+        
+        while !doneCoils
+        {
+            var coilExists = false
+            var coil:Coil? = nil
+            
+            if let existingCoils = coils
+            {
+                if existingCoils.count > currentCoilRefNum
+                {
+                    coilExists = true
+                    coil = existingCoils[currentCoilRefNum]
+                }
+            }
+            else
+            {
+                coils = Array()
+            }
+            
+            let coilDlog = CoilDlog()
+            let newCoils = coilDlog.runDialog(currentCoilRefNum, usingCoil: coil)
+            
+            if (newCoils.result == CoilDlog.DlogResult.cancel)
+            {
+                doneCoils = true
+                DLog("User chose cancel")
+                self.phaseDefinition = Phase(core: newCore!, coils: oldPhase.coils)
+                return
+            }
+            else
+            {
+                if (coilExists)
+                {
+                    coils![currentCoilRefNum] = newCoils.coil!
+                }
+                else
+                {
+                    coils!.append(newCoils.coil!)
+                }
+                
+                if (newCoils.result == CoilDlog.DlogResult.done)
+                {
+                    doneCoils = true
+                }
+                else if (newCoils.result == CoilDlog.DlogResult.previous)
+                {
+                    currentCoilRefNum -= 1
+                }
+                else // must be next
+                {
+                    currentCoilRefNum += 1
+                }
+                
+            }
+        }
+        
+        self.phaseDefinition = Phase(core: newCore!, coils: coils!)
+        
+        self.handleCreateModel(self)
+    }
+    
+    
     @IBAction func handleCreateModel(_ sender: AnyObject)
     {
         guard let phase = self.phaseDefinition
@@ -271,7 +351,6 @@ class AppController: NSObject {
         
         if (theModel != nil)
         {
-            // TODO: Give the user a chance to save the model
             let saveYesOrNo = NSAlert()
             saveYesOrNo.messageText = "This will destroy the current model! Do you wish to save it before proceeding?"
             saveYesOrNo.alertStyle = NSAlertStyle.warning
@@ -470,10 +549,10 @@ class AppController: NSObject {
     {
         if (menuItem == self.createModelMenuItem)
         {
-            return self.phaseDefinition != nil
+            return self.phaseDefinition != nil && self.theModel == nil
         }
         
-        if (menuItem == self.saveCirFileMenuItem) || (menuItem == self.runSimMenuItem) || (menuItem == self.saveModelMenuItem)
+        if (menuItem == self.saveCirFileMenuItem) || (menuItem == self.runSimMenuItem) || (menuItem == self.saveModelMenuItem) || (menuItem == self.modifyModelMenuItem)
         {
             return self.theModel != nil
         }
@@ -666,11 +745,22 @@ class AppController: NSObject {
         
         let oldPhase = self.phaseDefinition
         
-        if (oldPhase != nil)
+        if (self.theModel != nil)
         {
-            // TODO: Ask user if he wants to save the current phase before deleteing it
+            let saveYesOrNo = NSAlert()
+            saveYesOrNo.messageText = "This will destroy the current model! Do you wish to save them before proceeding?"
+            saveYesOrNo.alertStyle = NSAlertStyle.warning
+            saveYesOrNo.addButton(withTitle: "Yes")
+            saveYesOrNo.addButton(withTitle: "No")
+            
+            if (saveYesOrNo.runModal() == NSAlertFirstButtonReturn)
+            {
+                self.handleSaveModel(self)
+            }
+            
             DLog("Deleting existing phase")
             self.phaseDefinition = nil
+            self.theModel = nil
         }
         
         // Bring up the core dialog

@@ -161,11 +161,45 @@ class CoilDlog: NSWindowController {
     
     func saveCoilAndClose()
     {
+        
+        let tst1 = positiveCurrentButton.state
+        let tst2 = negativeCurrentButton.state
+        let tst3 = noCurrentButton.state
+        
+        DLog("+: \(tst1), -: \(tst2), 0: \(tst3)")
+        
         returnedCoil = Coil(coilName: coilNameField.stringValue, coilRadialPosition: radialPositionField.integerValue, amps: ampsField.doubleValue, currentDirection: (positiveCurrentButton.state == NSOnState ? 1 : (negativeCurrentButton.state == NSOnState ? -1 : 0)), capacitanceToPreviousCoil: radialCapacitanceField.doubleValue, capacitanceToGround:capacitanceToGroundField.doubleValue, innerRadius: innerDiameterField.doubleValue / 2.0, eddyLossPercentage:eddyLossField.doubleValue, sections: self.sections)
         
         NSApp.stopModal()
         self.window!.orderOut(self)
     }
+    
+    @IBAction func handleCurrDirGroup(_ sender: Any)
+    {
+        guard let wButton:NSButton = sender as? NSButton else
+        {
+            return
+        }
+        
+        if wButton == noCurrentButton
+        {
+            positiveCurrentButton.state = NSOffState
+            negativeCurrentButton.state = NSOffState
+        }
+        else if wButton == positiveCurrentButton
+        {
+            negativeCurrentButton.state = NSOffState
+            noCurrentButton.state = NSOffState
+        }
+        else if wButton == negativeCurrentButton
+        {
+            positiveCurrentButton.state = NSOffState
+            noCurrentButton.state = NSOffState
+        }
+        
+        wButton.state = NSOnState
+    }
+    
     
     @IBAction func doneButtonPushed(_ sender: AnyObject)
     {
