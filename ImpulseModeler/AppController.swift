@@ -169,8 +169,13 @@ class AppController: NSObject {
     
     @IBAction func handleRunSimulation(_ sender: AnyObject)
     {
-        // hardcoded BIL level during testing, need to add a dialog or something for this
-        let testSource = PCH_Source(type: PCH_Source.Types.FullWave, pkVoltage: 125000.0)
+        let srcDlog = SourceDefinitionDlog()
+        guard let testSource = srcDlog.runDialog()
+        else
+        {
+            DLog("User chose cancel")
+            return
+        }
         
         let bbModel = PCH_BlueBookModel(theModel: self.theModel!, phase: self.phaseDefinition!)
         
