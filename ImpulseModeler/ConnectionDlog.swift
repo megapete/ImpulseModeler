@@ -32,14 +32,22 @@ class ConnectionDlog: NSWindowController
         }
         
         theView.sections = theModel
-        let requiredHeight = theView.calculateCoilHeight() + 50.0
+        theView.createFieldsForSections()
         
-        if requiredHeight > Double(theView.superview!.frame.height)
+        let requiredHeight = theView.calculateCoilHeight() + 100.0
+        
+        
+        if (theView.frame.height < CGFloat(requiredHeight))
         {
+            let newFrame = NSRect(x: theView.frame.origin.x, y: theView.frame.origin.y, width: theView.frame.width, height: CGFloat(requiredHeight))
             
+            let beforeFrame = theView.frame
+            theView.frame = newFrame
+            let afterFrame = theView.frame
+            
+            DLog("Before Ht: \(beforeFrame.height), After Ht: \(afterFrame.height)")
         }
         
-        DLog("Length: \(requiredHeight)")
     }
     
     func runDialog(theModel:[PCH_DiskSection]) -> [(from:Int, to:Int)]?

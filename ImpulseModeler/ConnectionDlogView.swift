@@ -10,13 +10,13 @@ import Cocoa
 
 class ConnectionDlogView: NSView
 {
-    let textFieldHt = 17.0
-    let connectorLength = 10.0
-    let elementHt = 17.0 + 2.0 * 5.0
-    let nodeDiameter = 5.0
+    // let textFieldHt = 17.0
+    let connectorLength = 15.0
+    var elementHt:Double? = nil
+    let nodeDiameter = 10.0
     
     var sections:[PCH_DiskSection]? = nil
-    var sectionFields:[NSTextField]? = nil
+    var sectionFields:[NSTextField] = Array()
     
     override func draw(_ dirtyRect: NSRect)
     {
@@ -41,6 +41,60 @@ class ConnectionDlogView: NSView
         
         drawLightningBoltAt(NSPoint(x:impulseConnectionRect.origin.x + impulseConnectionRect.width / 2.0, y:impulseConnectionRect.origin.y + impulseConnectionRect.height - 0.5))
         
+        var lastCoilName = ""
+        var horizontalOffset = CGFloat(100.0)
+        var verticalOffset = CGFloat(50.0)
+        
+        NSColor.black.set()
+        
+        for nextField in sectionFields
+        {
+            let nextCoilName = PCH_StrLeft(nextField.stringValue, length: 2)
+            
+            if nextCoilName != lastCoilName
+            {
+                horizontalOffset += 100.0
+                verticalOffset = CGFloat(50.0)
+                
+                lastCoilName = nextCoilName
+            }
+            else
+            {
+                verticalOffset += CGFloat(elementHt!)
+            }
+            
+            let oldFrame = nextField.frame
+            let newFrame = NSRect(x: horizontalOffset - oldFrame.width / 2.0, y: verticalOffset, width: oldFrame.width, height: oldFrame.height)
+            
+            nextField.frame = newFrame
+            
+            let borderRect = NSRect(x: newFrame.origin.x - 2.0, y: newFrame.origin.y - 4.0, width: newFrame.width + 7.0, height: newFrame.height + 7.0)
+            let borderPath = NSBezierPath(rect: borderRect)
+            borderPath.stroke()
+            
+            let connectorPath = NSBezierPath()
+            let connectorX = borderRect.origin.x + borderRect.width / 2.0
+            
+            connectorPath.move(to: NSPoint(x: connectorX, y: borderRect.origin.y))
+            let endPoint = NSPoint(x: connectorX, y: borderRect.origin.y - CGFloat(connectorLength))
+            connectorPath.line(to: endPoint)
+            connectorPath.stroke()
+            
+            connectorPath.move(to: NSPoint(x: connectorX, y: borderRect.origin.y + borderRect.height))
+            connectorPath.line(to: NSPoint(x: connectorX, y: borderRect.origin.y + borderRect.height + CGFloat(connectorLength)))
+            connectorPath.stroke()
+            
+            let nodeCircleRect = NSRect(x: endPoint.x - CGFloat(nodeDiameter) / 2.0, y: endPoint.y - CGFloat(nodeDiameter) / 2.0, width: CGFloat(nodeDiameter), height: CGFloat(nodeDiameter))
+            let nodeCirclePath = NSBezierPath(ovalIn: nodeCircleRect)
+            
+            NSColor.white.set()
+            nodeCirclePath.fill()
+            
+            NSColor.black.set()
+            nodeCirclePath.stroke()
+            
+        }
+        
     }
     
     func calculateCoilHeight() -> Double
@@ -48,6 +102,11 @@ class ConnectionDlogView: NSView
         var result = 0.0
         
         let sectArray = sections!
+        
+        if (elementHt == nil)
+        {
+            self.createFieldsForSections()
+        }
         
         var lastSection:PCH_DiskSection? = nil
         
@@ -80,7 +139,7 @@ class ConnectionDlogView: NSView
                 }
             }
             
-            currentCoilHt += elementHt
+            currentCoilHt += elementHt!
             
             lastSection = nextSection
         }
@@ -100,8 +159,18 @@ class ConnectionDlogView: NSView
         for nextSection in sectArray
         {
             let nextField = NSTextField(labelWithString: nextSection.data.sectionID)
-            nextField.isBordered = true
-            nextField.isHidden = true
+            
+            if (elementHt == nil)
+            {
+                elementHt = Double(nextField.frame.height) + 7.0 + 2.0 * self.connectorLength
+            }
+            
+            nextField.isBordered = false
+            nextField.isHidden = false
+            nextField.alignment = NSTextAlignment.center
+            
+            self.sectionFields.append(nextField)
+            self.addSubview(nextField)
         }
     }
     
