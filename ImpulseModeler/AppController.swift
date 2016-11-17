@@ -179,6 +179,14 @@ class AppController: NSObject {
         
         let bbModel = PCH_BlueBookModel(theModel: self.theModel!, phase: self.phaseDefinition!)
         
+        let connDlog = ConnectionDlog()
+        guard let testConnection = connDlog.runDialog(theModel: self.theModel!)
+        else
+        {
+            DLog("User chose cancel")
+            return
+        }
+        
         // Hardcoded connections, this will obviously need to be made more fancy
         let theConnections = [(0, [-1, 20, 42]), (21, [62])]
         

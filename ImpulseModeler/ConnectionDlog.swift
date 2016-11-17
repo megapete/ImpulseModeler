@@ -8,12 +8,46 @@
 
 import Cocoa
 
-class ConnectionDlog: NSWindowController {
-
-    override func windowDidLoad() {
+class ConnectionDlog: NSWindowController
+{
+    @IBOutlet weak var theView: ConnectionDlogView!
+    
+    var model:[PCH_DiskSection]? = nil
+    
+    override var windowNibName: String!
+    {
+        return "ConnectionDlog"
+    }
+    
+    override func windowDidLoad()
+    {
         super.windowDidLoad()
 
         // Implement this method to handle any initialization after your window controller's window has been loaded from its nib file.
+        
+        guard let theModel = model
+        else
+        {
+            return
+        }
+        
+        theView.sections = theModel
+        let requiredHeight = theView.calculateCoilHeight() + 50.0
+        
+        if requiredHeight > Double(theView.superview!.frame.height)
+        {
+            
+        }
+        
+        DLog("Length: \(requiredHeight)")
     }
     
+    func runDialog(theModel:[PCH_DiskSection]) -> [(from:Int, to:Int)]?
+    {
+        self.model = theModel
+        
+        NSApp.runModal(for: self.window!)
+        
+        return nil
+    }
 }
