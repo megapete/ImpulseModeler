@@ -32,21 +32,7 @@ class ConnectionDlog: NSWindowController
         }
         
         theView.sections = theModel
-        theView.createFieldsForSections()
-        
-        let requiredHeight = theView.calculateCoilHeight() + 100.0
-        
-        
-        if (theView.frame.height < CGFloat(requiredHeight))
-        {
-            let newFrame = NSRect(x: theView.frame.origin.x, y: theView.frame.origin.y, width: theView.frame.width, height: CGFloat(requiredHeight))
-            
-            let beforeFrame = theView.frame
-            theView.frame = newFrame
-            let afterFrame = theView.frame
-            
-            DLog("Before Ht: \(beforeFrame.height), After Ht: \(afterFrame.height)")
-        }
+        theView.fixFrameRect()
         
     }
     

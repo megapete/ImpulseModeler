@@ -29,8 +29,9 @@
                             <rect key="frame" x="1" y="1" width="893" height="720"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
-                                <customView translatesAutoresizingMaskIntoConstraints="NO" id="x6J-aT-XcX" customClass="ConnectionDlogView" customModule="ImpulseModeler" customModuleProvider="target">
+                                <customView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="x6J-aT-XcX" customClass="ConnectionDlogView" customModule="ImpulseModeler" customModuleProvider="target">
                                     <rect key="frame" x="0.0" y="0.0" width="893" height="720"/>
+                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                     <subviews>
                                         <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hjh-g6-ayg">
                                             <rect key="frame" x="14" y="672" width="107" height="32"/>
@@ -51,12 +52,6 @@
                                     </subviews>
                                 </customView>
                             </subviews>
-                            <constraints>
-                                <constraint firstAttribute="trailing" secondItem="x6J-aT-XcX" secondAttribute="trailing" id="5Se-T5-cbK"/>
-                                <constraint firstAttribute="bottom" secondItem="x6J-aT-XcX" secondAttribute="bottom" id="ULJ-bI-2FL"/>
-                                <constraint firstItem="x6J-aT-XcX" firstAttribute="top" secondItem="QBk-0S-9Au" secondAttribute="top" id="WfD-ou-McN"/>
-                                <constraint firstItem="x6J-aT-XcX" firstAttribute="leading" secondItem="QBk-0S-9Au" secondAttribute="leading" id="aag-XE-aKf"/>
-                            </constraints>
                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                         </clipView>
                         <scroller key="horizontalScroller" verticalHuggingPriority="750" horizontal="YES" id="AHj-od-KRq">

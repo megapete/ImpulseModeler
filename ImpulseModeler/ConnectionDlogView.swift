@@ -22,11 +22,13 @@ class ConnectionDlogView: NSView
     {
         super.draw(dirtyRect)
         
+        // Set the background to white for the view
         NSColor.white.set()
         NSRectFill(self.bounds)
 
         // Drawing code here.
         
+        // Draw the "button" around the ground icon
         NSColor.gray.set()
         let groundConnectionRect = NSRect(x: 67.5 - 15.0, y: self.bounds.height - 125.0, width: 30.0, height: 30.0)
         var path = NSBezierPath(roundedRect:groundConnectionRect , xRadius: 5.0, yRadius: 5.0)
@@ -34,6 +36,7 @@ class ConnectionDlogView: NSView
         
         drawGroundAt(NSPoint(x: 67.5, y: self.bounds.height - 100.0))
         
+        // Draw the button around the impulse icon
         NSColor.gray.set()
         let impulseConnectionRect = NSOffsetRect(groundConnectionRect, 0.0, -50.0)
         path = NSBezierPath(roundedRect: impulseConnectionRect, xRadius: 5.0, yRadius: 5.0)
@@ -41,11 +44,14 @@ class ConnectionDlogView: NSView
         
         drawLightningBoltAt(NSPoint(x:impulseConnectionRect.origin.x + impulseConnectionRect.width / 2.0, y:impulseConnectionRect.origin.y + impulseConnectionRect.height - 0.5))
         
+        // Show the disks and nodes
         var lastCoilName = ""
         var horizontalOffset = CGFloat(100.0)
         var verticalOffset = CGFloat(50.0)
         
         NSColor.black.set()
+        
+        var lastTopCircleCenter = NSPoint(x: 0.0, y: 0.0)
         
         for nextField in sectionFields
         {
@@ -53,6 +59,20 @@ class ConnectionDlogView: NSView
             
             if nextCoilName != lastCoilName
             {
+                if lastCoilName != ""
+                {
+                    // Show the final top node over the previous coil
+                    let nodeCircleRect = NSRect(x: lastTopCircleCenter.x - CGFloat(nodeDiameter) / 2.0, y: lastTopCircleCenter.y - CGFloat(nodeDiameter) / 2.0, width: CGFloat(nodeDiameter), height: CGFloat(nodeDiameter))
+                    let nodeCirclePath = NSBezierPath(ovalIn: nodeCircleRect)
+                    
+                    NSColor.white.set()
+                    nodeCirclePath.fill()
+                    
+                    NSColor.black.set()
+                    nodeCirclePath.stroke()
+                }
+                
+                // change the offsets to show the next coil
                 horizontalOffset += 100.0
                 verticalOffset = CGFloat(50.0)
                 
@@ -68,22 +88,27 @@ class ConnectionDlogView: NSView
             
             nextField.frame = newFrame
             
+            // Show the border around the disk name (using isBordered is UGLY)
             let borderRect = NSRect(x: newFrame.origin.x - 2.0, y: newFrame.origin.y - 4.0, width: newFrame.width + 7.0, height: newFrame.height + 7.0)
             let borderPath = NSBezierPath(rect: borderRect)
             borderPath.stroke()
             
             let connectorPath = NSBezierPath()
             let connectorX = borderRect.origin.x + borderRect.width / 2.0
-            
+        
+            // Draw the connector coming out the bottom of the disk
             connectorPath.move(to: NSPoint(x: connectorX, y: borderRect.origin.y))
             let endPoint = NSPoint(x: connectorX, y: borderRect.origin.y - CGFloat(connectorLength))
             connectorPath.line(to: endPoint)
             connectorPath.stroke()
             
+            // Draw the connector coming out the top of the disk
             connectorPath.move(to: NSPoint(x: connectorX, y: borderRect.origin.y + borderRect.height))
-            connectorPath.line(to: NSPoint(x: connectorX, y: borderRect.origin.y + borderRect.height + CGFloat(connectorLength)))
+             lastTopCircleCenter = NSPoint(x: connectorX, y: borderRect.origin.y + borderRect.height + CGFloat(connectorLength))
+            connectorPath.line(to: lastTopCircleCenter)
             connectorPath.stroke()
             
+            // Draw the node circle under the disk
             let nodeCircleRect = NSRect(x: endPoint.x - CGFloat(nodeDiameter) / 2.0, y: endPoint.y - CGFloat(nodeDiameter) / 2.0, width: CGFloat(nodeDiameter), height: CGFloat(nodeDiameter))
             let nodeCirclePath = NSBezierPath(ovalIn: nodeCircleRect)
             
@@ -95,6 +120,31 @@ class ConnectionDlogView: NSView
             
         }
         
+        // Show the final top node over the final coil
+        let nodeCircleRect = NSRect(x: lastTopCircleCenter.x - CGFloat(nodeDiameter) / 2.0, y: lastTopCircleCenter.y - CGFloat(nodeDiameter) / 2.0, width: CGFloat(nodeDiameter), height: CGFloat(nodeDiameter))
+        let nodeCirclePath = NSBezierPath(ovalIn: nodeCircleRect)
+        
+        NSColor.white.set()
+        nodeCirclePath.fill()
+        
+        NSColor.black.set()
+        nodeCirclePath.stroke()
+    }
+    
+    func fixFrameRect()
+    {
+        let requiredHeight = self.calculateCoilHeight() + 100.0
+        
+        let scrollView = self.superview!
+        
+        if (scrollView.frame.height < CGFloat(requiredHeight))
+        {
+            let yOffset = CGFloat(requiredHeight) - scrollView.frame.height
+            
+            let newFrame = NSRect(x: scrollView.frame.origin.x, y: scrollView.frame.origin.y - yOffset, width: scrollView.frame.width, height: CGFloat(requiredHeight))
+            
+            self.frame = newFrame
+        }
     }
     
     func calculateCoilHeight() -> Double
