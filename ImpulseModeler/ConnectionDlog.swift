@@ -8,7 +8,7 @@
 
 import Cocoa
 
-class ConnectionDlog: NSWindowController
+class ConnectionDlog: NSWindowController, NSWindowDelegate
 {
     @IBOutlet weak var theView: ConnectionDlogView!
     
@@ -34,6 +34,12 @@ class ConnectionDlog: NSWindowController
         theView.sections = theModel
         theView.fixFrameRect()
         
+    }
+    
+    func windowDidResize(_ notification: Notification)
+    {
+        theView.fixFrameRect()
+        theView.needsDisplay = true
     }
     
     func runDialog(theModel:[PCH_DiskSection]) -> [(from:Int, to:Int)]?

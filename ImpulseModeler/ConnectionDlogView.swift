@@ -131,6 +131,8 @@ class ConnectionDlogView: NSView
         nodeCirclePath.stroke()
     }
     
+    
+    
     func fixFrameRect()
     {
         let requiredHeight = self.calculateCoilHeight() + 100.0
