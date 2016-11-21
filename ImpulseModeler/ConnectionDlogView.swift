@@ -26,6 +26,9 @@ class ConnectionDlogView: NSView
     let horizontalOffsetToFirstCoil = 200.0
     let horizontalOffsetBetweenCoils = 100.0
     
+    var groundConnectionRect:NSRect?
+    var impulseConnectionRect:NSRect?
+    
     var sections:[PCH_DiskSection]? = nil
     var sectionFields:[NSTextField] = Array()
     var nodes:[Node] = Array()
@@ -44,20 +47,27 @@ class ConnectionDlogView: NSView
         NSRectFill(self.bounds)
         
         // Draw the "button" around the ground icon
-        NSColor.gray.set()
-        let groundConnectionRect = NSRect(x: 67.5 - 15.0, y: self.bounds.height - 125.0, width: 30.0, height: 30.0)
-        var path = NSBezierPath(roundedRect:groundConnectionRect , xRadius: 5.0, yRadius: 5.0)
-        path.stroke()
         
-        drawGroundAt(NSPoint(x: 67.5, y: self.bounds.height - 100.0))
+        if let grdConnRect = self.groundConnectionRect
+        {
+            NSColor.gray.set()
+            let path = NSBezierPath(roundedRect:grdConnRect , xRadius: 5.0, yRadius: 5.0)
+            path.stroke()
+            
+            drawGroundAt(NSPoint(x: grdConnRect.origin.x + 15.0, y: grdConnRect.origin.y + grdConnRect.height - 5.0))
+        }
+        
+        
         
         // Draw the button around the impulse icon
-        NSColor.gray.set()
-        let impulseConnectionRect = NSOffsetRect(groundConnectionRect, 0.0, -50.0)
-        path = NSBezierPath(roundedRect: impulseConnectionRect, xRadius: 5.0, yRadius: 5.0)
-        path.stroke()
-        
-        drawLightningBoltAt(NSPoint(x:impulseConnectionRect.origin.x + impulseConnectionRect.width / 2.0, y:impulseConnectionRect.origin.y + impulseConnectionRect.height - 0.5))
+        if let impConnRect = self.impulseConnectionRect
+        {
+            NSColor.gray.set()
+            let path = NSBezierPath(roundedRect: impConnRect, xRadius: 5.0, yRadius: 5.0)
+            path.stroke()
+            
+            drawLightningBoltAt(NSPoint(x:impConnRect.origin.x + impConnRect.width / 2.0, y:impConnRect.origin.y + impConnRect.height - 0.5))
+        }
         
         // Start by showing the disks and connectors
         for nextField in self.sectionFields
@@ -217,6 +227,9 @@ class ConnectionDlogView: NSView
             
             previousSection = currSection
         }
+        
+        self.groundConnectionRect = NSRect(x: 67.5 - 15.0, y: self.bounds.height - 125.0, width: 30.0, height: 30.0)
+        self.impulseConnectionRect = NSOffsetRect(self.groundConnectionRect!, 0.0, -50.0)
     }
     
     func fixFrameRect()
