@@ -8,15 +8,32 @@
 
 import Cocoa
 
+struct Node {
+    
+    let idNum:Int
+    var connections:[Int]
+    var location:NSPoint
+    var currentColor:NSColor
+}
+
 class ConnectionDlogView: NSView
 {
-    // let textFieldHt = 17.0
     let connectorLength = 15.0
     var elementHt:Double? = nil
+    var requiredCoilHt:Double? = nil
     let nodeDiameter = 10.0
+    let offsetFromBottom = 50.0
+    let horizontalOffsetToFirstCoil = 200.0
+    let horizontalOffsetBetweenCoils = 100.0
     
     var sections:[PCH_DiskSection]? = nil
     var sectionFields:[NSTextField] = Array()
+    var nodes:[Node] = Array()
+    
+    var nodeRects:[NSRect] = Array()
+    var nodeColors:[NSColor] = Array()
+    
+    // var isFirstTime = true
     
     override func draw(_ dirtyRect: NSRect)
     {
@@ -25,8 +42,6 @@ class ConnectionDlogView: NSView
         // Set the background to white for the view
         NSColor.white.set()
         NSRectFill(self.bounds)
-
-        // Drawing code here.
         
         // Draw the "button" around the ground icon
         NSColor.gray.set()
@@ -44,98 +59,169 @@ class ConnectionDlogView: NSView
         
         drawLightningBoltAt(NSPoint(x:impulseConnectionRect.origin.x + impulseConnectionRect.width / 2.0, y:impulseConnectionRect.origin.y + impulseConnectionRect.height - 0.5))
         
-        // Show the disks and nodes
-        var lastCoilName = ""
-        var horizontalOffset = CGFloat(100.0)
-        var verticalOffset = CGFloat(50.0)
-        
-        NSColor.black.set()
-        
-        var lastTopCircleCenter = NSPoint(x: 0.0, y: 0.0)
-        
-        for nextField in sectionFields
+        // Start by showing the disks and connectors
+        for nextField in self.sectionFields
         {
-            let nextCoilName = PCH_StrLeft(nextField.stringValue, length: 2)
-            
-            if nextCoilName != lastCoilName
-            {
-                if lastCoilName != ""
-                {
-                    // Show the final top node over the previous coil
-                    let nodeCircleRect = NSRect(x: lastTopCircleCenter.x - CGFloat(nodeDiameter) / 2.0, y: lastTopCircleCenter.y - CGFloat(nodeDiameter) / 2.0, width: CGFloat(nodeDiameter), height: CGFloat(nodeDiameter))
-                    let nodeCirclePath = NSBezierPath(ovalIn: nodeCircleRect)
-                    
-                    NSColor.white.set()
-                    nodeCirclePath.fill()
-                    
-                    NSColor.black.set()
-                    nodeCirclePath.stroke()
-                }
-                
-                // change the offsets to show the next coil
-                horizontalOffset += 100.0
-                verticalOffset = CGFloat(50.0)
-                
-                lastCoilName = nextCoilName
-            }
-            else
-            {
-                verticalOffset += CGFloat(elementHt!)
-            }
-            
-            let oldFrame = nextField.frame
-            let newFrame = NSRect(x: horizontalOffset - oldFrame.width / 2.0, y: verticalOffset, width: oldFrame.width, height: oldFrame.height)
-            
-            nextField.frame = newFrame
+            NSColor.black.set()
             
             // Show the border around the disk name (using isBordered is UGLY)
-            let borderRect = NSRect(x: newFrame.origin.x - 2.0, y: newFrame.origin.y - 4.0, width: newFrame.width + 7.0, height: newFrame.height + 7.0)
+            let borderRect = NSRect(x: nextField.frame.origin.x - 2.0, y: nextField.frame.origin.y - 4.0, width: nextField.frame.width + 7.0, height: nextField.frame.height + 7.0)
             let borderPath = NSBezierPath(rect: borderRect)
             borderPath.stroke()
             
             let connectorPath = NSBezierPath()
             let connectorX = borderRect.origin.x + borderRect.width / 2.0
-        
+            
             // Draw the connector coming out the bottom of the disk
             connectorPath.move(to: NSPoint(x: connectorX, y: borderRect.origin.y))
-            let endPoint = NSPoint(x: connectorX, y: borderRect.origin.y - CGFloat(connectorLength))
-            connectorPath.line(to: endPoint)
+            connectorPath.relativeLine(to: NSPoint(x: 0.0, y: CGFloat(-connectorLength)))
             connectorPath.stroke()
             
             // Draw the connector coming out the top of the disk
             connectorPath.move(to: NSPoint(x: connectorX, y: borderRect.origin.y + borderRect.height))
-             lastTopCircleCenter = NSPoint(x: connectorX, y: borderRect.origin.y + borderRect.height + CGFloat(connectorLength))
-            connectorPath.line(to: lastTopCircleCenter)
+            connectorPath.relativeLine(to: NSPoint(x: 0.0, y: CGFloat(connectorLength)))
             connectorPath.stroke()
-            
-            // Draw the node circle under the disk
-            let nodeCircleRect = NSRect(x: endPoint.x - CGFloat(nodeDiameter) / 2.0, y: endPoint.y - CGFloat(nodeDiameter) / 2.0, width: CGFloat(nodeDiameter), height: CGFloat(nodeDiameter))
-            let nodeCirclePath = NSBezierPath(ovalIn: nodeCircleRect)
-            
-            NSColor.white.set()
-            nodeCirclePath.fill()
-            
-            NSColor.black.set()
-            nodeCirclePath.stroke()
-            
         }
         
-        // Show the final top node over the final coil
-        let nodeCircleRect = NSRect(x: lastTopCircleCenter.x - CGFloat(nodeDiameter) / 2.0, y: lastTopCircleCenter.y - CGFloat(nodeDiameter) / 2.0, width: CGFloat(nodeDiameter), height: CGFloat(nodeDiameter))
-        let nodeCirclePath = NSBezierPath(ovalIn: nodeCircleRect)
-        
-        NSColor.white.set()
-        nodeCirclePath.fill()
-        
-        NSColor.black.set()
-        nodeCirclePath.stroke()
+        // And now the nodes
+        for nextNode in self.nodes
+        {
+            let nodeRect = NSRect(x: nextNode.location.x - CGFloat(self.nodeDiameter / 2.0), y: nextNode.location.y - CGFloat(self.nodeDiameter / 2.0), width: CGFloat(self.nodeDiameter), height: CGFloat(self.nodeDiameter))
+            
+            let nodePath = NSBezierPath(ovalIn: nodeRect)
+            
+            nextNode.currentColor.set()
+            nodePath.fill()
+            
+            NSColor.black.set()
+            nodePath.stroke()
+        }
     }
     
+    override var acceptsFirstResponder: Bool
+    {
+        return true
+    }
     
+    override func mouseDown(with event: NSEvent) {
+        
+        guard let window = event.window
+        else
+        {
+            super.mouseDown(with: event)
+            return
+        }
+        
+        guard let viewsWindow = self.window
+        else
+        {
+            super.mouseDown(with: event)
+            return
+        }
+        
+        if (viewsWindow != window)
+        {
+            super.mouseDown(with: event)
+            return
+        }
+        
+        let pointInWindow = event.locationInWindow
+        let pointInView = self.convert(pointInWindow, to: nil)
+        
+        for nextNodeRect in nodeRects
+        {
+            if nextNodeRect.contains(pointInView)
+            {
+                NSColor.lightGray.set()
+            }
+            else
+            {
+                NSColor.white.set()
+            }
+            
+            let nextNode = NSBezierPath(ovalIn: nextNodeRect)
+            nextNode.fill()
+        }
+        
+    }
+    
+    func setUpView()
+    {
+        guard let theSections = self.sections
+        else
+        {
+            ALog("No sections defined")
+            return
+        }
+        
+        self.fixFrameRect()
+        
+        // At this point, the textfields for the disk names have all been set up. Here we will create the nodes and set the rectangles for each text field
+        
+        var previousSection:PCH_DiskSection? = nil
+        var currentInNodeCenter = NSPoint(x: self.horizontalOffsetToFirstCoil, y: self.offsetFromBottom)
+
+        for i in 0..<theSections.count
+        {
+            let currSection = theSections[i]
+            
+            if let prevSection = previousSection
+            {
+                let prevSectionCoilName = PCH_StrLeft(prevSection.data.sectionID, length: 2)
+                let currSectionCoilName = PCH_StrLeft(currSection.data.sectionID, length: 2)
+                
+                if (prevSectionCoilName == currSectionCoilName)
+                {
+                    if prevSection.data.nodes.outNode != currSection.data.nodes.inNode
+                    {
+                        // there's a break in the coil, save the outNode of the previous section
+                        let outNode = Node(idNum: prevSection.data.nodes.outNode, connections: Array(), location: currentInNodeCenter, currentColor: NSColor.white)
+                        
+                        self.nodes.append(outNode)
+                        
+                        currentInNodeCenter.y += CGFloat(self.connectorLength)
+                    }
+                }
+                else
+                {
+                    // we've started a new coil, show the final outNode of the previous coil, then start the new one
+                    
+                    let outNode = Node(idNum: prevSection.data.nodes.outNode, connections: Array(), location: currentInNodeCenter, currentColor: NSColor.white)
+                    
+                    self.nodes.append(outNode)
+                    
+                    currentInNodeCenter.x += CGFloat(self.horizontalOffsetBetweenCoils)
+                    currentInNodeCenter.y = CGFloat(self.offsetFromBottom)
+                }
+            }
+            
+            let inNode = Node(idNum: currSection.data.nodes.inNode, connections: Array(), location: currentInNodeCenter, currentColor: NSColor.white)
+            
+            self.nodes.append(inNode)
+            
+            // Set the rectangle of the textfield with the disk name
+            let oldFrame = self.sectionFields[i].frame
+            let newFrame = NSRect(x: currentInNodeCenter.x - (oldFrame.width + 7.0) / 2.0 + 2.0, y: currentInNodeCenter.y + CGFloat(self.connectorLength) + 4.0, width: oldFrame.width, height: oldFrame.height)
+            
+            self.sectionFields[i].frame = newFrame
+            
+            currentInNodeCenter.y += CGFloat(self.elementHt!)
+            
+            // check if this is the last section in the array and if so, set it's outNode
+            if i == theSections.count - 1
+            {
+                let outNode = Node(idNum: currSection.data.nodes.outNode, connections: Array(), location: currentInNodeCenter, currentColor: NSColor.white)
+                
+                self.nodes.append(outNode)
+            }
+            
+            previousSection = currSection
+        }
+    }
     
     func fixFrameRect()
     {
-        let requiredHeight = self.calculateCoilHeight() + 100.0
+        let requiredHeight = self.calculateCoilHeight() + 2.0 * self.offsetFromBottom
         
         let scrollView = self.superview!
         
@@ -151,11 +237,17 @@ class ConnectionDlogView: NSView
     
     func calculateCoilHeight() -> Double
     {
+        if let requiredHt = self.requiredCoilHt
+        {
+            // we've already calculated this, just return the value
+            return requiredHt
+        }
+        
         var result = 0.0
         
-        let sectArray = sections!
+        let sectArray = self.sections!
         
-        if (elementHt == nil)
+        if (self.elementHt == nil)
         {
             self.createFieldsForSections()
         }
@@ -195,6 +287,8 @@ class ConnectionDlogView: NSView
             
             lastSection = nextSection
         }
+        
+        self.requiredCoilHt = result
         
         return result
     }
