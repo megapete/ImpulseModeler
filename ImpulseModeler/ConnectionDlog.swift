@@ -35,8 +35,7 @@ class ConnectionDlog: NSWindowController, NSWindowDelegate
         
         theView.sections = theModel
         theView.setUpView()
-        
-        self.window!.acceptsMouseMovedEvents = true
+
         
     }
     

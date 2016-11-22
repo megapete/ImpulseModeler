@@ -23,20 +23,21 @@ class ConnectionDlogView: NSView
     var requiredCoilHt:Double? = nil
     let nodeDiameter = 10.0
     let offsetFromBottom = 50.0
-    let horizontalOffsetToFirstCoil = 200.0
-    let horizontalOffsetBetweenCoils = 100.0
+    let horizontalOffsetToFirstCoil = 250.0
+    let horizontalOffsetBetweenCoils = 150.0
     
     var groundConnectionRect:NSRect?
+    var highlightGround = false
+    
     var impulseConnectionRect:NSRect?
     
     var sections:[PCH_DiskSection]? = nil
     var sectionFields:[NSTextField] = Array()
     var nodes:[Node] = Array()
     
-    var nodeRects:[NSRect] = Array()
-    var nodeColors:[NSColor] = Array()
+    var startNode:Node? = nil
     
-    // var isFirstTime = true
+
     
     override func draw(_ dirtyRect: NSRect)
     {
@@ -54,10 +55,11 @@ class ConnectionDlogView: NSView
             let path = NSBezierPath(roundedRect:grdConnRect , xRadius: 5.0, yRadius: 5.0)
             path.stroke()
             
+            self.nodes[0].currentColor.set()
+            path.fill()
+            
             drawGroundAt(NSPoint(x: grdConnRect.origin.x + 15.0, y: grdConnRect.origin.y + grdConnRect.height - 5.0))
         }
-        
-        
         
         // Draw the button around the impulse icon
         if let impConnRect = self.impulseConnectionRect
@@ -65,6 +67,9 @@ class ConnectionDlogView: NSView
             NSColor.gray.set()
             let path = NSBezierPath(roundedRect: impConnRect, xRadius: 5.0, yRadius: 5.0)
             path.stroke()
+            
+            self.nodes[1].currentColor.set()
+            path.fill()
             
             drawLightningBoltAt(NSPoint(x:impConnRect.origin.x + impConnRect.width / 2.0, y:impConnRect.origin.y + impConnRect.height - 0.5))
         }
@@ -96,6 +101,12 @@ class ConnectionDlogView: NSView
         // And now the nodes
         for nextNode in self.nodes
         {
+            if nextNode.idNum < 0
+            {
+                // the node is either ground or the impulse generator, so ignore it
+                continue
+            }
+            
             let nodeRect = NSRect(x: nextNode.location.x - CGFloat(self.nodeDiameter / 2.0), y: nextNode.location.y - CGFloat(self.nodeDiameter / 2.0), width: CGFloat(self.nodeDiameter), height: CGFloat(self.nodeDiameter))
             
             let nodePath = NSBezierPath(ovalIn: nodeRect)
@@ -113,7 +124,18 @@ class ConnectionDlogView: NSView
         return true
     }
     
-    override func mouseDown(with event: NSEvent) {
+    override func mouseUp(with event: NSEvent)
+    {
+        if var fromNode = self.startNode
+        {
+            fromNode.currentColor = NSColor.white
+            
+            self.needsDisplay = true
+        }
+    }
+    
+    override func mouseDown(with event: NSEvent)
+    {
         
         guard let window = event.window
         else
@@ -136,23 +158,15 @@ class ConnectionDlogView: NSView
         }
         
         let pointInWindow = event.locationInWindow
-        let pointInView = self.convert(pointInWindow, to: nil)
+        let pointInView = self.convert(pointInWindow, from: nil)
         
-        for nextNodeRect in nodeRects
+        if self.groundConnectionRect!.contains(pointInView)
         {
-            if nextNodeRect.contains(pointInView)
-            {
-                NSColor.lightGray.set()
-            }
-            else
-            {
-                NSColor.white.set()
-            }
-            
-            let nextNode = NSBezierPath(ovalIn: nextNodeRect)
-            nextNode.fill()
+            DLog("Got ground click")
+            self.nodes[0].currentColor = NSColor.lightGray
+            self.startNode = self.nodes[0]
+            self.needsDisplay = true
         }
-        
     }
     
     func setUpView()
@@ -166,7 +180,14 @@ class ConnectionDlogView: NSView
         
         self.fixFrameRect()
         
-        // At this point, the textfields for the disk names have all been set up. Here we will create the nodes and set the rectangles for each text field
+        // At this point, the textfields for the disk names have all been set up. Here we will create the nodes and set the rectangles for each text field.
+        
+        // First we'll set the special nodes for ground (index 0) and the impulse generator (index 1).
+        let gndNode = Node(idNum: -1, connections: Array(), location: NSPoint(x:0.0, y:0.0), currentColor: NSColor.white)
+        self.nodes.append(gndNode)
+        
+        let impgenNode = Node(idNum: -2, connections: Array(), location: NSPoint(x:0.0, y:0.0), currentColor: NSColor.white)
+        self.nodes.append(impgenNode)
         
         var previousSection:PCH_DiskSection? = nil
         var currentInNodeCenter = NSPoint(x: self.horizontalOffsetToFirstCoil, y: self.offsetFromBottom)
