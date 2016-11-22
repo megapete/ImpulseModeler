@@ -48,7 +48,8 @@ class ConnectionDlogView: NSView
     
     let connectorBlue = NSColor(red: 0.0, green: 0.0, blue: 1.0, alpha: 0.75)
     let connectingBlue = NSColor(red: 0.0, green: 0.0, blue: 1.0, alpha: 0.5)
-
+    
+    var connections:[(fromNode:Node, toNode:Node)] = Array()
     
     override func draw(_ dirtyRect: NSRect)
     {
@@ -109,6 +110,40 @@ class ConnectionDlogView: NSView
             connectorPath.stroke()
         }
         
+        // Show any connectors that we may have made
+        for nextConnection in self.connections
+        {
+            let thePath = NSBezierPath()
+            thePath.move(to: nextConnection.fromNode.location)
+            thePath.lineWidth = 1.5
+            
+            if nextConnection.toNode.idNum == -1
+            {
+                // handle ground
+                thePath.relativeLine(to: NSPoint(x: -50.0, y: -15.0))
+                NSColor.green.set()
+                thePath.stroke()
+                self.drawGroundAt(thePath.currentPoint)
+            }
+            else if (nextConnection.toNode.idNum == -2)
+            {
+                // handle impulse generator
+                thePath.relativeLine(to: NSPoint(x: 50.0, y: 15.0))
+                NSColor.red.set()
+                thePath.stroke()
+                
+                // x+3.0, y+24.0
+                let startPt = NSPoint(x: thePath.currentPoint.x + 3.0, y: thePath.currentPoint.y + 24.0)
+                self.drawLightningBoltAt(startPt)
+            }
+            else
+            {
+                thePath.line(to: nextConnection.toNode.location)
+                self.connectorBlue.set()
+                thePath.stroke()
+            }
+        }
+        
         // And now the nodes
         for nextNode in self.nodes
         {
@@ -149,6 +184,63 @@ class ConnectionDlogView: NSView
     {
         if let fromNode = self.startNode
         {
+            let pointInWindow = event.locationInWindow
+            self.finishPoint = self.convert(pointInWindow, from: nil)
+
+            if self.groundConnectionRect!.contains(self.finishPoint!)
+            {
+                // only create the connection if it is not to and from the same node
+                if fromNode !== self.nodes[0]
+                {
+                    self.connections.append((fromNode:fromNode, toNode:self.nodes[0]))
+                    fromNode.connections.append(-1)
+                    
+                    self.nodes[0].currentColor = NSColor.white
+                }
+                
+                
+            }
+            else if self.impulseConnectionRect!.contains(self.finishPoint!)
+            {
+                if fromNode !== self.nodes[1]
+                {
+                    self.connections.append((fromNode:fromNode, toNode:self.nodes[1]))
+                    fromNode.connections.append(-2)
+                    
+                    self.nodes[1].currentColor = NSColor.white
+                }
+            }
+            else
+            {
+                for nextNode in self.nodes
+                {
+                    if (nextNode.idNum < 0)
+                    {
+                        continue
+                    }
+                    
+                    let nodeRadius = CGFloat(self.nodeDiameter / 2.0)
+                    let checkRect = NSRect(x: nextNode.location.x - nodeRadius, y: nextNode.location.y - nodeRadius, width: nodeRadius * 2.0, height: nodeRadius * 2.0)
+                    
+                    if checkRect.contains(self.finishPoint!)
+                    {
+                        if fromNode.idNum < 0
+                        {
+                            nextNode.connections.append(fromNode.idNum)
+                        }
+                        else
+                        {
+                            fromNode.connections.append(nextNode.idNum)
+                        }
+                        
+                        self.connections.append((fromNode:nextNode, toNode:fromNode))
+                        
+                        nextNode.currentColor = NSColor.white
+                    }
+                    
+                }
+            }
+            
             fromNode.currentColor = NSColor.white
             
             self.startNode = nil
@@ -165,20 +257,20 @@ class ConnectionDlogView: NSView
         guard let window = event.window
             else
         {
-            super.mouseDown(with: event)
+            super.mouseDragged(with: event)
             return
         }
         
         guard let viewsWindow = self.window
             else
         {
-            super.mouseDown(with: event)
+            super.mouseDragged(with: event)
             return
         }
         
         if (viewsWindow != window)
         {
-            super.mouseDown(with: event)
+            super.mouseDragged(with: event)
             return
         }
         
@@ -226,12 +318,10 @@ class ConnectionDlogView: NSView
                 }
             }
             
-            
             self.needsDisplay = true
         }
         
-        
-        
+        self.autoscroll(with: event)
     }
     
     override func mouseDown(with event: NSEvent)
