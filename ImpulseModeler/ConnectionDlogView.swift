@@ -45,6 +45,9 @@ class ConnectionDlogView: NSView
     
     var startNode:Node? = nil
     var finishPoint:NSPoint? = nil
+    
+    let connectorBlue = NSColor(red: 0.0, green: 0.0, blue: 1.0, alpha: 0.75)
+    let connectingBlue = NSColor(red: 0.0, green: 0.0, blue: 1.0, alpha: 0.5)
 
     
     override func draw(_ dirtyRect: NSRect)
@@ -132,7 +135,7 @@ class ConnectionDlogView: NSView
             connectionPath.move(to: stNode.location)
             connectionPath.line(to: self.finishPoint!)
             connectionPath.lineWidth = 3.0
-            NSColor.lightGray.set()
+            self.connectingBlue.set()
             connectionPath.stroke()
         }
     }
@@ -183,6 +186,47 @@ class ConnectionDlogView: NSView
         {
             let pointInWindow = event.locationInWindow
             self.finishPoint = self.convert(pointInWindow, from: nil)
+            
+            if self.groundConnectionRect!.contains(self.finishPoint!)
+            {
+                self.nodes[0].currentColor = self.connectingBlue
+            }
+            else if self.startNode !== self.nodes[0]
+            {
+                self.nodes[0].currentColor = NSColor.white
+            }
+                
+            if self.impulseConnectionRect!.contains(self.finishPoint!)
+            {
+                self.nodes[1].currentColor = self.connectingBlue
+            }
+            else if self.startNode !== self.nodes[1]
+            {
+                self.nodes[1].currentColor = NSColor.white
+            }
+            
+            for nextNode in self.nodes
+            {
+                if nextNode.idNum < 0
+                {
+                    // we took care of ground and impulse generator above
+                    continue
+                }
+                
+                let nodeRadius = CGFloat(self.nodeDiameter / 2.0)
+                let checkRect = NSRect(x: nextNode.location.x - nodeRadius, y: nextNode.location.y - nodeRadius, width: nodeRadius * 2.0, height: nodeRadius * 2.0)
+                
+                if checkRect.contains(self.finishPoint!)
+                {
+                    nextNode.currentColor = self.connectingBlue
+                }
+                else if self.startNode !== nextNode
+                {
+                    nextNode.currentColor = NSColor.white
+                }
+            }
+            
+            
             self.needsDisplay = true
         }
         
@@ -219,7 +263,7 @@ class ConnectionDlogView: NSView
         if self.groundConnectionRect!.contains(pointInView)
         {
             DLog("Got ground click")
-            self.nodes[0].currentColor = NSColor.lightGray
+            self.nodes[0].currentColor = self.connectingBlue
             self.startNode = self.nodes[0]
             self.finishPoint = self.startNode!.location
             self.needsDisplay = true
@@ -228,7 +272,7 @@ class ConnectionDlogView: NSView
         
         if self.impulseConnectionRect!.contains(pointInView)
         {
-            self.nodes[1].currentColor = NSColor.lightGray
+            self.nodes[1].currentColor = self.connectingBlue
             self.startNode = self.nodes[1]
             self.finishPoint = self.startNode!.location
             self.needsDisplay = true
@@ -248,7 +292,7 @@ class ConnectionDlogView: NSView
             
             if checkRect.contains(pointInView)
             {
-                nextNode.currentColor = NSColor.lightGray
+                nextNode.currentColor = self.connectingBlue
                 self.startNode = nextNode
                 self.finishPoint = self.startNode!.location
                 self.needsDisplay = true
