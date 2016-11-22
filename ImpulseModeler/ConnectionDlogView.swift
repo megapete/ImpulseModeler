@@ -8,12 +8,20 @@
 
 import Cocoa
 
-struct Node {
+class Node {
     
     let idNum:Int
     var connections:[Int]
     var location:NSPoint
     var currentColor:NSColor
+    
+    init(idNum:Int, connections:[Int], location:NSPoint, currentColor:NSColor)
+    {
+        self.idNum = idNum
+        self.connections = connections
+        self.location = location
+        self.currentColor = currentColor
+    }
 }
 
 class ConnectionDlogView: NSView
@@ -36,7 +44,7 @@ class ConnectionDlogView: NSView
     var nodes:[Node] = Array()
     
     var startNode:Node? = nil
-    
+    var finishPoint:NSPoint? = nil
 
     
     override func draw(_ dirtyRect: NSRect)
@@ -117,6 +125,16 @@ class ConnectionDlogView: NSView
             NSColor.black.set()
             nodePath.stroke()
         }
+        
+        if let stNode = self.startNode
+        {
+            let connectionPath = NSBezierPath()
+            connectionPath.move(to: stNode.location)
+            connectionPath.line(to: self.finishPoint!)
+            connectionPath.lineWidth = 3.0
+            NSColor.lightGray.set()
+            connectionPath.stroke()
+        }
     }
     
     override var acceptsFirstResponder: Bool
@@ -126,12 +144,50 @@ class ConnectionDlogView: NSView
     
     override func mouseUp(with event: NSEvent)
     {
-        if var fromNode = self.startNode
+        if let fromNode = self.startNode
         {
             fromNode.currentColor = NSColor.white
             
+            self.startNode = nil
             self.needsDisplay = true
         }
+        else
+        {
+            super.mouseUp(with: event)
+        }
+    }
+    
+    override func mouseDragged(with event: NSEvent)
+    {
+        guard let window = event.window
+            else
+        {
+            super.mouseDown(with: event)
+            return
+        }
+        
+        guard let viewsWindow = self.window
+            else
+        {
+            super.mouseDown(with: event)
+            return
+        }
+        
+        if (viewsWindow != window)
+        {
+            super.mouseDown(with: event)
+            return
+        }
+        
+        if self.startNode != nil
+        {
+            let pointInWindow = event.locationInWindow
+            self.finishPoint = self.convert(pointInWindow, from: nil)
+            self.needsDisplay = true
+        }
+        
+        
+        
     }
     
     override func mouseDown(with event: NSEvent)
@@ -165,7 +221,39 @@ class ConnectionDlogView: NSView
             DLog("Got ground click")
             self.nodes[0].currentColor = NSColor.lightGray
             self.startNode = self.nodes[0]
+            self.finishPoint = self.startNode!.location
             self.needsDisplay = true
+            return
+        }
+        
+        if self.impulseConnectionRect!.contains(pointInView)
+        {
+            self.nodes[1].currentColor = NSColor.lightGray
+            self.startNode = self.nodes[1]
+            self.finishPoint = self.startNode!.location
+            self.needsDisplay = true
+            return
+        }
+        
+        for nextNode in self.nodes
+        {
+            if nextNode.idNum < 0
+            {
+                // we took care of ground and impulse generator above
+                continue
+            }
+            
+            let nodeRadius = CGFloat(self.nodeDiameter / 2.0)
+            let checkRect = NSRect(x: nextNode.location.x - nodeRadius, y: nextNode.location.y - nodeRadius, width: nodeRadius * 2.0, height: nodeRadius * 2.0)
+            
+            if checkRect.contains(pointInView)
+            {
+                nextNode.currentColor = NSColor.lightGray
+                self.startNode = nextNode
+                self.finishPoint = self.startNode!.location
+                self.needsDisplay = true
+                return
+            }
         }
     }
     
@@ -182,11 +270,14 @@ class ConnectionDlogView: NSView
         
         // At this point, the textfields for the disk names have all been set up. Here we will create the nodes and set the rectangles for each text field.
         
-        // First we'll set the special nodes for ground (index 0) and the impulse generator (index 1).
-        let gndNode = Node(idNum: -1, connections: Array(), location: NSPoint(x:0.0, y:0.0), currentColor: NSColor.white)
+        // First we'll set the special nodes for ground (index 0) and the impulse generator (index 1). Start with the rectangles for their "nodes".
+        self.groundConnectionRect = NSRect(x: 67.5 - 15.0, y: self.bounds.height - 125.0, width: 30.0, height: 30.0)
+        self.impulseConnectionRect = NSOffsetRect(self.groundConnectionRect!, 0.0, -50.0)
+        
+        let gndNode = Node(idNum: -1, connections: Array(), location: NSPoint(x:self.groundConnectionRect!.origin.x + self.groundConnectionRect!.width / 2.0, y:self.groundConnectionRect!.origin.y + self.groundConnectionRect!.height / 2.0), currentColor: NSColor.white)
         self.nodes.append(gndNode)
         
-        let impgenNode = Node(idNum: -2, connections: Array(), location: NSPoint(x:0.0, y:0.0), currentColor: NSColor.white)
+        let impgenNode = Node(idNum: -2, connections: Array(), location: NSPoint(x:self.impulseConnectionRect!.origin.x + self.impulseConnectionRect!.width / 2.0, y:self.impulseConnectionRect!.origin.y + self.impulseConnectionRect!.height / 2.0), currentColor: NSColor.white)
         self.nodes.append(impgenNode)
         
         var previousSection:PCH_DiskSection? = nil
@@ -249,8 +340,7 @@ class ConnectionDlogView: NSView
             previousSection = currSection
         }
         
-        self.groundConnectionRect = NSRect(x: 67.5 - 15.0, y: self.bounds.height - 125.0, width: 30.0, height: 30.0)
-        self.impulseConnectionRect = NSOffsetRect(self.groundConnectionRect!, 0.0, -50.0)
+        
     }
     
     func fixFrameRect()
