@@ -8,6 +8,7 @@
 
 import Cocoa
 
+// Helper class for use within the view
 class Node {
     
     let idNum:Int
@@ -26,6 +27,7 @@ class Node {
 
 class ConnectionDlogView: NSView
 {
+    // Drawing constants
     let connectorLength = 15.0
     var elementHt:Double? = nil
     var requiredCoilHt:Double? = nil
@@ -34,21 +36,30 @@ class ConnectionDlogView: NSView
     let horizontalOffsetToFirstCoil = 250.0
     let horizontalOffsetBetweenCoils = 150.0
     
+    // We keep around the rectangles for the ground and impulse generator
     var groundConnectionRect:NSRect?
-    var highlightGround = false
-    
     var impulseConnectionRect:NSRect?
     
+    // The sections are passed in by the parent window's controller
     var sections:[PCH_DiskSection]? = nil
+    
+    // The textfields are for the disk names
     var sectionFields:[NSTextField] = Array()
+
+    // The nodes shown in the view
     var nodes:[Node] = Array()
     
+    // we keep track of the start node when the used clicks to start dragging to make a connection
     var startNode:Node? = nil
+    
+    // The current finish point is used while dragging to show a "light" line
     var finishPoint:NSPoint? = nil
     
+    // connectorBlue is the color of the final connection, connectingBlue is the "light" line indicated above
     let connectorBlue = NSColor(red: 0.0, green: 0.0, blue: 1.0, alpha: 0.75)
     let connectingBlue = NSColor(red: 0.0, green: 0.0, blue: 1.0, alpha: 0.5)
     
+    // We store the connections in a local array (along as within the Nodes themselves) to make it easier to keep track of the drawing that needs to be done
     var connections:[(fromNode:Node, toNode:Node)] = Array()
     
     override func draw(_ dirtyRect: NSRect)
@@ -59,8 +70,7 @@ class ConnectionDlogView: NSView
         NSColor.white.set()
         NSRectFill(self.bounds)
         
-        // Draw the "button" around the ground icon
-        
+        // Draw the "button" for the ground icon
         if let grdConnRect = self.groundConnectionRect
         {
             NSColor.gray.set()
@@ -73,7 +83,7 @@ class ConnectionDlogView: NSView
             drawGroundAt(NSPoint(x: grdConnRect.origin.x + 15.0, y: grdConnRect.origin.y + grdConnRect.height - 5.0))
         }
         
-        // Draw the button around the impulse icon
+        // Draw the button for the impulse icon
         if let impConnRect = self.impulseConnectionRect
         {
             NSColor.gray.set()
@@ -86,7 +96,7 @@ class ConnectionDlogView: NSView
             drawLightningBoltAt(NSPoint(x:impConnRect.origin.x + impConnRect.width / 2.0, y:impConnRect.origin.y + impConnRect.height - 0.5))
         }
         
-        // Start by showing the disks and connectors
+        // Start by showing the disks and their connectors
         for nextField in self.sectionFields
         {
             NSColor.black.set()
@@ -110,7 +120,7 @@ class ConnectionDlogView: NSView
             connectorPath.stroke()
         }
         
-        // Show any connectors that we may have made
+        // Show any connections between disks that the user may have made
         for nextConnection in self.connections
         {
             let thePath = NSBezierPath()
@@ -164,6 +174,7 @@ class ConnectionDlogView: NSView
             nodePath.stroke()
         }
         
+        // Finally, if the user is dragging the mouse to make a connecttion, we need to show the light blue line
         if let stNode = self.startNode
         {
             let connectionPath = NSBezierPath()
@@ -175,13 +186,16 @@ class ConnectionDlogView: NSView
         }
     }
     
+    // Required override to accept mouse events
     override var acceptsFirstResponder: Bool
     {
         return true
     }
     
+    // The mouseUp event is used to see which node (if any) the user has completed a connection to.
     override func mouseUp(with event: NSEvent)
     {
+        // We only do something if there is a startNode
         if let fromNode = self.startNode
         {
             let pointInWindow = event.locationInWindow
@@ -189,7 +203,7 @@ class ConnectionDlogView: NSView
 
             if self.groundConnectionRect!.contains(self.finishPoint!)
             {
-                // only create the connection if it is not to and from the same node
+                // only create the connection if it is not to and from the same node (note the '!==' for comparing object instances)
                 if fromNode !== self.nodes[0]
                 {
                     self.connections.append((fromNode:fromNode, toNode:self.nodes[0]))
@@ -197,8 +211,6 @@ class ConnectionDlogView: NSView
                     
                     self.nodes[0].currentColor = NSColor.white
                 }
-                
-                
             }
             else if self.impulseConnectionRect!.contains(self.finishPoint!)
             {
@@ -226,6 +238,7 @@ class ConnectionDlogView: NSView
                     {
                         if fromNode.idNum < 0
                         {
+                            // The ground and impulse nodes are always "to" nodes
                             nextNode.connections.append(fromNode.idNum)
                         }
                         else
@@ -233,6 +246,7 @@ class ConnectionDlogView: NSView
                             fromNode.connections.append(nextNode.idNum)
                         }
                         
+                        // We invert the nextNode and fromNode order here so that things draw correctly with ground and impulse (and it doesn't matter for any other node combination
                         self.connections.append((fromNode:nextNode, toNode:fromNode))
                         
                         nextNode.currentColor = NSColor.white
@@ -243,6 +257,7 @@ class ConnectionDlogView: NSView
             
             fromNode.currentColor = NSColor.white
             
+            // Clear the startNode property and redraw
             self.startNode = nil
             self.needsDisplay = true
         }
@@ -274,6 +289,7 @@ class ConnectionDlogView: NSView
             return
         }
         
+        // Only enter if there is a startNode
         if self.startNode != nil
         {
             let pointInWindow = event.locationInWindow
@@ -321,11 +337,13 @@ class ConnectionDlogView: NSView
             self.needsDisplay = true
         }
         
+        // This call is needed to handle autoscrolling. Thank god this exists.
         self.autoscroll(with: event)
     }
     
     override func mouseDown(with event: NSEvent)
     {
+        // The user clicked the mouse, check if he clicked a node (or ground or impulse)
         
         guard let window = event.window
         else
