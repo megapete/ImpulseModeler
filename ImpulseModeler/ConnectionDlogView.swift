@@ -59,7 +59,7 @@ class ConnectionDlogView: NSView
     let connectorBlue = NSColor(red: 0.0, green: 0.0, blue: 1.0, alpha: 0.75)
     let connectingBlue = NSColor(red: 0.0, green: 0.0, blue: 1.0, alpha: 0.5)
     
-    // We store the connections in a local array (along as within the Nodes themselves) to make it easier to keep track of the drawing that needs to be done
+    // We store the connections in a local array (as well as within the Nodes themselves) to make it easier to keep track of the drawing that needs to be done
     var connections:[(fromNode:Node, toNode:Node)] = Array()
     
     override func draw(_ dirtyRect: NSRect)
@@ -246,7 +246,7 @@ class ConnectionDlogView: NSView
                             fromNode.connections.append(nextNode.idNum)
                         }
                         
-                        // We invert the nextNode and fromNode order here so that things draw correctly with ground and impulse (and it doesn't matter for any other node combination
+                        // We invert the nextNode and fromNode order here so that things draw correctly with ground and impulse (and it doesn't matter for any other node combination)
                         self.connections.append((fromNode:nextNode, toNode:fromNode))
                         
                         nextNode.currentColor = NSColor.white
@@ -370,7 +370,6 @@ class ConnectionDlogView: NSView
         
         if self.groundConnectionRect!.contains(pointInView)
         {
-            DLog("Got ground click")
             self.nodes[0].currentColor = self.connectingBlue
             self.startNode = self.nodes[0]
             self.finishPoint = self.startNode!.location
@@ -409,6 +408,18 @@ class ConnectionDlogView: NSView
         }
     }
     
+    func resetAllConnections()
+    {
+        self.connections = Array()
+        
+        for nextNode in self.nodes
+        {
+            nextNode.connections = Array()
+        }
+        
+        self.needsDisplay = true
+    }
+    
     func setUpView()
     {
         guard let theSections = self.sections
@@ -423,7 +434,7 @@ class ConnectionDlogView: NSView
         // At this point, the textfields for the disk names have all been set up. Here we will create the nodes and set the rectangles for each text field.
         
         // First we'll set the special nodes for ground (index 0) and the impulse generator (index 1). Start with the rectangles for their "nodes".
-        self.groundConnectionRect = NSRect(x: 67.5 - 15.0, y: self.bounds.height - 125.0, width: 30.0, height: 30.0)
+        self.groundConnectionRect = NSRect(x: 67.5 - 15.0, y: self.bounds.height - 175.0, width: 30.0, height: 30.0)
         self.impulseConnectionRect = NSOffsetRect(self.groundConnectionRect!, 0.0, -50.0)
         
         let gndNode = Node(idNum: -1, connections: Array(), location: NSPoint(x:self.groundConnectionRect!.origin.x + self.groundConnectionRect!.width / 2.0, y:self.groundConnectionRect!.origin.y + self.groundConnectionRect!.height / 2.0), currentColor: NSColor.white)
@@ -663,5 +674,6 @@ class ConnectionDlogView: NSView
         path.stroke()
         
     }
+    
     
 }

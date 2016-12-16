@@ -187,14 +187,67 @@ class AppController: NSObject {
             return
         }
         
-        // Hardcoded connections, this will obviously need to be made more fancy
-        let theConnections = [(0, [-1, 20, 42]), (21, [62])]
+        // The first thing we do is extract all the impulse-generator connection nodes. We want to end up with only one node that is actually connected to the generator and that node should be connected to all the other nodes that are also connected to the generator. Finally, those node's connections should be deleted from the list.
+        var genNodes = Set<Int>()
+        // var newConnectionArray = Array<(from:Int, to:[Int])>()
+        for nextConnection in testConnection
+        {
+            if nextConnection.to.contains(-2)
+            {
+                genNodes.insert(nextConnection.from)
+                
+                for nextToNode in nextConnection.to
+                {
+                    if (nextToNode != -2)
+                    {
+                        genNodes.insert(nextToNode)
+                    }
+                }
+            }
+        }
+        
+        // At this point we have a set that MUST contain at least one node
+        if genNodes.count == 0
+        {
+            // Put up a fancy dialog here
+            DLog("No generator connection!")
+            return
+        }
+        
+        // Now we'll go through the array of connections over and over until all generator-connected nodes are in genNodes
+        var doneFindingGenNodes = false
+        while !doneFindingGenNodes
+        {
+            doneFindingGenNodes = true
+            
+            for nextConnection in testConnection
+            {
+                if genNodes.contains(nextConnection.from)
+                {
+                    for nextToNode in nextConnection.to
+                    {
+                        if (nextToNode != -2)
+                        {
+                            if (!genNodes.contains(nextToNode))
+                            {
+                                genNodes.insert(nextToNode)
+                                doneFindingGenNodes = false
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    
+        var newConnectionArray = testConnection.filter({!genNodes.contains($0.from)})
+        let sourceConnNode = genNodes.removeFirst()
+        newConnectionArray.append((from:sourceConnNode, to:Array(genNodes)))
         
         let simTimeStep = 10.0E-9
         let saveTimeStep = 100.0E-9
         let totalSimTime = 100.0E-6
         
-        guard let resultMatrices = bbModel.SimulateWithConnections(theConnections, sourceConnection: (testSource, 41), simTimeStep: simTimeStep, saveTimeStep: saveTimeStep, totalTime: totalSimTime)
+        guard let resultMatrices = bbModel.SimulateWithConnections(newConnectionArray as! [(fromNode: Int, toNodes: [Int])], sourceConnection: (testSource, sourceConnNode), simTimeStep: simTimeStep, saveTimeStep: saveTimeStep, totalTime: totalSimTime)
         else
         {
             DLog("Simulation failed!")

@@ -12,6 +12,8 @@ class ConnectionDlog: NSWindowController, NSWindowDelegate
 {
     @IBOutlet weak var theView: ConnectionDlogView!
     
+    var result:[(from:Int, to:[Int])]? = nil
+    
     var model:[PCH_DiskSection]? = nil
     
     override var windowNibName: String!
@@ -35,8 +37,6 @@ class ConnectionDlog: NSWindowController, NSWindowDelegate
         
         theView.sections = theModel
         theView.setUpView()
-
-        
     }
     
     func windowDidResize(_ notification: Notification)
@@ -45,12 +45,44 @@ class ConnectionDlog: NSWindowController, NSWindowDelegate
         theView.needsDisplay = true
     }
     
-    func runDialog(theModel:[PCH_DiskSection]) -> [(from:Int, to:Int)]?
+    func runDialog(theModel:[PCH_DiskSection]) -> [(from:Int, to:[Int])]?
     {
         self.model = theModel
         
         NSApp.runModal(for: self.window!)
         
-        return nil
+        return self.result
     }
+    
+    @IBAction func handleShoot(_ sender: Any)
+    {
+        var connections:[(from:Int, to:[Int])] = Array()
+        
+        for nextNode in theView.nodes
+        {
+            if nextNode.idNum >= 0
+            {
+                let connection = (from:nextNode.idNum, to:nextNode.connections)
+                connections.append(connection)
+            }
+        }
+        
+        self.result = connections
+        
+        NSApp.stopModal()
+        self.window!.orderOut(self)
+    }
+    
+    
+    @IBAction func handleCancel(_ sender: Any)
+    {
+        NSApp.stopModal()
+        self.window!.orderOut(self)
+    }
+    
+    @IBAction func handleResetAll(_ sender: Any)
+    {
+        theView.resetAllConnections()
+    }
+    
 }
