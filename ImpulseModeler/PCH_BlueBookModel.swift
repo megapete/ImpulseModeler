@@ -27,7 +27,14 @@ class PCH_BlueBookModel: NSObject {
     {
         let sectionCount = theModel.count
         let coilCount = phase.coils.count
-        let nodeCount = sectionCount + coilCount
+        
+        // Each axial section in the model has an "end node" that is not the start node of the next axial section, so we need to make sure we include all those nodes in the matrix.
+        var axialSectionCount = 0
+        for nextCoil in phase.coils
+        {
+            axialSectionCount += nextCoil.sections!.count
+        }
+        let nodeCount = sectionCount + axialSectionCount
         
         self.M = PCH_Matrix(numRows: sectionCount, numCols: sectionCount, matrixPrecision: PCH_Matrix.precisions.doublePrecision, matrixType: PCH_Matrix.types.positiveDefinite)
         
@@ -45,6 +52,18 @@ class PCH_BlueBookModel: NSObject {
         var endNodes = [Int]()
         var nextStart = 0
         
+        for nextCoil in phase.coils
+        {
+            for nextAxialSection in nextCoil.sections!
+            {
+                startNodes.append(nextStart)
+                
+                nextStart += Int(nextAxialSection.numDisks) + 1
+                
+                endNodes.append(nextStart - 1)
+            }
+        }
+        /*
         for i in 0..<coilCount
         {
             startNodes.append(nextStart)
@@ -53,7 +72,7 @@ class PCH_BlueBookModel: NSObject {
             
             endNodes.append(nextStart - 1)
         }
-        
+        */
         // we need to keep track of the previous section for the capacitance matrix
         var prevSection:PCH_DiskSection? = nil
         
