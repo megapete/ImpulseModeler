@@ -60,6 +60,10 @@ func DiskSectionUsingID(_ sectID:String, inModel:[PCH_DiskSection]) -> PCH_DiskS
     return result
 }
 
+// Constants for the "generator" and "ground" nodes
+let GENERATOR_NODE_NUMBER = -2
+let GROUND_NODE_NUMBER = -1
+
 class AppController: NSObject {
 
     // The physical and capacitance data for one phase of the transformer
@@ -179,6 +183,8 @@ class AppController: NSObject {
         
         let bbModel = PCH_BlueBookModel(theModel: self.theModel!, phase: self.phaseDefinition!)
         
+        // bbModel.M.SaveAsCSV()
+        
         let connDlog = ConnectionDlog()
         guard let testConnection = connDlog.runDialog(theModel: self.theModel!)
         else
@@ -241,7 +247,12 @@ class AppController: NSObject {
     
         var newConnectionArray = testConnection.filter({!genNodes.contains($0.from)})
         let sourceConnNode = genNodes.removeFirst()
-        newConnectionArray.append((from:sourceConnNode, to:Array(genNodes)))
+        
+        if genNodes.count > 0
+        {
+            let genNodeArray = Array(genNodes)
+            newConnectionArray.append((from:sourceConnNode, to:genNodeArray))
+        }
         
         let simTimeStep = 10.0E-9
         let saveTimeStep = 100.0E-9

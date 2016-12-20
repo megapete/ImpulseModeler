@@ -60,7 +60,7 @@ class ConnectionDlog: NSWindowController, NSWindowDelegate
         
         for nextNode in theView.nodes
         {
-            if nextNode.idNum >= 0
+            if nextNode.idNum >= 0 && nextNode.connections.count > 0
             {
                 let connection = (from:nextNode.idNum, to:nextNode.connections)
                 connections.append(connection)
