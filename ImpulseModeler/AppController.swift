@@ -275,16 +275,29 @@ class AppController: NSObject {
             nextTime += saveTimeStep
         }
         
-        // Set up the arrays for the node and section names
-        let sectionCount = theModel!.count
-        let nodeCount = sectionCount + self.phaseDefinition!.coils.count
+        // Set up the arrays for the node and section names. This is a major rethinking of the node naming method, which used to assume that all disks of the same "coil" were automatically connected together. We now use the actual node numbering that is part of each section (inNode, outNode) and make sure we do not repeat anything.
+        
+        /*
+        let sectionCount = bbModel.A.numCols
+        let nodeCount = bbModel.A.numRows
+        var nodeNumSet = Set<Int>()
         var nodeNames = Array(repeating: "", count: nodeCount)
-        var deviceNames = Array(repeating: "", count: sectionCount)
+        var deviceNames = Array<String>()
         var currentNodeIndex = 0
         var currentDeviceIndex = 0
         var lastCoilName = self.phaseDefinition!.coils[0].coilName
         var lastDiskNum = ""
+        */
         
+        var bbModelSections = Array<PCH_BB_ModelSection>()
+        for nextSection in self.theModel!
+        {
+            let nextBBSection = PCH_BB_ModelSection(inNode: nextSection.data.nodes.inNode, outNode: nextSection.data.nodes.outNode, name: nextSection.data.sectionID)
+    
+            bbModelSections.append(nextBBSection)
+        }
+        
+        /*
         for nextSection in self.theModel!
         {
             let nextSectionID = nextSection.data.sectionID
@@ -304,12 +317,12 @@ class AppController: NSObject {
             lastCoilName = coilName
             lastDiskNum = "\(Int(diskNum)! + 1)"
         }
-        
+        */
         // Add the name of the last disk
-        nodeNames[currentNodeIndex] = lastCoilName + "I" + lastDiskNum
+        // nodeNames[currentNodeIndex] = lastCoilName + "I" + lastDiskNum
         
         
-        let bbModelOutput = PCH_BlueBookModelOutput(timeArray: timeArray, voltageNodes: nodeNames, voltsMatrix: resultMatrices.V, deviceIDs: deviceNames, ampsMatrix: resultMatrices.I)
+        let bbModelOutput = PCH_BlueBookModelOutput(timeArray: timeArray, sections:bbModelSections, voltsMatrix: resultMatrices.V, ampsMatrix: resultMatrices.I)
         
         let saveFilePanel = NSSavePanel()
         

@@ -10,28 +10,62 @@
 
 import Cocoa
 
+// Helper class for encoding the section data we're interested in
+class PCH_BB_ModelSection: NSObject, NSCoding
+{
+    let inNode:Int
+    let outNode:Int
+    let name:String
+    
+    init(inNode:Int, outNode:Int, name:String)
+    {
+        self.inNode = inNode
+        self.outNode = outNode
+        self.name = name
+    }
+    
+    convenience required init?(coder aDecoder: NSCoder)
+    {
+        let inNode = aDecoder.decodeInteger(forKey: "InNode")
+        let outNode = aDecoder.decodeInteger(forKey: "OutNode")
+        let name = aDecoder.decodeObject(forKey: "Name") as! String
+        
+        self.init(inNode:inNode, outNode:outNode, name:name)
+    }
+    
+    func encode(with aCoder: NSCoder)
+    {
+        aCoder.encode(self.inNode, forKey: "InNode")
+        aCoder.encode(self.outNode, forKey: "OutNode")
+        aCoder.encode(self.name, forKey: "Name")
+    }
+}
+
 class PCH_BlueBookModelOutput: NSObject, NSCoding {
 
     let timeArray:[Double]
     
-    let voltageNodes:[String]
+    let sections:[PCH_BB_ModelSection]
+    
+    // let voltageNodes:[String]
     // The first index is the time index, followed by the node index
     var voltsArray:[[Double]]
     
-    let deviceIDs:[String]
+    // let deviceIDs:[String]
     // The first index is the time index, followed by the device index
     var ampsArray:[[Double]]
     
-    init(timeArray:[Double], voltageNodes:[String], voltsArray:[[Double]], deviceIDs:[String], ampsArray:[[Double]])
+    init(timeArray:[Double], sections:[PCH_BB_ModelSection], voltsArray:[[Double]], ampsArray:[[Double]])
     {
         self.timeArray = timeArray
-        self.voltageNodes = voltageNodes
+        self.sections = sections
+        // self.voltageNodes = voltageNodes
         self.voltsArray = voltsArray
-        self.deviceIDs = deviceIDs
+        // self.deviceIDs = deviceIDs
         self.ampsArray = ampsArray
     }
     
-    convenience init(timeArray:[Double], voltageNodes:[String], voltsMatrix:PCH_Matrix, deviceIDs:[String], ampsMatrix:PCH_Matrix)
+    convenience init(timeArray:[Double], sections:[PCH_BB_ModelSection], voltsMatrix:PCH_Matrix, ampsMatrix:PCH_Matrix)
     {
         // Initialize the voltage array
         var voltsArray = Array(repeatElement(Array(repeatElement(0.0, count: voltsMatrix.numCols)), count: voltsMatrix.numRows))
@@ -57,27 +91,29 @@ class PCH_BlueBookModelOutput: NSObject, NSCoding {
             }
         }
         
-        self.init(timeArray:timeArray, voltageNodes:voltageNodes, voltsArray:voltsArray, deviceIDs:deviceIDs, ampsArray:ampsArray)
+        self.init(timeArray:timeArray, sections:sections, voltsArray:voltsArray, ampsArray:ampsArray)
     }
     
     convenience required init?(coder aDecoder: NSCoder)
     {
         let timeArray = aDecoder.decodeObject(forKey: "Times") as! [Double]
-        let voltageNodes = aDecoder.decodeObject(forKey: "VoltageNodes") as! [String]
+        let sections = aDecoder.decodeObject(forKey: "Sections") as! [PCH_BB_ModelSection]
+        // let voltageNodes = aDecoder.decodeObject(forKey: "VoltageNodes") as! [String]
         let voltsArray = aDecoder.decodeObject(forKey: "Volts") as! [[Double]]
-        let deviceIDs = aDecoder.decodeObject(forKey: "DeviceIDs") as! [String]
+        // let deviceIDs = aDecoder.decodeObject(forKey: "DeviceIDs") as! [String]
         let ampsArray = aDecoder.decodeObject(forKey: "Amps") as! [[Double]]
         
-        self.init(timeArray:timeArray, voltageNodes:voltageNodes, voltsArray:voltsArray, deviceIDs:deviceIDs, ampsArray:ampsArray)
+        self.init(timeArray:timeArray, sections:sections, voltsArray:voltsArray, ampsArray:ampsArray)
     }
     
     func encode(with aCoder: NSCoder)
     {
         
         aCoder.encode(self.timeArray, forKey:"Times")
-        aCoder.encode(self.voltageNodes, forKey:"VoltageNodes")
+        aCoder.encode(self.sections, forKey:"Sections")
+        // aCoder.encode(self.voltageNodes, forKey:"VoltageNodes")
         aCoder.encode(self.voltsArray, forKey:"Volts")
-        aCoder.encode(self.deviceIDs, forKey:"DeviceIDs")
+        // aCoder.encode(self.deviceIDs, forKey:"DeviceIDs")
         aCoder.encode(self.ampsArray, forKey:"Amps")
     }
 }
