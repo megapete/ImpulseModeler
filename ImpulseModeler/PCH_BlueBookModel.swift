@@ -26,7 +26,6 @@ class PCH_BlueBookModel: NSObject {
     init(theModel:[PCH_DiskSection], phase:Phase)
     {
         let sectionCount = theModel.count
-        let coilCount = phase.coils.count
         
         // Each axial section in the model has an "end node" that is not the start node of the next axial section, so we need to make sure we include all those nodes in the matrix.
         var axialSectionCount = 0
@@ -63,21 +62,17 @@ class PCH_BlueBookModel: NSObject {
                 endNodes.append(nextStart - 1)
             }
         }
-        /*
-        for i in 0..<coilCount
-        {
-            startNodes.append(nextStart)
-            
-            nextStart += Int(phase.coils[i].numDisks) + 1
-            
-            endNodes.append(nextStart - 1)
-        }
-        */
+        
         // we need to keep track of the previous section for the capacitance matrix
         var prevSection:PCH_DiskSection? = nil
         
         for sectionIndex in 0..<sectionCount
         {
+            if sectionIndex == 110
+            {
+                DLog("Stopping")
+            }
+            
             let nextSection = theModel[sectionIndex]
             
             if (startNodes.contains(nextSection.data.nodes.inNode))
@@ -137,7 +132,7 @@ class PCH_BlueBookModel: NSObject {
                     // we don't include ground nodes in this part
                     if (sectionID != "GND")
                     {
-                        C[prevSection!.data.nodes.outNode, shuntCapSection.data.nodes.outNode] = -shuntC / 2.0
+                        C[prevSection!.data.nodes.outNode, shuntCapSection.data.nodes.outNode] += -shuntC / 2.0
                     }
                 }
                 
@@ -167,25 +162,11 @@ class PCH_BlueBookModel: NSObject {
             
             C[nextSection.data.nodes.inNode, nextSection.data.nodes.inNode] = Cj + Cj1 + sumKip
             
-            /* taken care of above
-             if (prevSection != nil)
-             {
-             Cbase[nextSection.data.nodes.inNode, prevSection!.data.nodes.inNode] = -Cj
-             }
-             */
-            
             C[nextSection.data.nodes.inNode, nextSection.data.nodes.outNode] = -Cj1
-            
-            /* taken care of above
-             if (prevSection != nil)
-             {
-             A[nextSection.data.nodes.inNode, sectionIndex-1] = 1
-             }
-             */
             
             // DLog("Total Kip for this node: \(sumKip)")
             
-            // take care of the final node
+            // take care of end nodes
             if (endNodes.contains(nextSection.data.nodes.outNode))
             {
                 sumKip = 0.0

@@ -183,7 +183,7 @@ class AppController: NSObject {
         
         let bbModel = PCH_BlueBookModel(theModel: self.theModel!, phase: self.phaseDefinition!)
         
-        // bbModel.M.SaveAsCSV()
+        // bbModel.C.SaveAsCSV()
         
         let connDlog = ConnectionDlog()
         guard let testConnection = connDlog.runDialog(theModel: self.theModel!)
@@ -340,7 +340,9 @@ class AppController: NSObject {
                 return
             }
             
+            // This is required to be able to open the files in different programs with the same class. 
             NSKeyedArchiver.setClassName("ImpulseResult", for: PCH_BlueBookModelOutput.self)
+            NSKeyedArchiver.setClassName("BBSections", for: PCH_BB_ModelSection.self)
             let archiveResult = NSKeyedArchiver.archiveRootObject(bbModelOutput, toFile: newFileURL.path)
             
             if (!archiveResult)
@@ -672,11 +674,11 @@ class AppController: NSObject {
             
             let diskNum = PCH_StrRight(nextSectionID, length: 3)
             
-            let nextDiskNum = String(format: "%03d", Int(diskNum)! + 1)
+            // let nextDiskNum = String(format: "%03d", Int(diskNum)! + 1)
             
-            let inNode = coilName + "I" + diskNum
-            let outNode = coilName + "I" + nextDiskNum
-            let midNode = coilName + "M" + diskNum
+            let inNode = String(format: "%@I%03d", coilName, nextDisk.data.nodes.inNode)
+            let outNode = String(format: "%@I%03d", coilName, nextDisk.data.nodes.outNode)
+            let midNode = String(format: "%@M%03d", coilName, nextDisk.data.nodes.inNode)
             let resName = "R" + nextSectionID
             let selfIndName = "L" + nextSectionID
             let indParResName = "RPL" + nextSectionID
@@ -725,10 +727,7 @@ class AppController: NSObject {
                 }
                 else
                 {
-                    shuntNode = coilArray[nextShuntSection.coilRef].coilName
-                    shuntNode += "I"
-                    let nodeNum = PCH_StrRight(nextShuntCap.key, length: 3)
-                    shuntNode += nodeNum
+                    shuntNode = String(format: "%@I%03d", coilArray[nextShuntSection.coilRef].coilName, nextShuntSection.data.nodes.inNode)
                 }
                 
                 fString += nsName + " " + inNode + " " + shuntNode + String(format: " %.4E\n", nextShuntCap.value)
@@ -761,9 +760,21 @@ class AppController: NSObject {
         {
             let nextID = coilArray[i].coilName
             
-            fString += "R" + nextID + "BOT " + nextID + "BOT " + nextID + "I001 1.0E-9\n"
-            fString += "R" + nextID + "CEN " + nextID + "CEN " + nextID + String(format: "I%03d 1.0E-9\n", Int(round(coilArray[i].numDisks)) / 2 + 1)
-            fString += "R" + nextID + "TOP " + nextID + "TOP " + nextID + String(format: "I%03d 1.0E-9\n", Int(round(coilArray[i].numDisks)) + 1)
+            var firstDiskInCoilIndex = 0
+            if i > 0
+            {
+                for j in 1...i
+                {
+                    firstDiskInCoilIndex += Int(round(coilArray[j-1].numDisks))
+                }
+            }
+            fString += String(format: "R%@BOT %@BOT %@I%03d 1.0E-9\n", nextID, nextID, nextID, theModel![firstDiskInCoilIndex].data.nodes.inNode)
+            
+            let middleDiskInCoilIndex = firstDiskInCoilIndex + Int(round(coilArray[i].numDisks)) / 2 - 1
+            fString += String(format: "R%@CEN %@CEN %@I%03d 1.0E-9\n", nextID, nextID, nextID, theModel![middleDiskInCoilIndex].data.nodes.outNode)
+            
+            let lastDiskInCoilIndex = firstDiskInCoilIndex + Int(round(coilArray[i].numDisks)) - 1
+            fString += String(format: "R%@TOP %@TOP %@I%03d 1.0E-9\n", nextID, nextID, nextID, theModel![lastDiskInCoilIndex].data.nodes.outNode)
         }
         
         
@@ -771,12 +782,12 @@ class AppController: NSObject {
         fString += "\n* Connections\n\n"
         
         // The shot
-        fString += "* Impulse shot\nVBIL HVTOP 0 EXP(0 128.75k 0 2.2E-7 1.0E-6 7.0E-5)\n\n"
+        fString += "* Impulse shot\nVBIL HVTOP 0 EXP(0 566.5k 0 2.2E-7 1.0E-6 7.0E-5)\n\n"
         
         // Options required to make this work most of the time
         fString += "* options for LTSpice\n.OPTIONS reltol=0.02 trtol=7 abstol=1e-6 vntol=1e-4 method=gear\n\n"
         
-        fString += ".TRAN 1.0ns 100us\n\n.END"
+        fString += ".TRAN 10.0ns 100us\n\n.END"
         
         self.saveFileWithString(fString)
     }
