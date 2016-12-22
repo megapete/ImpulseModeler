@@ -68,11 +68,6 @@ class PCH_BlueBookModel: NSObject {
         
         for sectionIndex in 0..<sectionCount
         {
-            if sectionIndex == 110
-            {
-                DLog("Stopping")
-            }
-            
             let nextSection = theModel[sectionIndex]
             
             if (startNodes.contains(nextSection.data.nodes.inNode))
@@ -184,7 +179,6 @@ class PCH_BlueBookModel: NSObject {
                     
                     if (sectionID != "GND")
                     {
-                        // Cbase[nextSection.data.nodes.outNode, section.data.nodes.inNode] += -shuntC / 2.0
                         C[nextSection.data.nodes.outNode, shuntCapSection.data.nodes.outNode] += -shuntC / 2.0
                     }
                 }
