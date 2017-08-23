@@ -575,6 +575,11 @@ class ConnectionDlogView: NSView
             lastSection = nextSection
         }
         
+        if currentCoilHt > result
+        {
+            result = currentCoilHt
+        }
+        
         self.requiredCoilHt = result
         
         return result

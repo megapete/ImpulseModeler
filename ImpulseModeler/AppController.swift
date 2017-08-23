@@ -258,7 +258,17 @@ class AppController: NSObject {
         let saveTimeStep = 100.0E-9
         let totalSimTime = 100.0E-6
         
-        guard let resultMatrices = bbModel.SimulateWithConnections(newConnectionArray as! [(fromNode: Int, toNodes: [Int])], sourceConnection: (testSource, sourceConnNode), simTimeStep: simTimeStep, saveTimeStep: saveTimeStep, totalTime: totalSimTime)
+        var tConnArray:[(fromNode: Int, toNodes: [Int])] = []
+        for nextConn in newConnectionArray
+        {
+            let nextInt = nextConn.from
+            let nextArray = nextConn.to
+            
+            tConnArray.append((nextInt, nextArray))
+        }
+        
+        
+        guard let resultMatrices = bbModel.SimulateWithConnections(tConnArray, sourceConnection: (testSource, sourceConnNode), simTimeStep: simTimeStep, saveTimeStep: saveTimeStep, totalTime: totalSimTime)
         else
         {
             DLog("Simulation failed!")
