@@ -104,6 +104,42 @@ class AppController: NSObject {
         return result
     }
     
+    func openModel(_ url:URL) -> Bool
+    {
+        if (self.theModel != nil)
+        {
+            let saveYesOrNo = NSAlert()
+            saveYesOrNo.messageText = "This will destroy the current model! Do you wish to save it before proceeding?"
+            saveYesOrNo.alertStyle = NSAlertStyle.warning
+            saveYesOrNo.addButton(withTitle: "Yes")
+            saveYesOrNo.addButton(withTitle: "No")
+            
+            if (saveYesOrNo.runModal() == NSAlertFirstButtonReturn)
+            {
+                self.handleSaveModel(self)
+            }
+        }
+        
+        if let archive = NSKeyedUnarchiver.unarchiveObject(withFile: url.path) as? PhaseModel
+        {
+            self.theModel = archive.model
+            self.phaseDefinition = archive.phase
+            NSDocumentController.shared().noteNewRecentDocumentURL(url)
+            
+            return true
+        }
+        else
+        {
+            let alertNoFile = NSAlert()
+            alertNoFile.messageText = "Invalid file or file does not exist"
+            alertNoFile.alertStyle = NSAlertStyle.warning
+            alertNoFile.addButton(withTitle: "Ok")
+            alertNoFile.runModal()
+            
+            return false
+        }
+    }
+    
     // Menu Handlers
     
     @IBAction func handleOpenModel(_ sender: AnyObject)
@@ -131,11 +167,13 @@ class AppController: NSObject {
         
         if (openFilePanel.runModal() == NSFileHandlingPanelOKButton)
         {
-            let archive = NSKeyedUnarchiver.unarchiveObject(withFile: openFilePanel.url!.path) as! PhaseModel
-            
-            self.theModel = archive.model
-            self.phaseDefinition = archive.phase
-            
+            if let archive = NSKeyedUnarchiver.unarchiveObject(withFile: openFilePanel.url!.path) as? PhaseModel
+            {
+                self.theModel = archive.model
+                self.phaseDefinition = archive.phase
+                
+                NSDocumentController.shared().noteNewRecentDocumentURL(openFilePanel.url!)
+            }
         }
     }
     
