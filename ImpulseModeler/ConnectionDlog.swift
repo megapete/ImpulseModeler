@@ -12,6 +12,9 @@ class ConnectionDlog: NSWindowController, NSWindowDelegate
 {
     @IBOutlet weak var theView: ConnectionDlogView!
     
+    @IBOutlet var popUpConn: NSMenu!
+    
+    
     var result:[(from:Int, to:[Int])]? = nil
     
     var model:[PCH_DiskSection]? = nil
@@ -36,6 +39,8 @@ class ConnectionDlog: NSWindowController, NSWindowDelegate
         }
         
         theView.sections = theModel
+        
+        theView.connectionPopUp = self.popUpConn
         theView.setUpView()
     }
     
@@ -83,6 +88,16 @@ class ConnectionDlog: NSWindowController, NSWindowDelegate
     @IBAction func handleResetAll(_ sender: Any)
     {
         theView.resetAllConnections()
+    }
+    
+    @IBAction func handleConnectToGround(_ sender: Any)
+    {
+        self.theView.connectSpecial(toNode: -1)
+    }
+    
+    @IBAction func handleConnectToImpulse(_ sender: Any)
+    {
+        self.theView.connectSpecial(toNode: -2)
     }
     
 }

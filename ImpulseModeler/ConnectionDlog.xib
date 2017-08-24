@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11542" systemVersion="16B2555" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12121" systemVersion="16G29" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11542"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12121"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="ConnectionDlog" customModule="ImpulseModeler" customModuleProvider="target">
             <connections>
+                <outlet property="popUpConn" destination="EJb-Gk-FxY" id="bVm-xh-GPh"/>
                 <outlet property="theView" destination="x6J-aT-XcX" id="1ps-xV-G9n"/>
                 <outlet property="window" destination="F0z-JX-Cv5" id="gIp-Ho-8D9"/>
             </connections>
@@ -96,5 +97,26 @@ Gw
             </connections>
             <point key="canvasLocation" x="161" y="150.5"/>
         </window>
+        <menu title="popUpMenu01" id="EJb-Gk-FxY">
+            <items>
+                <menuItem title="Connect to ground" id="L7N-nM-P02">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="handleConnectToGround:" target="-2" id="BbQ-gt-U1I"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Connect to impulse" id="6LA-Ab-FDR">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="handleConnectToImpulse:" target="-2" id="pFF-yt-Zx4"/>
+                    </connections>
+                </menuItem>
+                <menuItem isSeparatorItem="YES" id="d18-ck-mdp"/>
+                <menuItem title="Disconnect all" id="jML-b4-Qva">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                </menuItem>
+            </items>
+            <point key="canvasLocation" x="33" y="639.5"/>
+        </menu>
     </objects>
 </document>

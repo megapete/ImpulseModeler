@@ -43,6 +43,9 @@ class ConnectionDlogView: NSView
     // The sections are passed in by the parent window's controller
     var sections:[PCH_DiskSection]? = nil
     
+    // The NSMenu popup menu for connections (passed in by parent window's controller)
+    var connectionPopUp:NSMenu? = nil
+    
     // The textfields are for the disk names
     var sectionFields:[NSTextField] = Array()
 
@@ -407,6 +410,80 @@ class ConnectionDlogView: NSView
             }
         }
     }
+    
+    
+    override func rightMouseDown(with event: NSEvent)
+    {
+        guard let window = event.window
+            else
+        {
+            super.rightMouseDown(with: event)
+            return
+        }
+        
+        guard let viewsWindow = self.window
+            else
+        {
+            super.rightMouseDown(with: event)
+            return
+        }
+        
+        if (viewsWindow != window)
+        {
+            super.rightMouseDown(with: event)
+            return
+        }
+        
+        guard let theMenu = self.connectionPopUp
+            else
+        {
+            return
+        }
+        
+        let pointInWindow = event.locationInWindow
+        let pointInView = self.convert(pointInWindow, from: nil)
+        
+        for nextNode in self.nodes
+        {
+            if nextNode.idNum < 0
+            {
+                // we took care of ground and impulse generator above
+                continue
+            }
+            
+            let nodeRadius = CGFloat(self.nodeDiameter / 2.0)
+            let checkRect = NSRect(x: nextNode.location.x - nodeRadius, y: nextNode.location.y - nodeRadius, width: nodeRadius * 2.0, height: nodeRadius * 2.0)
+            
+            if checkRect.contains(pointInView)
+            {
+                self.startNode = nextNode
+                NSMenu.popUpContextMenu(theMenu, with: event, for: self)
+                self.startNode = nil
+            }
+        }
+    }
+    
+    func connectSpecial(toNode:Int)
+    {
+        if (toNode >= 0 || toNode < -2)
+        {
+            return
+        }
+        
+        if let sNode = self.startNode
+        {
+            if sNode.idNum < 0 // shouldn't happen
+            {
+                return
+            }
+            
+            sNode.connections.append(toNode)
+            let nodeIndex = abs(toNode + 1)
+            self.connections.append((fromNode:sNode, toNode:self.nodes[nodeIndex]))
+            self.needsDisplay = true
+        }
+    }
+    
     
     func resetAllConnections()
     {
