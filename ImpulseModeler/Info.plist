@@ -11,8 +11,12 @@
 			<array>
 				<string>impmdl</string>
 			</array>
+			<key>CFBundleTypeName</key>
+			<string>PCH_ImpulseModeler</string>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
+			<key>LSTypeIsPackage</key>
+			<integer>0</integer>
 		</dict>
 	</array>
 	<key>CFBundleExecutable</key>

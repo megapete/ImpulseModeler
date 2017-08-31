@@ -167,6 +167,9 @@ class AppController: NSObject {
         
         if (openFilePanel.runModal() == NSFileHandlingPanelOKButton)
         {
+            let testURL = openFilePanel.url!
+            let testURLPath = testURL.path
+            
             if let archive = NSKeyedUnarchiver.unarchiveObject(withFile: openFilePanel.url!.path) as? PhaseModel
             {
                 self.theModel = archive.model

@@ -13,8 +13,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     @IBOutlet weak var window: NSWindow!
     @IBOutlet weak var theController: AppController!
-
-
+    
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         // Insert code here to initialize your application
     }
@@ -23,13 +22,16 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Insert code here to tear down your application
     }
 
-    func application(_ sender: NSApplication, openFile filename: String) -> Bool {
     
+    func application(_ sender: NSApplication, openFile filename: String) -> Bool
+    {
         let fixedFileName = (filename as NSString).expandingTildeInPath
         
         let url = URL(fileURLWithPath: fixedFileName, isDirectory: false)
         
         return theController.openModel(url)
     }
+     
+    
 }
 
