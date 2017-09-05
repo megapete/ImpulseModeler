@@ -14,15 +14,22 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @IBOutlet weak var window: NSWindow!
     @IBOutlet weak var theController: AppController!
     
-    func applicationDidFinishLaunching(_ aNotification: Notification) {
+    func applicationDidFinishLaunching(_ aNotification: Notification)
+    {
         // Insert code here to initialize your application
     }
 
-    func applicationWillTerminate(_ aNotification: Notification) {
+    func applicationWillTerminate(_ aNotification: Notification)
+    {
         // Insert code here to tear down your application
     }
-
     
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool
+    {
+        return true
+    }
+
+    // This function is required to use the Open Recent menu item as well as to launch the program from th Finder by double-clicking a file.
     func application(_ sender: NSApplication, openFile filename: String) -> Bool
     {
         let fixedFileName = (filename as NSString).expandingTildeInPath
