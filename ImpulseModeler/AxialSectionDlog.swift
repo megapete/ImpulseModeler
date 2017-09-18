@@ -49,9 +49,9 @@ class AxialSectionDlog: NSWindowController {
     var returnedSection:AxialSection? = nil
     var returnValue = DlogResult.cancel
     
-    override var windowNibName: String!
+    override var windowNibName: NSNib.Name!
     {
-        return "AxialSectionDlog"
+        return NSNib.Name("AxialSectionDlog")
     }
     
     override func windowDidLoad()
@@ -74,9 +74,9 @@ class AxialSectionDlog: NSWindowController {
         interdiskField.doubleValue = interdisk
         overTopDiskField.doubleValue = overTopDisk
         
-        topStaticRingBox.state = (hasTopStaticRing ? NSOnState : NSOffState)
-        bottomStaticRingBox.state = (hasBottomStaticRing ? NSOnState : NSOffState)
-        interleavedBox.state = (isInterleaved ? NSOnState : NSOffState)
+        topStaticRingBox.state = (hasTopStaticRing ? .on : .off)
+        bottomStaticRingBox.state = (hasBottomStaticRing ? .on : .off)
+        interleavedBox.state = (isInterleaved ? .on : .off)
         
         previousButton.isEnabled = (sectionReference == 0 ? false : true)
     }
@@ -115,7 +115,7 @@ class AxialSectionDlog: NSWindowController {
     {
         let diskSize:NSSize = NSSize(width: self.diskRBField.doubleValue, height: self.diskHeightField.doubleValue)
         
-        self.returnedSection = AxialSection(sectionAxialPosition: self.sectionReference, turns: self.totalTurnsField.doubleValue, numDisks: self.totalDisksField.doubleValue, topDiskSerialCapacitance: self.topDiskCapField.doubleValue, bottomDiskSerialCapacitance: self.bottomDiskCapField.doubleValue, commonDiskSerialCapacitance: self.commonDiskCapField.doubleValue, topStaticRing: self.topStaticRingBox.state == NSOnState, bottomStaticRing: self.bottomStaticRingBox.state == NSOffState, isInterleaved: self.interleavedBox.state == NSOnState, diskResistance: self.diskResistanceField.doubleValue, diskSize: diskSize, interDiskDimn: self.interdiskField.doubleValue, overTopDiskDimn: self.overTopDiskField.doubleValue)
+        self.returnedSection = AxialSection(sectionAxialPosition: self.sectionReference, turns: self.totalTurnsField.doubleValue, numDisks: self.totalDisksField.doubleValue, topDiskSerialCapacitance: self.topDiskCapField.doubleValue, bottomDiskSerialCapacitance: self.bottomDiskCapField.doubleValue, commonDiskSerialCapacitance: self.commonDiskCapField.doubleValue, topStaticRing: self.topStaticRingBox.state == .on, bottomStaticRing: self.bottomStaticRingBox.state == .off, isInterleaved: self.interleavedBox.state == .on, diskResistance: self.diskResistanceField.doubleValue, diskSize: diskSize, interDiskDimn: self.interdiskField.doubleValue, overTopDiskDimn: self.overTopDiskField.doubleValue)
         
         NSApp.stopModal()
         self.window!.orderOut(self)

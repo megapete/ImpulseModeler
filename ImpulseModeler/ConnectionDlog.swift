@@ -19,9 +19,9 @@ class ConnectionDlog: NSWindowController, NSWindowDelegate
     
     var model:[PCH_DiskSection]? = nil
     
-    override var windowNibName: String!
+    override var windowNibName: NSNib.Name!
     {
-        return "ConnectionDlog"
+        return NSNib.Name("ConnectionDlog")
     }
     
     override func windowDidLoad()

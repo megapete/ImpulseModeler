@@ -53,7 +53,7 @@ func PCH_StrMid(_ src:String, start:Int, end:Int) -> String
     
     let theRange = Range(uncheckedBounds: (src.index(src.startIndex, offsetBy: start), src.index(src.startIndex, offsetBy: end+1)))
     
-    let result = src.substring(with: theRange)
+    let result = String(src[theRange])
     
     return result
 }

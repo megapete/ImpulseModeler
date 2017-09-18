@@ -30,9 +30,9 @@ class CoreInputDlog: NSWindowController {
     
     
     // This was the easiest way I could find to just show the associated xib file (see the 3rd response at http://stackoverflow.com/questions/24220638/subclassing-nswindowcontroller-in-swift-and-initwindownibname
-    override var windowNibName: String!
+    override var windowNibName: NSNib.Name!
     {
-        return "CoreInputDlog"
+        return NSNib.Name("CoreInputDlog")
     }
     
     override func windowDidLoad()
@@ -43,15 +43,15 @@ class CoreInputDlog: NSWindowController {
         
         if (self.htFactor == 3)
         {
-            threeXbutton.state = NSOnState
+            threeXbutton.state = .on
         }
         else if (self.htFactor == 1)
         {
-            oneXbutton.state = NSOnState
+            oneXbutton.state = .on
         }
         else
         {
-            otherXbutton.state = NSOnState
+            otherXbutton.state = .on
             htFactorField.isEnabled = true
         }
         

@@ -110,11 +110,11 @@ class AppController: NSObject {
         {
             let saveYesOrNo = NSAlert()
             saveYesOrNo.messageText = "This will destroy the current model! Do you wish to save it before proceeding?"
-            saveYesOrNo.alertStyle = NSAlertStyle.warning
+            saveYesOrNo.alertStyle = NSAlert.Style.warning
             saveYesOrNo.addButton(withTitle: "Yes")
             saveYesOrNo.addButton(withTitle: "No")
             
-            if (saveYesOrNo.runModal() == NSAlertFirstButtonReturn)
+            if (saveYesOrNo.runModal() == NSApplication.ModalResponse.alertFirstButtonReturn)
             {
                 self.handleSaveModel(self)
             }
@@ -124,7 +124,7 @@ class AppController: NSObject {
         {
             self.theModel = archive.model
             self.phaseDefinition = archive.phase
-            NSDocumentController.shared().noteNewRecentDocumentURL(url)
+            NSDocumentController.shared.noteNewRecentDocumentURL(url)
             
             return true
         }
@@ -132,7 +132,7 @@ class AppController: NSObject {
         {
             let alertNoFile = NSAlert()
             alertNoFile.messageText = "Invalid file or file does not exist"
-            alertNoFile.alertStyle = NSAlertStyle.warning
+            alertNoFile.alertStyle = NSAlert.Style.warning
             alertNoFile.addButton(withTitle: "Ok")
             alertNoFile.runModal()
             
@@ -148,11 +148,11 @@ class AppController: NSObject {
         {
             let saveYesOrNo = NSAlert()
             saveYesOrNo.messageText = "This will destroy the current model! Do you wish to save it before proceeding?"
-            saveYesOrNo.alertStyle = NSAlertStyle.warning
+            saveYesOrNo.alertStyle = NSAlert.Style.warning
             saveYesOrNo.addButton(withTitle: "Yes")
             saveYesOrNo.addButton(withTitle: "No")
             
-            if (saveYesOrNo.runModal() == NSAlertFirstButtonReturn)
+            if (saveYesOrNo.runModal() == NSApplication.ModalResponse.alertFirstButtonReturn)
             {
                 self.handleSaveModel(self)
             }
@@ -165,17 +165,17 @@ class AppController: NSObject {
         openFilePanel.allowedFileTypes = ["impmdl"]
         openFilePanel.allowsOtherFileTypes = false
         
-        if (openFilePanel.runModal() == NSFileHandlingPanelOKButton)
+        if (openFilePanel.runModal().rawValue == NSFileHandlingPanelOKButton)
         {
-            let testURL = openFilePanel.url!
-            let testURLPath = testURL.path
+            // let testURL = openFilePanel.url!
+            // let testURLPath = testURL.path
             
             if let archive = NSKeyedUnarchiver.unarchiveObject(withFile: openFilePanel.url!.path) as? PhaseModel
             {
                 self.theModel = archive.model
                 self.phaseDefinition = archive.phase
                 
-                NSDocumentController.shared().noteNewRecentDocumentURL(openFilePanel.url!)
+                NSDocumentController.shared.noteNewRecentDocumentURL(openFilePanel.url!)
             }
         }
     }
@@ -189,7 +189,7 @@ class AppController: NSObject {
         saveFilePanel.allowedFileTypes = ["impmdl"]
         saveFilePanel.allowsOtherFileTypes = false
         
-        if (saveFilePanel.runModal() == NSFileHandlingPanelOKButton)
+        if (saveFilePanel.runModal().rawValue == NSFileHandlingPanelOKButton)
         {
             guard let newFileURL = saveFilePanel.url
                 else
@@ -382,7 +382,7 @@ class AppController: NSObject {
         saveFilePanel.allowedFileTypes = ["impres"]
         saveFilePanel.allowsOtherFileTypes = false
         
-        if (saveFilePanel.runModal() == NSFileHandlingPanelOKButton)
+        if (saveFilePanel.runModal().rawValue == NSFileHandlingPanelOKButton)
         {
             guard let newFileURL = saveFilePanel.url
                 else
@@ -496,11 +496,11 @@ class AppController: NSObject {
         {
             let saveYesOrNo = NSAlert()
             saveYesOrNo.messageText = "This will destroy the current model! Do you wish to save it before proceeding?"
-            saveYesOrNo.alertStyle = NSAlertStyle.warning
+            saveYesOrNo.alertStyle = NSAlert.Style.warning
             saveYesOrNo.addButton(withTitle: "Yes")
             saveYesOrNo.addButton(withTitle: "No")
             
-            if (saveYesOrNo.runModal() == NSAlertFirstButtonReturn)
+            if (saveYesOrNo.runModal() == NSApplication.ModalResponse.alertFirstButtonReturn)
             {
                 self.handleSaveModel(self)
             }
@@ -723,7 +723,7 @@ class AppController: NSObject {
             
             let coilName = PCH_StrLeft(nextSectionID, length: 2)
             
-            let diskNum = PCH_StrRight(nextSectionID, length: 3)
+            // let diskNum = PCH_StrRight(nextSectionID, length: 3)
             
             // let nextDiskNum = String(format: "%03d", Int(diskNum)! + 1)
             
@@ -852,7 +852,7 @@ class AppController: NSObject {
         saveFilePanel.allowedFileTypes = ["cir"]
         saveFilePanel.allowsOtherFileTypes = false
         
-        if (saveFilePanel.runModal() == NSFileHandlingPanelOKButton)
+        if (saveFilePanel.runModal().rawValue == NSFileHandlingPanelOKButton)
         {
             guard let newFileURL = saveFilePanel.url
                 else
@@ -879,14 +879,14 @@ class AppController: NSObject {
         
         if wMenu == self.inchItem
         {
-            self.inchItem.state = NSOnState
-            self.metricItem.state = NSOffState
+            self.inchItem.state = .on
+            self.metricItem.state = .off
             self.unitFactor = 25.4 / 1000.0
         }
         else if wMenu == self.metricItem
         {
-            self.inchItem.state = NSOffState
-            self.metricItem.state = NSOnState
+            self.inchItem.state = .off
+            self.metricItem.state = .on
             self.unitFactor = 1.0 / 1000.0
         }
     }
@@ -902,11 +902,11 @@ class AppController: NSObject {
         {
             let saveYesOrNo = NSAlert()
             saveYesOrNo.messageText = "This will destroy the current model! Do you wish to save them before proceeding?"
-            saveYesOrNo.alertStyle = NSAlertStyle.warning
+            saveYesOrNo.alertStyle = NSAlert.Style.warning
             saveYesOrNo.addButton(withTitle: "Yes")
             saveYesOrNo.addButton(withTitle: "No")
             
-            if (saveYesOrNo.runModal() == NSAlertFirstButtonReturn)
+            if (saveYesOrNo.runModal() == NSApplication.ModalResponse.alertFirstButtonReturn)
             {
                 self.handleSaveModel(self)
             }

@@ -71,7 +71,7 @@ class ConnectionDlogView: NSView
         
         // Set the background to white for the view
         NSColor.white.set()
-        NSRectFill(self.bounds)
+        self.bounds.fill()
         
         // Draw the "button" for the ground icon
         if let grdConnRect = self.groundConnectionRect

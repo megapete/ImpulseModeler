@@ -39,9 +39,9 @@ class CoilDlog: NSWindowController {
     
     var sections:[AxialSection]?
     
-    override var windowNibName: String!
+    override var windowNibName: NSNib.Name!
     {
-        return "CoilDlog"
+        return NSNib.Name("CoilDlog")
     }
     
     override func windowDidLoad()
@@ -59,15 +59,15 @@ class CoilDlog: NSWindowController {
         
         if currentDirection > 0
         {
-            positiveCurrentButton.state = NSOnState
+            positiveCurrentButton.state = .on
         }
         else if currentDirection < 0
         {
-            negativeCurrentButton.state = NSOnState
+            negativeCurrentButton.state = .on
         }
         else
         {
-            noCurrentButton.state = NSOnState
+            noCurrentButton.state = .on
         }
         
         prevButton.isEnabled = (radialPosition != 0)
@@ -102,7 +102,7 @@ class CoilDlog: NSWindowController {
     {
         var doneSections = false
         
-        let currentCoil = Coil(coilName: coilNameField.stringValue, coilRadialPosition: radialPositionField.integerValue, amps: ampsField.doubleValue, currentDirection: (positiveCurrentButton.state == NSOnState ? 1 : (negativeCurrentButton.state == NSOnState ? -1 : 0)), capacitanceToPreviousCoil: radialCapacitanceField.doubleValue, capacitanceToGround:capacitanceToGroundField.doubleValue, innerRadius: innerDiameterField.doubleValue / 2.0, eddyLossPercentage:eddyLossField.doubleValue, sections: sections)
+        let currentCoil = Coil(coilName: coilNameField.stringValue, coilRadialPosition: radialPositionField.integerValue, amps: ampsField.doubleValue, currentDirection: (positiveCurrentButton.state == .on ? 1 : (negativeCurrentButton.state == .on ? -1 : 0)), capacitanceToPreviousCoil: radialCapacitanceField.doubleValue, capacitanceToGround:capacitanceToGroundField.doubleValue, innerRadius: innerDiameterField.doubleValue / 2.0, eddyLossPercentage:eddyLossField.doubleValue, sections: sections)
         
         var currentSectionReferenceNumber = 0
         
@@ -161,7 +161,7 @@ class CoilDlog: NSWindowController {
     
     func saveCoilAndClose()
     {
-        returnedCoil = Coil(coilName: coilNameField.stringValue, coilRadialPosition: radialPositionField.integerValue, amps: ampsField.doubleValue, currentDirection: (positiveCurrentButton.state == NSOnState ? 1 : (negativeCurrentButton.state == NSOnState ? -1 : 0)), capacitanceToPreviousCoil: radialCapacitanceField.doubleValue, capacitanceToGround:capacitanceToGroundField.doubleValue, innerRadius: innerDiameterField.doubleValue / 2.0, eddyLossPercentage:eddyLossField.doubleValue, sections: self.sections)
+        returnedCoil = Coil(coilName: coilNameField.stringValue, coilRadialPosition: radialPositionField.integerValue, amps: ampsField.doubleValue, currentDirection: (positiveCurrentButton.state == .on ? 1 : (negativeCurrentButton.state == .on ? -1 : 0)), capacitanceToPreviousCoil: radialCapacitanceField.doubleValue, capacitanceToGround:capacitanceToGroundField.doubleValue, innerRadius: innerDiameterField.doubleValue / 2.0, eddyLossPercentage:eddyLossField.doubleValue, sections: self.sections)
         
         NSApp.stopModal()
         self.window!.orderOut(self)
@@ -173,21 +173,21 @@ class CoilDlog: NSWindowController {
         
         if wButton == noCurrentButton
         {
-            positiveCurrentButton.state = NSOffState
-            negativeCurrentButton.state = NSOffState
+            positiveCurrentButton.state = .off
+            negativeCurrentButton.state = .off
         }
         else if wButton == positiveCurrentButton
         {
-            negativeCurrentButton.state = NSOffState
-            noCurrentButton.state = NSOffState
+            negativeCurrentButton.state = .off
+            noCurrentButton.state = .off
         }
         else if wButton == negativeCurrentButton
         {
-            positiveCurrentButton.state = NSOffState
-            noCurrentButton.state = NSOffState
+            positiveCurrentButton.state = .off
+            noCurrentButton.state = .off
         }
         
-        wButton.state = NSOnState
+        wButton.state = .on
     }
     
     
