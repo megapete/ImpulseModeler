@@ -663,8 +663,17 @@ class AppController: NSObject {
             
             DLog("Calculating to: \(nDisk.data.sectionID)")
             
+            let nIsUncoupled = (phase.coils[nDisk.coilRef].phaseNum == 0 ? true : false)
+            
             for otherDisk in diskArray
             {
+                let otherIsUncoupled = (phase.coils[otherDisk.coilRef].phaseNum == 0 ? true : false)
+                
+                if (nIsUncoupled != otherIsUncoupled)
+                {
+                    continue
+                }
+                
                 let mutInd = fabs(nDisk.MutualInductanceTo(otherDisk, windHtFactor:phase.core.htFactor))
                 
                 let mutIndCoeff = mutInd / sqrt(nDisk.data.selfInductance * otherDisk.data.selfInductance)

@@ -34,9 +34,12 @@ class Coil:NSObject, NSCoding
     /// The average eddy-loss percentage of dc resistance for the coil
     let eddyLossPercentage:Double
     
+    /// Variable to decide if we need to consider intercoil capacitances and mutual inductances (ie: is this coil decoupled from the others?). For now, we use the simplification that the "main" coils are on phase 1, while any others are on phase 0 (if I ever need to fix this to allow for more than one other phase, this assumption will need to be modified)
+    let phaseNum:Int
+    
     var sections:[AxialSection]?
     
-    init(coilName:String, coilRadialPosition:Int, amps:Double, currentDirection:Int, capacitanceToPreviousCoil:Double, capacitanceToGround:Double, innerRadius:Double, eddyLossPercentage:Double, sections:[AxialSection]? = nil)
+    init(coilName:String, coilRadialPosition:Int, amps:Double, currentDirection:Int, capacitanceToPreviousCoil:Double, capacitanceToGround:Double, innerRadius:Double, eddyLossPercentage:Double, phaseNum:Int, sections:[AxialSection]? = nil)
     {
         self.coilName = coilName
         self.coilRadialPosition = coilRadialPosition
@@ -47,6 +50,7 @@ class Coil:NSObject, NSCoding
         self.innerRadius = innerRadius
         self.eddyLossPercentage = eddyLossPercentage
         self.sections = sections
+        self.phaseNum = phaseNum
     }
     
     convenience required init?(coder aDecoder: NSCoder)
@@ -60,8 +64,9 @@ class Coil:NSObject, NSCoding
         let innerRadius = aDecoder.decodeDouble(forKey: "InnerRadius")
         let eddyLossPercentage = aDecoder.decodeDouble(forKey: "EddyLossPercentage")
         let sections = aDecoder.decodeObject(forKey: "Sections") as! [AxialSection]
+        let phaseNum = aDecoder.decodeInteger(forKey: "PhaseNumber")
         
-        self.init(coilName:coilName, coilRadialPosition:coilRadialPosition, amps:amps, currentDirection:currentDirection, capacitanceToPreviousCoil:capacitanceToPreviousCoil, capacitanceToGround:capacitanceToGround, innerRadius:innerRadius, eddyLossPercentage:eddyLossPercentage, sections:sections)
+        self.init(coilName:coilName, coilRadialPosition:coilRadialPosition, amps:amps, currentDirection:currentDirection, capacitanceToPreviousCoil:capacitanceToPreviousCoil, capacitanceToGround:capacitanceToGround, innerRadius:innerRadius, eddyLossPercentage:eddyLossPercentage, phaseNum:phaseNum, sections:sections)
     }
     
     func encode(with aCoder: NSCoder) {
@@ -75,6 +80,7 @@ class Coil:NSObject, NSCoding
         aCoder.encode(self.innerRadius, forKey: "InnerRadius")
         aCoder.encode(self.eddyLossPercentage, forKey: "EddyLossPercentage")
         aCoder.encode(self.sections, forKey: "Sections")
+        aCoder.encode(self.phaseNum, forKey: "PhaseNumber")
     }
     
     /// The total number of disks in the coil
@@ -169,7 +175,10 @@ class AxialSection:NSObject, NSCoding
     /// The spacer on top of this section (0.0 for the topmost section of a coil)
     let overTopDiskDimn:Double
     
-    init(sectionAxialPosition:Int, turns:Double, numDisks:Double, topDiskSerialCapacitance:Double, bottomDiskSerialCapacitance:Double, commonDiskSerialCapacitance:Double, topStaticRing:Bool, bottomStaticRing:Bool, isInterleaved:Bool, diskResistance:Double, diskSize:NSSize, interDiskDimn:Double, overTopDiskDimn:Double)
+    /// Variable to decide if we need to consider intercoil capacitances and mutual inductances (ie: is this coil decoupled from the others?). For now, we use the simplification that the "main" coils are on phase 1, while any others are on phase 0 (if I ever need to fix this to allow for more than one other phase, this assumption will need to be modified)
+    var phaseNum:Int
+    
+    init(sectionAxialPosition:Int, turns:Double, numDisks:Double, topDiskSerialCapacitance:Double, bottomDiskSerialCapacitance:Double, commonDiskSerialCapacitance:Double, topStaticRing:Bool, bottomStaticRing:Bool, isInterleaved:Bool, diskResistance:Double, diskSize:NSSize, interDiskDimn:Double, overTopDiskDimn:Double, phaseNum:Int)
     {
         self.sectionAxialPosition = sectionAxialPosition
         self.turns = turns
@@ -184,6 +193,7 @@ class AxialSection:NSObject, NSCoding
         self.diskSize = diskSize
         self.interDiskDimn = interDiskDimn
         self.overTopDiskDimn = overTopDiskDimn
+        self.phaseNum = phaseNum
     }
     
     convenience required init?(coder aDecoder: NSCoder) {
@@ -201,8 +211,9 @@ class AxialSection:NSObject, NSCoding
         let diskSize = aDecoder.decodeSize(forKey: "DiskSize")
         let interDiskDimn = aDecoder.decodeDouble(forKey: "InterDiskDimn")
         let overTopDiskDimn = aDecoder.decodeDouble(forKey: "OverTopDiskDimn")
+        let phaseNum = aDecoder.decodeInteger(forKey: "PhaseNumber")
         
-        self.init(sectionAxialPosition:sectionAxialPosition, turns:turns, numDisks:numDisks, topDiskSerialCapacitance:topDiskSerialCapacitance, bottomDiskSerialCapacitance:bottomDiskSerialCapacitance, commonDiskSerialCapacitance:commonDiskSerialCapacitance, topStaticRing:topStaticRing, bottomStaticRing:bottomStaticRing, isInterleaved:isInterleaved, diskResistance:diskResistance, diskSize:diskSize, interDiskDimn:interDiskDimn, overTopDiskDimn:overTopDiskDimn)
+        self.init(sectionAxialPosition:sectionAxialPosition, turns:turns, numDisks:numDisks, topDiskSerialCapacitance:topDiskSerialCapacitance, bottomDiskSerialCapacitance:bottomDiskSerialCapacitance, commonDiskSerialCapacitance:commonDiskSerialCapacitance, topStaticRing:topStaticRing, bottomStaticRing:bottomStaticRing, isInterleaved:isInterleaved, diskResistance:diskResistance, diskSize:diskSize, interDiskDimn:interDiskDimn, overTopDiskDimn:overTopDiskDimn, phaseNum:phaseNum)
     }
     
     func encode(with aCoder: NSCoder) {
@@ -220,6 +231,7 @@ class AxialSection:NSObject, NSCoding
         aCoder.encode(self.diskSize, forKey: "DiskSize")
         aCoder.encode(self.interDiskDimn, forKey: "InterDiskDimn")
         aCoder.encode(self.overTopDiskDimn, forKey: "OverTopDiskDimn")
+        aCoder.encode(self.phaseNum, forKey: "PhaseNumber")
     }
     
     func Height() -> Double

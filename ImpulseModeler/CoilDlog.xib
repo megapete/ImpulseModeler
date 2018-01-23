@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11542" systemVersion="16B2555" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="13771" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11542"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13771"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -11,6 +11,7 @@
                 <outlet property="ampsField" destination="vp2-tp-UNa" id="s3D-Cq-pUG"/>
                 <outlet property="capacitanceToGroundField" destination="QBx-hT-ADJ" id="cAF-Cg-VeK"/>
                 <outlet property="coilNameField" destination="Nax-yp-pND" id="6aO-AZ-2Rx"/>
+                <outlet property="decoupledCheckbox" destination="Qbd-XA-e5U" id="3OD-a8-vrU"/>
                 <outlet property="eddyLossField" destination="jhm-0P-2VL" id="1op-Ht-N9m"/>
                 <outlet property="innerDiameterField" destination="jFP-VE-BR4" id="HSV-Pg-yfa"/>
                 <outlet property="negativeCurrentButton" destination="gVh-Yi-vnA" id="Iah-d4-qOR"/>
@@ -271,6 +272,17 @@ Gw
                         </buttonCell>
                         <connections>
                             <action selector="handleCurrDirGroup:" target="-2" id="JfX-1a-ESB"/>
+                        </connections>
+                    </button>
+                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Qbd-XA-e5U">
+                        <rect key="frame" x="18" y="100" width="193" height="18"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="check" title="Different phase (decoupled)" bezelStyle="regularSquare" imagePosition="left" inset="2" id="6ao-v7-0bR">
+                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="handleDecoupled:" target="-2" id="kDu-Xq-F1q"/>
                         </connections>
                     </button>
                 </subviews>

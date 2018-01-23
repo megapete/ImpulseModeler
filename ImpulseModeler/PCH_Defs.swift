@@ -61,7 +61,7 @@ func PCH_StrMid(_ src:String, start:Int, end:Int) -> String
 // A more familiar way of getting a string's length
 func PCH_StrLength(_ src:String) -> Int
 {
-    return src.characters.count
+    return src.count
 }
 
 /** 

@@ -115,7 +115,7 @@ class AxialSectionDlog: NSWindowController {
     {
         let diskSize:NSSize = NSSize(width: self.diskRBField.doubleValue, height: self.diskHeightField.doubleValue)
         
-        self.returnedSection = AxialSection(sectionAxialPosition: self.sectionReference, turns: self.totalTurnsField.doubleValue, numDisks: self.totalDisksField.doubleValue, topDiskSerialCapacitance: self.topDiskCapField.doubleValue, bottomDiskSerialCapacitance: self.bottomDiskCapField.doubleValue, commonDiskSerialCapacitance: self.commonDiskCapField.doubleValue, topStaticRing: self.topStaticRingBox.state == .on, bottomStaticRing: self.bottomStaticRingBox.state == .off, isInterleaved: self.interleavedBox.state == .on, diskResistance: self.diskResistanceField.doubleValue, diskSize: diskSize, interDiskDimn: self.interdiskField.doubleValue, overTopDiskDimn: self.overTopDiskField.doubleValue)
+        self.returnedSection = AxialSection(sectionAxialPosition: self.sectionReference, turns: self.totalTurnsField.doubleValue, numDisks: self.totalDisksField.doubleValue, topDiskSerialCapacitance: self.topDiskCapField.doubleValue, bottomDiskSerialCapacitance: self.bottomDiskCapField.doubleValue, commonDiskSerialCapacitance: self.commonDiskCapField.doubleValue, topStaticRing: self.topStaticRingBox.state == .on, bottomStaticRing: self.bottomStaticRingBox.state == .off, isInterleaved: self.interleavedBox.state == .on, diskResistance: self.diskResistanceField.doubleValue, diskSize: diskSize, interDiskDimn: self.interdiskField.doubleValue, overTopDiskDimn: self.overTopDiskField.doubleValue, phaseNum:1)
         
         NSApp.stopModal()
         self.window!.orderOut(self)

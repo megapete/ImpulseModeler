@@ -31,6 +31,9 @@ class CoilDlog: NSWindowController {
     @IBOutlet var positiveCurrentButton: NSButton!
     var currentDirection = 1
     
+    @IBOutlet var decoupledCheckbox: NSButton!
+    var phaseNum = 1
+    
     @IBOutlet var prevButton: NSButton!
     
     enum DlogResult {case cancel, done, previous, next}
@@ -70,6 +73,17 @@ class CoilDlog: NSWindowController {
             noCurrentButton.state = .on
         }
         
+        if phaseNum == 1
+        {
+            decoupledCheckbox.state = .off
+            radialCapacitanceField.isEnabled = true
+        }
+        else
+        {
+            decoupledCheckbox.state = .on
+            radialCapacitanceField.isEnabled = false
+        }
+        
         prevButton.isEnabled = (radialPosition != 0)
     }
     
@@ -86,6 +100,7 @@ class CoilDlog: NSWindowController {
             self.capToGround = oldCoil.capacitanceToGround
             self.sections = oldCoil.sections
             self.eddyLossPercentage = oldCoil.eddyLossPercentage
+            self.phaseNum = oldCoil.phaseNum
         }
         else
         {
@@ -102,7 +117,7 @@ class CoilDlog: NSWindowController {
     {
         var doneSections = false
         
-        let currentCoil = Coil(coilName: coilNameField.stringValue, coilRadialPosition: radialPositionField.integerValue, amps: ampsField.doubleValue, currentDirection: (positiveCurrentButton.state == .on ? 1 : (negativeCurrentButton.state == .on ? -1 : 0)), capacitanceToPreviousCoil: radialCapacitanceField.doubleValue, capacitanceToGround:capacitanceToGroundField.doubleValue, innerRadius: innerDiameterField.doubleValue / 2.0, eddyLossPercentage:eddyLossField.doubleValue, sections: sections)
+        let currentCoil = Coil(coilName: coilNameField.stringValue, coilRadialPosition: radialPositionField.integerValue, amps: ampsField.doubleValue, currentDirection: (positiveCurrentButton.state == .on ? 1 : (negativeCurrentButton.state == .on ? -1 : 0)), capacitanceToPreviousCoil: radialCapacitanceField.doubleValue, capacitanceToGround:capacitanceToGroundField.doubleValue, innerRadius: innerDiameterField.doubleValue / 2.0, eddyLossPercentage:eddyLossField.doubleValue, phaseNum: (decoupledCheckbox.state == .on ? 0 : 1), sections: sections)
         
         var currentSectionReferenceNumber = 0
         
@@ -161,7 +176,15 @@ class CoilDlog: NSWindowController {
     
     func saveCoilAndClose()
     {
-        returnedCoil = Coil(coilName: coilNameField.stringValue, coilRadialPosition: radialPositionField.integerValue, amps: ampsField.doubleValue, currentDirection: (positiveCurrentButton.state == .on ? 1 : (negativeCurrentButton.state == .on ? -1 : 0)), capacitanceToPreviousCoil: radialCapacitanceField.doubleValue, capacitanceToGround:capacitanceToGroundField.doubleValue, innerRadius: innerDiameterField.doubleValue / 2.0, eddyLossPercentage:eddyLossField.doubleValue, sections: self.sections)
+        if (self.sections != nil)
+        {
+            for nextSection in self.sections!
+            {
+                nextSection.phaseNum = self.phaseNum
+            }
+        }
+        
+        returnedCoil = Coil(coilName: coilNameField.stringValue, coilRadialPosition: radialPositionField.integerValue, amps: ampsField.doubleValue, currentDirection: (positiveCurrentButton.state == .on ? 1 : (negativeCurrentButton.state == .on ? -1 : 0)), capacitanceToPreviousCoil: radialCapacitanceField.doubleValue, capacitanceToGround:capacitanceToGroundField.doubleValue, innerRadius: innerDiameterField.doubleValue / 2.0, eddyLossPercentage:eddyLossField.doubleValue, phaseNum: (decoupledCheckbox.state == .on ? 0 : 1), sections: self.sections)
         
         NSApp.stopModal()
         self.window!.orderOut(self)
@@ -190,6 +213,23 @@ class CoilDlog: NSWindowController {
         wButton.state = .on
     }
     
+    @IBAction func handleDecoupled(_ sender: Any)
+    {
+        if (self.phaseNum == 1)
+        {
+            decoupledCheckbox.state = .on
+            radialCapacitanceField.isEnabled = false;
+            radialCapacitanceField.stringValue = "0"
+            self.radialCapacitance = 0.0
+            self.phaseNum = 0;
+        }
+        else
+        {
+            decoupledCheckbox.state = .off
+            radialCapacitanceField.isEnabled = true;
+            self.phaseNum = 1;
+        }
+    }
     
     @IBAction func doneButtonPushed(_ sender: AnyObject)
     {

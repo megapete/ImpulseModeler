@@ -322,7 +322,7 @@ class PCH_BlueBookModel: NSObject {
                 AI[nextConnection.fromNode, 0] = newAI
             }
             
-            // Now the shot, uisng Runge-Kutta
+            // Now the shot, using Runge-Kutta
             AI[sourceConnection.toNode, 0] = sourceConnection.source.dV(simTime)
             let an = newC.SolveWith(AI)!
             
