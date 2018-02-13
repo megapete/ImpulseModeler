@@ -609,11 +609,13 @@ class AppController: NSObject {
             // We only run through this loop if the ground capacitance is non-zero
             if coilCapacitanceToGround != 0.0
             {
+                let capacitancePerUnitHeight = coilCapacitanceToGround / theCoil.Height()
+                
                 for sectionIndex in currentStartIndex...currentEndIndex
                 {
                     let currentSection = self.theModel![sectionIndex]
                     
-                    let diskCapToGnd = coilCapacitanceToGround / round(theCoil.numDisks)
+                    let diskCapToGnd = capacitancePerUnitHeight * Double(currentSection.diskRect.height)
                     
                     currentSection.data.shuntCapacitances[AppController.gndSection.data.sectionID] = diskCapToGnd
                     // currentSection.data.shuntCaps[AppController.gndSection] = diskCapToGnd
@@ -621,13 +623,15 @@ class AppController: NSObject {
                 }
             }
             
-            // we only go through the next loop if this isn't the first coil AND the capacitance to previous coil is non-zero
+            // we only go through the next loop if this isn't the first coil AND the capacitance to previous coil is non-zero (if it is zero, this must be a coil on another phase)
             if (theCoilNum > 0) && (theCoil.capacitanceToPreviousCoil != 0)
             {
                 // let previousEndIndex = currentStartIndex - 1
                 
                 let maxSections = round(max(phase.coils[theCoilNum].numDisks, phase.coils[theCoilNum-1].numDisks))
                 
+                // This is kinda wrong, in that we really should consider the height of each section like we do above for ground capacitances but it gets complicated with the 2 coils that we need to consider.
+                // TODO: Fix inter-coil capacitances to use capacitance per unit height
                 let capPerSection = theCoil.capacitanceToPreviousCoil / maxSections
                 
                 var leftSectionIndex = previousStartIndex
