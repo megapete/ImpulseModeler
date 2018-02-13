@@ -370,10 +370,16 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
-				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../GNU_Scientific_Library/include\"";
+				HEADER_SEARCH_PATHS = (
+					"\"$(SRCROOT)/../GNU_Scientific_Library/include\"",
+					/Users/peterhub/Documents/MyProjects/GNU_Scientific_Library/include,
+				);
 				INFOPLIST_FILE = ImpulseModeler/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/../GNU_Scientific_Library/lib\"";
+				LIBRARY_SEARCH_PATHS = (
+					"\"$(SRCROOT)/../GNU_Scientific_Library/lib\"",
+					/Users/peterhub/Documents/MyProjects/GNU_Scientific_Library/lib,
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.huberis-tech.ImpulseModeler";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "ImpulseModeler/ImpulseModeler-Bridging-Header.h";
@@ -389,10 +395,16 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
-				HEADER_SEARCH_PATHS = "\"$(SRCROOT)/../GNU_Scientific_Library/include\"";
+				HEADER_SEARCH_PATHS = (
+					"\"$(SRCROOT)/../GNU_Scientific_Library/include\"",
+					/Users/peterhub/Documents/MyProjects/GNU_Scientific_Library/include,
+				);
 				INFOPLIST_FILE = ImpulseModeler/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				LIBRARY_SEARCH_PATHS = "\"$(SRCROOT)/../GNU_Scientific_Library/lib\"";
+				LIBRARY_SEARCH_PATHS = (
+					"\"$(SRCROOT)/../GNU_Scientific_Library/lib\"",
+					/Users/peterhub/Documents/MyProjects/GNU_Scientific_Library/lib,
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.huberis-tech.ImpulseModeler";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OBJC_BRIDGING_HEADER = "ImpulseModeler/ImpulseModeler-Bridging-Header.h";
