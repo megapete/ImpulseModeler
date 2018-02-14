@@ -295,9 +295,7 @@ class AppController: NSObject {
             newConnectionArray.append((from:sourceConnNode, to:genNodeArray))
         }
         
-        let simTimeStep = 10.0E-9
-        let saveTimeStep = 100.0E-9
-        let totalSimTime = 100.0E-6
+        
         
         var tConnArray:[(fromNode: Int, toNodes: [Int])] = []
         for nextConn in newConnectionArray
@@ -308,8 +306,14 @@ class AppController: NSObject {
             tConnArray.append((nextInt, nextArray))
         }
         
+        // we'll set up three time step structs for BIL simulations
+        var timeStepArray:[PCH_BB_TimeStepInfo] = []
+        timeStepArray.append(PCH_BB_TimeStepInfo(startTime: 0.0, endTime: 2.0E-6, timeStep: 1.0E-9, saveTimeStep: 1.0E-9))
+        timeStepArray.append(PCH_BB_TimeStepInfo(startTime: 2.0E-6, endTime: 50.0E-6, timeStep: 10.0E-9, saveTimeStep: 100.0E-9))
+        timeStepArray.append(PCH_BB_TimeStepInfo(startTime: 50.0E-6, endTime: 100.0E-6, timeStep: 100.0E-9, saveTimeStep: 100.0E-9))
         
-        guard let resultMatrices = bbModel.SimulateWithConnections(tConnArray, sourceConnection: (testSource, sourceConnNode), simTimeStep: simTimeStep, saveTimeStep: saveTimeStep, totalTime: totalSimTime)
+        
+        guard let resultMatrices = bbModel.SimulateWithConnections(tConnArray, sourceConnection: (testSource, sourceConnNode), timeSteps: timeStepArray)
         else
         {
             DLog("Simulation failed!")
@@ -317,28 +321,33 @@ class AppController: NSObject {
         }
         
         // Set up the array for the simulation times
-        let numTimeSteps = Int(totalSimTime / saveTimeStep) + 1
-        var timeArray = Array(repeating: 0.0, count: numTimeSteps)
-        var nextTime = 0.0
-        for i in 0..<numTimeSteps
+        // let numTimeSteps = Int(totalSimTime / saveTimeStep) + 1
+        
+        var numSavedTimeSteps = 1
+        for nextTimeStep in timeStepArray
         {
-            timeArray[i] = nextTime
-            nextTime += saveTimeStep
+            numSavedTimeSteps += nextTimeStep.NumberOfSaveTimeSteps()
         }
         
-        // Set up the arrays for the node and section names. This is a major rethinking of the node naming method, which used to assume that all disks of the same "coil" were automatically connected together. We now use the actual node numbering that is part of each section (inNode, outNode) and make sure we do not repeat anything.
+        var timeArray = Array(repeating: 0.0, count: numSavedTimeSteps)
+        var currentTimeStepIndex = 0
+        var currentTimeStep = timeStepArray[currentTimeStepIndex].saveTimeStep
         
-        /*
-        let sectionCount = bbModel.A.numCols
-        let nodeCount = bbModel.A.numRows
-        var nodeNumSet = Set<Int>()
-        var nodeNames = Array(repeating: "", count: nodeCount)
-        var deviceNames = Array<String>()
-        var currentNodeIndex = 0
-        var currentDeviceIndex = 0
-        var lastCoilName = self.phaseDefinition!.coils[0].coilName
-        var lastDiskNum = ""
-        */
+        var nextTime = 0.0
+        for i in 0..<numSavedTimeSteps
+        {
+            if (currentTimeStepIndex + 1 < timeStepArray.count)
+            {
+                if nextTime >= timeStepArray[currentTimeStepIndex + 1].startTime
+                {
+                    currentTimeStepIndex += 1
+                    currentTimeStep = timeStepArray[currentTimeStepIndex].saveTimeStep
+                }
+            }
+            
+            timeArray[i] = nextTime
+            nextTime += currentTimeStep
+        }
         
         var bbModelSections = Array<PCH_BB_ModelSection>()
         for nextSection in self.theModel!
@@ -347,31 +356,6 @@ class AppController: NSObject {
     
             bbModelSections.append(nextBBSection)
         }
-        
-        /*
-        for nextSection in self.theModel!
-        {
-            let nextSectionID = nextSection.data.sectionID
-            deviceNames[currentDeviceIndex] = nextSectionID
-            currentDeviceIndex += 1
-            
-            let coilName = PCH_StrLeft(nextSectionID, length: 2)
-            if (coilName != lastCoilName)
-            {
-                nodeNames[currentNodeIndex] = lastCoilName + "I" + lastDiskNum
-                currentNodeIndex += 1
-            }
-            
-            let diskNum = PCH_StrRight(nextSectionID, length: 3)
-            nodeNames[currentNodeIndex] = coilName + "I" + diskNum
-            currentNodeIndex += 1
-            lastCoilName = coilName
-            lastDiskNum = "\(Int(diskNum)! + 1)"
-        }
-        */
-        // Add the name of the last disk
-        // nodeNames[currentNodeIndex] = lastCoilName + "I" + lastDiskNum
-        
         
         let bbModelOutput = PCH_BlueBookModelOutput(timeArray: timeArray, sections:bbModelSections, voltsMatrix: resultMatrices.V, ampsMatrix: resultMatrices.I)
         

@@ -8,6 +8,20 @@
 
 import Cocoa
 
+// Struct used in the simulation call
+struct PCH_BB_TimeStepInfo {
+    
+    let startTime:Double
+    let endTime:Double
+    let timeStep:Double
+    let saveTimeStep:Double
+    
+    func NumberOfSaveTimeSteps() -> Int
+    {
+        return Int((endTime - startTime) / saveTimeStep)
+    }
+}
+
 class PCH_BlueBookModel: NSObject {
 
     // The inductance matrix
@@ -199,9 +213,30 @@ class PCH_BlueBookModel: NSObject {
 
     }
     
-    func SimulateWithConnections(_ connections:[(fromNode:Int, toNodes:[Int])], sourceConnection:(source:PCH_Source, toNode:Int), simTimeStep:Double, saveTimeStep:Double, totalTime:Double) -> (V:PCH_Matrix, I:PCH_Matrix)?
+    
+    
+    func SimulateWithConnections(_ connections:[(fromNode:Int, toNodes:[Int])], sourceConnection:(source:PCH_Source, toNode:Int), timeSteps:[PCH_BB_TimeStepInfo]) -> (V:PCH_Matrix, I:PCH_Matrix)?
     {
+        guard timeSteps.count > 0 else
+        {
+            ALog("There must be at least one time step defined")
+            return nil
+        }
+        
+        // It is assumed that the calling routine correctly put the timeSteps array in order of the startTime member and that in each time-step, the endTime is greater than the startTime and that timeStep and saveTimeStep are non-zero. It is also assumed that the overall simulation time is the endTime of the last member of the array
+        
+        var currentTimeStepIndex = 0
+        let simulationEndTime = timeSteps.last!.endTime
+        
+        var numSavedTimeSteps = 1
+        
+        for nextTimeStep in timeSteps
+        {
+            numSavedTimeSteps += nextTimeStep.NumberOfSaveTimeSteps()
+        }
+        
         // Nodes can be connected to ground (they cannot be connected "from" ground), to other nodes, or to the source.
+        
         
         let newC = self.C
         
@@ -278,17 +313,30 @@ class PCH_BlueBookModel: NSObject {
         var I = PCH_Matrix(numVectorElements: sectionCount, vectorPrecision: PCH_Matrix.precisions.doublePrecision)
         var V = PCH_Matrix(numVectorElements: nodeCount, vectorPrecision: PCH_Matrix.precisions.doublePrecision)
         
-        let numSavedTimeSteps = Int(round(totalTime / saveTimeStep)) + 1
+        // let numSavedTimeSteps = Int(round(totalTime / saveTimeStep)) + 1
         
         let savedValuesV = PCH_Matrix(numRows: numSavedTimeSteps, numCols: nodeCount, matrixPrecision: PCH_Matrix.precisions.doublePrecision, matrixType: PCH_Matrix.types.generalMatrix)
         let savedValuesI = PCH_Matrix(numRows: numSavedTimeSteps, numCols: sectionCount, matrixPrecision: PCH_Matrix.precisions.doublePrecision, matrixType: PCH_Matrix.types.generalMatrix)
         
         var simTime = 0.0
-        var timeStepCount = 0
-        let saveStepInterval = Int(round(saveTimeStep / simTimeStep))
+        // var timeStepCount = 0
         
-        while simTime <= totalTime
+        var nextSaveTime = 0.0
+        var currentSaveRow = 0
+        
+        var currentTimeStep = timeSteps[currentTimeStepIndex].timeStep
+        
+        while simTime <= simulationEndTime
         {
+            if (currentTimeStepIndex + 1 < timeSteps.count)
+            {
+                if simTime >= timeSteps[currentTimeStepIndex + 1].startTime
+                {
+                    currentTimeStepIndex += 1
+                    currentTimeStep = timeSteps[currentTimeStepIndex].timeStep
+                }
+            }
+            
             guard let AI = (A * I)
             else
             {
@@ -326,14 +374,14 @@ class PCH_BlueBookModel: NSObject {
             AI[sourceConnection.toNode, 0] = sourceConnection.source.dV(simTime)
             let an = newC.SolveWith(AI)!
             
-            AI[sourceConnection.toNode, 0] = sourceConnection.source.dV(simTime + simTimeStep / 2.0)
+            AI[sourceConnection.toNode, 0] = sourceConnection.source.dV(simTime + currentTimeStep / 2.0)
             let bn = newC.SolveWith(AI)!
             let cn = bn
             
-            AI[sourceConnection.toNode, 0] = sourceConnection.source.dV(simTime + simTimeStep)
+            AI[sourceConnection.toNode, 0] = sourceConnection.source.dV(simTime + currentTimeStep)
             let dn = newC.SolveWith(AI)!
             
-            let newV = V + simTimeStep/6.0 * (an + 2.0 * bn + 2.0 * cn + dn)
+            let newV = V + currentTimeStep/6.0 * (an + 2.0 * bn + 2.0 * cn + dn)
             
             guard let BV = (B * newV)
             else
@@ -354,32 +402,44 @@ class PCH_BlueBookModel: NSObject {
             // The current derivative dI/dt _is_ a function of I, so this is a more "traditional" calculation using Runge-Kutta.
             let aan = M.SolveWith(rtSide)!
             
-            var newI = I + (simTimeStep/2.0 * aan)
+            var newI = I + (currentTimeStep/2.0 * aan)
             rtSide = BV - (R * newI)!
             let bbn = M.SolveWith(rtSide)!
             
-            newI = I + (simTimeStep/2.0 * bbn)
+            newI = I + (currentTimeStep/2.0 * bbn)
             rtSide = BV - (R * newI)!
             let ccn = M.SolveWith(rtSide)!
             
-            newI = I + (simTimeStep * ccn)
+            newI = I + (currentTimeStep * ccn)
             rtSide = BV - (R * newI)!
             let ddn = M.SolveWith(rtSide)!
             
-            newI = I + simTimeStep/6.0 * (aan + 2.0 * bbn + 2.0 * ccn + ddn)
+            newI = I + currentTimeStep/6.0 * (aan + 2.0 * bbn + 2.0 * ccn + ddn)
             
+            if simTime >= nextSaveTime
+            {
+                DLog("Saving at time: \(simTime) (diff: \(nextSaveTime - simTime)")
+                savedValuesV.SetRow(currentSaveRow, vector: newV)
+                savedValuesI.SetRow(currentSaveRow, vector: newI)
+                
+                nextSaveTime = simTime + timeSteps[currentTimeStepIndex].saveTimeStep
+                currentSaveRow += 1
+            }
+            
+            /*
             if (timeStepCount % saveStepInterval == 0)
             {
                 DLog("Saving step: \(timeStepCount)")
                 savedValuesV.SetRow(timeStepCount / saveStepInterval, vector: newV)
                 savedValuesI.SetRow(timeStepCount / saveStepInterval, vector: newI)
             }
+            */
             
             V = newV
             I = newI
             
-            simTime += simTimeStep
-            timeStepCount += 1
+            simTime += currentTimeStep
+            
         }
         
         return (savedValuesV, savedValuesI)
