@@ -323,41 +323,18 @@ class AppController: NSObject {
         // Set up the array for the simulation times
         // let numTimeSteps = Int(totalSimTime / saveTimeStep) + 1
         
-        var numSavedTimeSteps = 1
-        for nextTimeStep in timeStepArray
-        {
-            numSavedTimeSteps += nextTimeStep.NumberOfSaveTimeSteps()
-        }
+        // var numSavedTimeSteps = 1
         
-        var timeArray = Array(repeating: 0.0, count: numSavedTimeSteps)
-        var currentTimeStepIndex = 0
-        var currentTimeStep = timeStepArray[currentTimeStepIndex].saveTimeStep
-        
-        var nextTime = 0.0
-        for i in 0..<numSavedTimeSteps
-        {
-            if (currentTimeStepIndex + 1 < timeStepArray.count)
-            {
-                if nextTime >= timeStepArray[currentTimeStepIndex + 1].startTime
-                {
-                    currentTimeStepIndex += 1
-                    currentTimeStep = timeStepArray[currentTimeStepIndex].saveTimeStep
-                }
-            }
-            
-            timeArray[i] = nextTime
-            nextTime += currentTimeStep
-        }
         
         var bbModelSections = Array<PCH_BB_ModelSection>()
         for nextSection in self.theModel!
         {
-            let nextBBSection = PCH_BB_ModelSection(inNode: nextSection.data.nodes.inNode, outNode: nextSection.data.nodes.outNode, name: nextSection.data.sectionID)
+            let nextBBSection = PCH_BB_ModelSection(inNode: nextSection.data.nodes.inNode, outNode: nextSection.data.nodes.outNode, name: nextSection.data.sectionID, zDims:(Double(nextSection.diskRect.origin.y), Double(nextSection.diskRect.origin.y + nextSection.diskRect.size.height)))
     
             bbModelSections.append(nextBBSection)
         }
         
-        let bbModelOutput = PCH_BlueBookModelOutput(timeArray: timeArray, sections:bbModelSections, voltsMatrix: resultMatrices.V, ampsMatrix: resultMatrices.I)
+        let bbModelOutput = PCH_BlueBookModelOutput(timeArray: resultMatrices.times, sections:bbModelSections, voltsMatrix: resultMatrices.V, ampsMatrix: resultMatrices.I)
         
         let saveFilePanel = NSSavePanel()
         

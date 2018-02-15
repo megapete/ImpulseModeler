@@ -16,12 +16,14 @@ class PCH_BB_ModelSection: NSObject, NSCoding
     let inNode:Int
     let outNode:Int
     let name:String
+    let zDims:(zBottom:Double, zTop:Double)
     
-    init(inNode:Int, outNode:Int, name:String)
+    init(inNode:Int, outNode:Int, name:String, zDims:(Double, Double))
     {
         self.inNode = inNode
         self.outNode = outNode
         self.name = name
+        self.zDims = zDims
     }
     
     convenience required init?(coder aDecoder: NSCoder)
@@ -29,8 +31,10 @@ class PCH_BB_ModelSection: NSObject, NSCoding
         let inNode = aDecoder.decodeInteger(forKey: "InNode")
         let outNode = aDecoder.decodeInteger(forKey: "OutNode")
         let name = aDecoder.decodeObject(forKey: "Name") as! String
+        let zBottom = aDecoder.decodeDouble(forKey: "Z-Bottom")
+        let zTop = aDecoder.decodeDouble(forKey: "Z-Top")
         
-        self.init(inNode:inNode, outNode:outNode, name:name)
+        self.init(inNode:inNode, outNode:outNode, name:name, zDims:(zBottom, zTop))
     }
     
     func encode(with aCoder: NSCoder)
@@ -38,6 +42,8 @@ class PCH_BB_ModelSection: NSObject, NSCoding
         aCoder.encode(self.inNode, forKey: "InNode")
         aCoder.encode(self.outNode, forKey: "OutNode")
         aCoder.encode(self.name, forKey: "Name")
+        aCoder.encode(self.zDims.zBottom, forKey:"Z-Bottom")
+        aCoder.encode(self.zDims.zTop, forKey:"Z-Top")
     }
 }
 

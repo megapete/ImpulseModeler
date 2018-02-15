@@ -215,7 +215,7 @@ class PCH_BlueBookModel: NSObject {
     
     
     
-    func SimulateWithConnections(_ connections:[(fromNode:Int, toNodes:[Int])], sourceConnection:(source:PCH_Source, toNode:Int), timeSteps:[PCH_BB_TimeStepInfo]) -> (V:PCH_Matrix, I:PCH_Matrix)?
+    func SimulateWithConnections(_ connections:[(fromNode:Int, toNodes:[Int])], sourceConnection:(source:PCH_Source, toNode:Int), timeSteps:[PCH_BB_TimeStepInfo]) -> (times:[Double], V:PCH_Matrix, I:PCH_Matrix)?
     {
         guard timeSteps.count > 0 else
         {
@@ -317,6 +317,7 @@ class PCH_BlueBookModel: NSObject {
         
         let savedValuesV = PCH_Matrix(numRows: numSavedTimeSteps, numCols: nodeCount, matrixPrecision: PCH_Matrix.precisions.doublePrecision, matrixType: PCH_Matrix.types.generalMatrix)
         let savedValuesI = PCH_Matrix(numRows: numSavedTimeSteps, numCols: sectionCount, matrixPrecision: PCH_Matrix.precisions.doublePrecision, matrixType: PCH_Matrix.types.generalMatrix)
+        var savedTimes:[Double] = []
         
         var simTime = 0.0
         // var timeStepCount = 0
@@ -328,6 +329,8 @@ class PCH_BlueBookModel: NSObject {
         
         while simTime <= simulationEndTime
         {
+            savedTimes.append(simTime)
+            
             if (currentTimeStepIndex + 1 < timeSteps.count)
             {
                 if simTime >= timeSteps[currentTimeStepIndex + 1].startTime
@@ -442,7 +445,7 @@ class PCH_BlueBookModel: NSObject {
             
         }
         
-        return (savedValuesV, savedValuesI)
+        return (savedTimes, savedValuesV, savedValuesI)
     
     }
 }
