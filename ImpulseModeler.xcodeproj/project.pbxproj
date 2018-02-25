@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		D301D8B22041EC0500A6B453 /* PCH_ProgressIndicatorWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D301D8B02041EC0500A6B453 /* PCH_ProgressIndicatorWindow.swift */; };
+		D301D8B32041EC0500A6B453 /* PCH_ProgressIndicatorWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = D301D8B12041EC0500A6B453 /* PCH_ProgressIndicatorWindow.xib */; };
 		D30C14521DDB97B60046BC55 /* SourceDefinitionDlog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D30C14501DDB97B60046BC55 /* SourceDefinitionDlog.swift */; };
 		D30C14531DDB97B60046BC55 /* SourceDefinitionDlog.xib in Resources */ = {isa = PBXBuildFile; fileRef = D30C14511DDB97B60046BC55 /* SourceDefinitionDlog.xib */; };
 		D30C14561DDBB6A60046BC55 /* ConnectionDlog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D30C14541DDBB6A60046BC55 /* ConnectionDlog.swift */; };
@@ -38,6 +40,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		D301D8B02041EC0500A6B453 /* PCH_ProgressIndicatorWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCH_ProgressIndicatorWindow.swift; sourceTree = "<group>"; };
+		D301D8B12041EC0500A6B453 /* PCH_ProgressIndicatorWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PCH_ProgressIndicatorWindow.xib; sourceTree = "<group>"; };
 		D30C14501DDB97B60046BC55 /* SourceDefinitionDlog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SourceDefinitionDlog.swift; sourceTree = "<group>"; };
 		D30C14511DDB97B60046BC55 /* SourceDefinitionDlog.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SourceDefinitionDlog.xib; sourceTree = "<group>"; };
 		D30C14541DDBB6A60046BC55 /* ConnectionDlog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectionDlog.swift; sourceTree = "<group>"; };
@@ -107,6 +111,8 @@
 				D340947B1DC2761400F1658B /* GlobalDefs.swift */,
 				D340947C1DC2761400F1658B /* PCH_Defs.swift */,
 				D340947F1DC2762600F1658B /* AppController.swift */,
+				D301D8B02041EC0500A6B453 /* PCH_ProgressIndicatorWindow.swift */,
+				D301D8B12041EC0500A6B453 /* PCH_ProgressIndicatorWindow.xib */,
 				D37146931DC9161600823F20 /* PCH_BlueBookModel.swift */,
 				D3F3010A1DCFCA530039B04A /* PCH_BlueBookModelOutput.swift */,
 				D371469B1DC9284800823F20 /* PCH_Source.swift */,
@@ -205,6 +211,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				D34094861DC2855900F1658B /* CoreInputDlog.xib in Resources */,
+				D301D8B32041EC0500A6B453 /* PCH_ProgressIndicatorWindow.xib in Resources */,
 				D30C14531DDB97B60046BC55 /* SourceDefinitionDlog.xib in Resources */,
 				D30C14571DDBB6A60046BC55 /* ConnectionDlog.xib in Resources */,
 				D34094501DC14BA200F1658B /* Assets.xcassets in Resources */,
@@ -234,6 +241,7 @@
 				D340947D1DC2761400F1658B /* GlobalDefs.swift in Sources */,
 				D34094951DC2904F00F1658B /* PCH_BlueBookFunctions.swift in Sources */,
 				D37146911DC3D5FC00823F20 /* CoilDlog.swift in Sources */,
+				D301D8B22041EC0500A6B453 /* PCH_ProgressIndicatorWindow.swift in Sources */,
 				D3F3010B1DCFCA530039B04A /* PCH_BlueBookModelOutput.swift in Sources */,
 				D340944E1DC14BA200F1658B /* AppDelegate.swift in Sources */,
 				D340948A1DC28A7000F1658B /* Coil.swift in Sources */,

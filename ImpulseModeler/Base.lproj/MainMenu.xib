@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="12121" systemVersion="16G29" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="13771" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="12121"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13771"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -17,6 +17,7 @@
             <connections>
                 <outlet property="createModelMenuItem" destination="LBY-cF-aK0" id="HPe-zd-zTv"/>
                 <outlet property="inchItem" destination="ssa-Or-PRz" id="tRU-Ck-Kts"/>
+                <outlet property="mainWindow" destination="QvC-M9-y7g" id="07f-32-v2K"/>
                 <outlet property="metricItem" destination="Mj6-PL-WCz" id="GhT-v2-1xc"/>
                 <outlet property="modifyModelMenuItem" destination="6Mh-zH-hUk" id="mH7-Eg-XaM"/>
                 <outlet property="runSimMenuItem" destination="SYD-vz-rAL" id="k1O-4g-yIy"/>
@@ -412,6 +413,12 @@
                                     <action selector="handleRunSimulation:" target="Ubf-fF-CrH" id="k5F-SF-pXS"/>
                                 </connections>
                             </menuItem>
+                            <menuItem title="Do something long" id="PR8-Hr-BSg">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="handleDoSomethingLong:" target="Ubf-fF-CrH" id="7Yk-ZV-Naa"/>
+                                </connections>
+                            </menuItem>
                         </items>
                     </menu>
                 </menuItem>
@@ -491,7 +498,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="335" y="390" width="980" height="687"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1920" height="1177"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <view key="contentView" wantsLayer="YES" id="EiT-Mj-1SZ">
                 <rect key="frame" x="0.0" y="0.0" width="980" height="687"/>
                 <autoresizingMask key="autoresizingMask"/>

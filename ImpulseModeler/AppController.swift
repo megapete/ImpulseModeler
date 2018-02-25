@@ -88,9 +88,66 @@ class AppController: NSObject {
     @IBOutlet weak var saveModelMenuItem: NSMenuItem!
     @IBOutlet weak var modifyModelMenuItem: NSMenuItem!
 
+    @IBOutlet weak var mainWindow: NSWindow!
+    
+    // The currently showing progress indicator (used for long operations like calculating mutual impedances and running impulse simulations)
+    let currentProgressIndicator:PCH_ProgressIndicatorWindow
     
     // The model in the format required by the routine for making a spice ".cir" file
     var theModel:[PCH_DiskSection]?
+    
+    override init()
+    {
+        // This is the best way I've found to actually "preload" the progress indicator window class and make it "load" its window from the nib
+        self.currentProgressIndicator = PCH_ProgressIndicatorWindow()
+        super.init() // doesn't do anything but Swift complains if we don't call this
+        
+    }
+    
+    
+    
+    // Debugging routine to test things that take a long time
+    @IBAction func handleDoSomethingLong(_ sender: Any)
+    {
+        if self.currentProgressIndicator.window == nil
+        {
+            DLog("Fuck!")
+            return
+        }
+        
+        let iterations = 100000
+        let updateIndicatorSteps = 1
+        
+        self.currentProgressIndicator.UpdateIndicator(value: 0.0, minValue: 0.0, maxValue: Double(iterations), text: "Testing lots of iterations, dude")
+        
+        self.mainWindow.beginSheet(self.currentProgressIndicator.window!, completionHandler: { (response) in
+            
+            DLog("Progress Indicator closed!")
+        })
+        
+        let myQueue = DispatchQueue(label:"com.huberistech.serial")
+        
+        myQueue.async {
+            
+            for i in 0..<iterations
+            {
+                let _ = 6.6789 * Double(i) / 1234.5
+                
+                if i % updateIndicatorSteps == 0
+                {
+                    DLog("Updating with i = \(i)")
+                    
+                    DispatchQueue.main.async {
+                        self.currentProgressIndicator.UpdateIndicator(value: Double(i))
+                    }
+                }
+            }
+            
+            self.mainWindow.endSheet(self.currentProgressIndicator.window!)
+            
+            DLog("Done.")
+        }
+    }
     
     func totalSectionsInPhase(_ phase:Phase) -> Int
     {
@@ -621,6 +678,19 @@ class AppController: NSObject {
         // And now we calculate the mutual inductances
         var diskArray = theModel!
         
+        // self.currentProgressIndicator = PCH_ProgressIndicatorWindow(text: "Calculating mutual inductances", minValue: 0.0, maxValue: Double(diskArray.count), startValue: 0.0)
+        
+        guard let progIndWindow = self.currentProgressIndicator.window else
+        {
+            DLog("Fuck!")
+            return
+        }
+        
+        self.mainWindow.beginSheet(progIndWindow, completionHandler: { (response) in
+            
+            DLog("Progress Indicator closed!")
+        })
+        
         DLog("Calculating mutual inductances")
         while diskArray.count > 0
         {
@@ -660,7 +730,12 @@ class AppController: NSObject {
             }
         }
         
+        mainWindow.endSheet(progIndWindow)
+        // self.currentProgressIndicator = nil
+        
         DLog("Done!")
+        
+        
     }
     
     override func validateMenuItem(_ menuItem: NSMenuItem) -> Bool
