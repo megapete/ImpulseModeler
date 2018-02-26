@@ -215,7 +215,7 @@ class PCH_BlueBookModel: NSObject {
     
     
     
-    func SimulateWithConnections(_ connections:[(fromNode:Int, toNodes:[Int])], sourceConnection:(source:PCH_Source, toNode:Int), timeSteps:[PCH_BB_TimeStepInfo]) -> (times:[Double], V:PCH_Matrix, I:PCH_Matrix)?
+    func SimulateWithConnections(_ connections:[(fromNode:Int, toNodes:[Int])], sourceConnection:(source:PCH_Source, toNode:Int), timeSteps:[PCH_BB_TimeStepInfo], progIndicatorWindow:PCH_ProgressIndicatorWindow? = nil) -> (times:[Double], V:PCH_Matrix, I:PCH_Matrix)?
     {
         guard timeSteps.count > 0 else
         {
@@ -427,6 +427,13 @@ class PCH_BlueBookModel: NSObject {
                 
                 nextSaveTime = simTime + timeSteps[currentTimeStepIndex].saveTimeStep
                 currentSaveRow += 1
+                
+                if let progIndWnd = progIndicatorWindow
+                {
+                    DispatchQueue.main.async {
+                        progIndWnd.UpdateIndicator(value: simTime)
+                    }
+                }
             }
             
             /*

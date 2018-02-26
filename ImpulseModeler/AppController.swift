@@ -369,58 +369,76 @@ class AppController: NSObject {
         timeStepArray.append(PCH_BB_TimeStepInfo(startTime: 2.0E-6, endTime: 50.0E-6, timeStep: 10.0E-9, saveTimeStep: 100.0E-9))
         timeStepArray.append(PCH_BB_TimeStepInfo(startTime: 50.0E-6, endTime: 100.0E-6, timeStep: 100.0E-9, saveTimeStep: 100.0E-9))
         
+        self.currentProgressIndicator.UpdateIndicator(value: 0.0, minValue: 0.0, maxValue: 100.0E-6, text: "Running Simulation...")
         
-        guard let resultMatrices = bbModel.SimulateWithConnections(tConnArray, sourceConnection: (testSource, sourceConnNode), timeSteps: timeStepArray)
-        else
-        {
-            DLog("Simulation failed!")
-            return
-        }
+        self.mainWindow.beginSheet(self.currentProgressIndicator.window!, completionHandler: nil)
         
-        // Set up the array for the simulation times
-        // let numTimeSteps = Int(totalSimTime / saveTimeStep) + 1
+        let simQueue = DispatchQueue(label: "com.huberistech.bil_simulation")
         
-        // var numSavedTimeSteps = 1
-        
-        
-        var bbModelSections = Array<PCH_BB_ModelSection>()
-        for nextSection in self.theModel!
-        {
-            let nextBBSection = PCH_BB_ModelSection(inNode: nextSection.data.nodes.inNode, outNode: nextSection.data.nodes.outNode, name: nextSection.data.sectionID, zDims:(Double(nextSection.diskRect.origin.y), Double(nextSection.diskRect.origin.y + nextSection.diskRect.size.height)))
-    
-            bbModelSections.append(nextBBSection)
-        }
-        
-        let bbModelOutput = PCH_BlueBookModelOutput(timeArray: resultMatrices.times, sections:bbModelSections, voltsMatrix: resultMatrices.V, ampsMatrix: resultMatrices.I)
-        
-        let saveFilePanel = NSSavePanel()
-        
-        saveFilePanel.title = "Save Impulse Simulation Results"
-        saveFilePanel.canCreateDirectories = true
-        saveFilePanel.allowedFileTypes = ["impres"]
-        saveFilePanel.allowsOtherFileTypes = false
-        
-        if (saveFilePanel.runModal().rawValue == NSFileHandlingPanelOKButton)
-        {
-            guard let newFileURL = saveFilePanel.url
+        simQueue.async {
+            
+            guard let resultMatrices = bbModel.SimulateWithConnections(tConnArray, sourceConnection: (testSource, sourceConnNode), timeSteps: timeStepArray, progIndicatorWindow:self.currentProgressIndicator)
                 else
             {
-                DLog("Bad file name")
+                DLog("Simulation failed!")
+                self.mainWindow.endSheet(self.currentProgressIndicator.window!)
                 return
             }
             
-            // This is required to be able to open the files in different programs with the same class. 
-            NSKeyedArchiver.setClassName("ImpulseResult", for: PCH_BlueBookModelOutput.self)
-            NSKeyedArchiver.setClassName("BBSections", for: PCH_BB_ModelSection.self)
-            let archiveResult = NSKeyedArchiver.archiveRootObject(bbModelOutput, toFile: newFileURL.path)
+            self.mainWindow.endSheet(self.currentProgressIndicator.window!)
             
-            if (!archiveResult)
-            {
-                DLog("Couldn't write the file!")
-            }
+            // Set up the array for the simulation times
+            // let numTimeSteps = Int(totalSimTime / saveTimeStep) + 1
             
-            DLog("Finished writing file")
-        }
+            // var numSavedTimeSteps = 1
+            
+            DispatchQueue.main.sync {
+                
+                
+                var bbModelSections = Array<PCH_BB_ModelSection>()
+                for nextSection in self.theModel!
+                {
+                    let nextBBSection = PCH_BB_ModelSection(inNode: nextSection.data.nodes.inNode, outNode: nextSection.data.nodes.outNode, name: nextSection.data.sectionID, zDims:(Double(nextSection.diskRect.origin.y), Double(nextSection.diskRect.origin.y + nextSection.diskRect.size.height)))
+                    
+                    bbModelSections.append(nextBBSection)
+                }
+                
+                let bbModelOutput = PCH_BlueBookModelOutput(timeArray: resultMatrices.times, sections:bbModelSections, voltsMatrix: resultMatrices.V, ampsMatrix: resultMatrices.I)
+                
+                let saveFilePanel = NSSavePanel()
+                
+                saveFilePanel.title = "Save Impulse Simulation Results"
+                saveFilePanel.canCreateDirectories = true
+                saveFilePanel.allowedFileTypes = ["impres"]
+                saveFilePanel.allowsOtherFileTypes = false
+                
+                if (saveFilePanel.runModal().rawValue == NSFileHandlingPanelOKButton)
+                {
+                    guard let newFileURL = saveFilePanel.url
+                        else
+                    {
+                        DLog("Bad file name")
+                        self.mainWindow.endSheet(self.currentProgressIndicator.window!)
+                        return
+                    }
+                    
+                    // This is required to be able to open the files in different programs with the same class.
+                    NSKeyedArchiver.setClassName("ImpulseResult", for: PCH_BlueBookModelOutput.self)
+                    NSKeyedArchiver.setClassName("BBSections", for: PCH_BB_ModelSection.self)
+                    let archiveResult = NSKeyedArchiver.archiveRootObject(bbModelOutput, toFile: newFileURL.path)
+                    
+                    if (!archiveResult)
+                    {
+                        DLog("Couldn't write the file!")
+                    }
+                    
+                    DLog("Finished writing file")
+                }
+                
+            } // end main.sync
+            
+        } // end simQueue.async
+        
     }
     
     @IBAction func handleModifyModel(_ sender: Any)
