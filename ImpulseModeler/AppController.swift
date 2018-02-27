@@ -369,31 +369,32 @@ class AppController: NSObject {
         timeStepArray.append(PCH_BB_TimeStepInfo(startTime: 2.0E-6, endTime: 50.0E-6, timeStep: 10.0E-9, saveTimeStep: 100.0E-9))
         timeStepArray.append(PCH_BB_TimeStepInfo(startTime: 50.0E-6, endTime: 100.0E-6, timeStep: 100.0E-9, saveTimeStep: 100.0E-9))
         
+        // uodate the progress indicator to reflect the maximum time of the impulse shot
         self.currentProgressIndicator.UpdateIndicator(value: 0.0, minValue: 0.0, maxValue: 100.0E-6, text: "Running Simulation...")
         
+        // open the sheet with the progress indicator
         self.mainWindow.beginSheet(self.currentProgressIndicator.window!, completionHandler: nil)
         
+        // create a serial queue
         let simQueue = DispatchQueue(label: "com.huberistech.bil_simulation")
         
+        // we need to call .async with our queue so that a non-main thread is created
         simQueue.async {
             
             guard let resultMatrices = bbModel.SimulateWithConnections(tConnArray, sourceConnection: (testSource, sourceConnNode), timeSteps: timeStepArray, progIndicatorWindow:self.currentProgressIndicator)
                 else
             {
                 DLog("Simulation failed!")
+                // if we get failure, we need to close the progress indicator before returning
                 self.mainWindow.endSheet(self.currentProgressIndicator.window!)
                 return
             }
             
+            // since the simulation is done, we close the progress indicator
             self.mainWindow.endSheet(self.currentProgressIndicator.window!)
             
-            // Set up the array for the simulation times
-            // let numTimeSteps = Int(totalSimTime / saveTimeStep) + 1
-            
-            // var numSavedTimeSteps = 1
-            
+            // we want to save the impres file using an NSSavePanel, but that is UI, which CANNOT be done in any thread except the main thread. We dispatch a sync call to the main thread to take care of this.
             DispatchQueue.main.sync {
-                
                 
                 var bbModelSections = Array<PCH_BB_ModelSection>()
                 for nextSection in self.theModel!
@@ -414,25 +415,24 @@ class AppController: NSObject {
                 
                 if (saveFilePanel.runModal().rawValue == NSFileHandlingPanelOKButton)
                 {
-                    guard let newFileURL = saveFilePanel.url
-                        else
+                    if let newFileURL = saveFilePanel.url
                     {
-                        DLog("Bad file name")
-                        self.mainWindow.endSheet(self.currentProgressIndicator.window!)
-                        return
+                        // This is required to be able to open the files in different programs with the same class.
+                        NSKeyedArchiver.setClassName("ImpulseResult", for: PCH_BlueBookModelOutput.self)
+                        NSKeyedArchiver.setClassName("BBSections", for: PCH_BB_ModelSection.self)
+                        let archiveResult = NSKeyedArchiver.archiveRootObject(bbModelOutput, toFile: newFileURL.path)
+                        
+                        if (!archiveResult)
+                        {
+                            DLog("Couldn't write the file!")
+                        }
+                        
+                        DLog("Finished writing file")
                     }
-                    
-                    // This is required to be able to open the files in different programs with the same class.
-                    NSKeyedArchiver.setClassName("ImpulseResult", for: PCH_BlueBookModelOutput.self)
-                    NSKeyedArchiver.setClassName("BBSections", for: PCH_BB_ModelSection.self)
-                    let archiveResult = NSKeyedArchiver.archiveRootObject(bbModelOutput, toFile: newFileURL.path)
-                    
-                    if (!archiveResult)
+                    else
                     {
-                        DLog("Couldn't write the file!")
+                        DLog("Bad file URL!")
                     }
-                    
-                    DLog("Finished writing file")
                 }
                 
             } // end main.sync
