@@ -320,7 +320,6 @@ class PCH_BlueBookModel: NSObject {
         var savedTimes:[Double] = []
         
         var simTime = 0.0
-        // var timeStepCount = 0
         
         var nextSaveTime = 0.0
         var currentSaveRow = 0
@@ -346,8 +345,6 @@ class PCH_BlueBookModel: NSObject {
                 ALog("A*I multiply failed")
                 return nil
             }
-            
-            // AI.matrixPrecision = PCH_Matrix.precisions.doublePrecision
             
             for nextGroundedNode in groundedNodes
             {
@@ -428,6 +425,7 @@ class PCH_BlueBookModel: NSObject {
                 nextSaveTime = simTime + timeSteps[currentTimeStepIndex].saveTimeStep
                 currentSaveRow += 1
                 
+                // update the progress indicator, if one was passed to the routine
                 if let progIndWnd = progIndicatorWindow
                 {
                     DispatchQueue.main.async {
@@ -436,20 +434,10 @@ class PCH_BlueBookModel: NSObject {
                 }
             }
             
-            /*
-            if (timeStepCount % saveStepInterval == 0)
-            {
-                DLog("Saving step: \(timeStepCount)")
-                savedValuesV.SetRow(timeStepCount / saveStepInterval, vector: newV)
-                savedValuesI.SetRow(timeStepCount / saveStepInterval, vector: newI)
-            }
-            */
-            
             V = newV
             I = newI
             
             simTime += currentTimeStep
-            
         }
         
         return (savedTimes, savedValuesV, savedValuesI)
