@@ -696,63 +696,61 @@ class AppController: NSObject {
         // And now we calculate the mutual inductances
         var diskArray = theModel!
         
-        // self.currentProgressIndicator = PCH_ProgressIndicatorWindow(text: "Calculating mutual inductances", minValue: 0.0, maxValue: Double(diskArray.count), startValue: 0.0)
+        let diskCount = Double(diskArray.count)
         
-        guard let progIndWindow = self.currentProgressIndicator.window else
-        {
-            DLog("Fuck!")
-            return
-        }
+        self.currentProgressIndicator.UpdateIndicator(value: 0.0, minValue: 0.0, maxValue: diskCount, text: "Calculating mutual inductances...")
         
-        self.mainWindow.beginSheet(progIndWindow, completionHandler: { (response) in
-            
-            DLog("Progress Indicator closed!")
-        })
+        // open the sheet with the progress indicator
+        self.mainWindow.beginSheet(self.currentProgressIndicator.window!, completionHandler: nil)
         
-        DLog("Calculating mutual inductances")
-        while diskArray.count > 0
-        {
-            let nDisk = diskArray.remove(at: 0)
+        // create a serial queue
+        let mutIndQueue = DispatchQueue(label: "com.huberistech.mutual_inductance_calculation")
+        
+        // we need to call .async with our queue so that a non-main thread is created
+        mutIndQueue.async {
             
-            DLog("Calculating to: \(nDisk.data.sectionID)")
-            
-            let nIsUncoupled = (phase.coils[nDisk.coilRef].phaseNum == 0 ? true : false)
-            
-            for otherDisk in diskArray
+            DLog("Calculating mutual inductances")
+            while diskArray.count > 0
             {
-                let otherIsUncoupled = (phase.coils[otherDisk.coilRef].phaseNum == 0 ? true : false)
+                self.currentProgressIndicator.UpdateIndicator(value: diskCount - Double(diskArray.count))
                 
-                if (nIsUncoupled != otherIsUncoupled)
+                let nDisk = diskArray.remove(at: 0)
+                
+                DLog("Calculating to: \(nDisk.data.sectionID)")
+                
+                let nIsUncoupled = (phase.coils[nDisk.coilRef].phaseNum == 0 ? true : false)
+                
+                for otherDisk in diskArray
                 {
-                    continue
+                    let otherIsUncoupled = (phase.coils[otherDisk.coilRef].phaseNum == 0 ? true : false)
+                    
+                    if (nIsUncoupled != otherIsUncoupled)
+                    {
+                        continue
+                    }
+                    
+                    let mutInd = fabs(nDisk.MutualInductanceTo(otherDisk, windHtFactor:phase.core.htFactor))
+                    
+                    let mutIndCoeff = mutInd / sqrt(nDisk.data.selfInductance * otherDisk.data.selfInductance)
+                    if (mutIndCoeff < 0.0 || mutIndCoeff > 1.0)
+                    {
+                        DLog("Illegal Mutual Inductance:\(mutInd); this.SelfInd:\(nDisk.data.selfInductance); that.SelfInd:\(otherDisk.data.selfInductance)")
+                    }
+                    
+                    nDisk.data.mutualInductances[otherDisk.data.sectionID] = mutInd
+                    otherDisk.data.mutualInductances[nDisk.data.sectionID] = mutInd
+                    
+                    nDisk.data.mutIndCoeff[otherDisk.data.sectionID] = mutIndCoeff
+                    otherDisk.data.mutIndCoeff[nDisk.data.sectionID] = mutIndCoeff
+                    
                 }
-                
-                let mutInd = fabs(nDisk.MutualInductanceTo(otherDisk, windHtFactor:phase.core.htFactor))
-                
-                let mutIndCoeff = mutInd / sqrt(nDisk.data.selfInductance * otherDisk.data.selfInductance)
-                if (mutIndCoeff < 0.0 || mutIndCoeff > 1.0)
-                {
-                    DLog("Illegal Mutual Inductance:\(mutInd); this.SelfInd:\(nDisk.data.selfInductance); that.SelfInd:\(otherDisk.data.selfInductance)")
-                }
-                
-                nDisk.data.mutualInductances[otherDisk.data.sectionID] = mutInd
-                otherDisk.data.mutualInductances[nDisk.data.sectionID] = mutInd
-                
-                // This ends up being the important thing to do
-                // nDisk.data.mutInd[otherDisk] = mutInd
-                // otherDisk.data.mutInd[nDisk] = mutInd
-                
-                nDisk.data.mutIndCoeff[otherDisk.data.sectionID] = mutIndCoeff
-                otherDisk.data.mutIndCoeff[nDisk.data.sectionID] = mutIndCoeff
-                
             }
-        }
-        
-        mainWindow.endSheet(progIndWindow)
-        // self.currentProgressIndicator = nil
-        
-        DLog("Done!")
-        
+            
+            self.mainWindow.endSheet(self.currentProgressIndicator.window!)
+            
+            DLog("Done!")
+            
+        } // end mutIndQueue.async
         
     }
     
