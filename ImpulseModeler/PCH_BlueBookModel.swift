@@ -328,7 +328,7 @@ class PCH_BlueBookModel: NSObject {
         
         while simTime <= simulationEndTime
         {
-            savedTimes.append(simTime)
+            
             
             if (currentTimeStepIndex + 1 < timeSteps.count)
             {
@@ -418,6 +418,7 @@ class PCH_BlueBookModel: NSObject {
             
             if simTime >= nextSaveTime
             {
+                savedTimes.append(simTime)
                 DLog("Saving at time: \(simTime) (diff: \(nextSaveTime - simTime)")
                 savedValuesV.SetRow(currentSaveRow, vector: newV)
                 savedValuesI.SetRow(currentSaveRow, vector: newI)
