@@ -45,7 +45,7 @@ class PCH_BlueBookModel: NSObject {
         var axialSectionCount = 0
         for nextCoil in phase.coils
         {
-            axialSectionCount += nextCoil.sections!.count
+            axialSectionCount += nextCoil.numAxialSections
         }
         let nodeCount = sectionCount + axialSectionCount
         

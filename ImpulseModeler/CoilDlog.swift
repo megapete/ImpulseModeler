@@ -31,7 +31,10 @@ class CoilDlog: NSWindowController {
     @IBOutlet var positiveCurrentButton: NSButton!
     var currentDirection = 1
     
-    @IBOutlet var decoupledCheckbox: NSButton!
+    @IBOutlet var phase1Button: NSButton!
+    @IBOutlet var phase2Button: NSButton!
+    @IBOutlet var phase3Button: NSButton!
+    
     var phaseNum = 1
     
     @IBOutlet var prevButton: NSButton!
@@ -75,13 +78,35 @@ class CoilDlog: NSWindowController {
         
         if phaseNum == 1
         {
-            decoupledCheckbox.state = .off
+            phase1Button.state = .on
+            phase2Button.state = .off
+            phase3Button.state = .off
             radialCapacitanceField.isEnabled = true
+        }
+        else if phaseNum == 2
+        {
+            phase1Button.state = .off
+            phase2Button.state = .on
+            phase3Button.state = .off
+            radialCapacitanceField.isEnabled = false
+            radialCapacitance = 0.0
+        }
+        else if phaseNum == 3
+        {
+            phase1Button.state = .off
+            phase2Button.state = .off
+            phase3Button.state = .on
+            radialCapacitanceField.isEnabled = false
+            radialCapacitance = 0.0
         }
         else
         {
-            decoupledCheckbox.state = .on
-            radialCapacitanceField.isEnabled = false
+            DLog("Illegal phase designation! Setting to phase 1")
+            phaseNum = 1
+            phase1Button.state = .on
+            phase2Button.state = .off
+            phase3Button.state = .off
+            radialCapacitanceField.isEnabled = true
         }
         
         prevButton.isEnabled = (radialPosition != 0)
@@ -117,7 +142,7 @@ class CoilDlog: NSWindowController {
     {
         var doneSections = false
         
-        let currentCoil = Coil(coilName: coilNameField.stringValue, coilRadialPosition: radialPositionField.integerValue, amps: ampsField.doubleValue, currentDirection: (positiveCurrentButton.state == .on ? 1 : (negativeCurrentButton.state == .on ? -1 : 0)), capacitanceToPreviousCoil: radialCapacitanceField.doubleValue, capacitanceToGround:capacitanceToGroundField.doubleValue, innerRadius: innerDiameterField.doubleValue / 2.0, eddyLossPercentage:eddyLossField.doubleValue, phaseNum: (decoupledCheckbox.state == .on ? 0 : 1), sections: sections)
+        let currentCoil = Coil(coilName: coilNameField.stringValue, coilRadialPosition: radialPositionField.integerValue, amps: ampsField.doubleValue, currentDirection: (positiveCurrentButton.state == .on ? 1 : (negativeCurrentButton.state == .on ? -1 : 0)), capacitanceToPreviousCoil: radialCapacitanceField.doubleValue, capacitanceToGround:capacitanceToGroundField.doubleValue, innerRadius: innerDiameterField.doubleValue / 2.0, eddyLossPercentage:eddyLossField.doubleValue, phaseNum: phaseNum, sections: sections)
         
         var currentSectionReferenceNumber = 0
         
@@ -184,7 +209,12 @@ class CoilDlog: NSWindowController {
             }
         }
         
-        returnedCoil = Coil(coilName: coilNameField.stringValue, coilRadialPosition: radialPositionField.integerValue, amps: ampsField.doubleValue, currentDirection: (positiveCurrentButton.state == .on ? 1 : (negativeCurrentButton.state == .on ? -1 : 0)), capacitanceToPreviousCoil: radialCapacitanceField.doubleValue, capacitanceToGround:capacitanceToGroundField.doubleValue, innerRadius: innerDiameterField.doubleValue / 2.0, eddyLossPercentage:eddyLossField.doubleValue, phaseNum: (decoupledCheckbox.state == .on ? 0 : 1), sections: self.sections)
+        if self.phaseNum == 1
+        {
+            self.radialCapacitance = radialCapacitanceField.doubleValue
+        }
+        
+        returnedCoil = Coil(coilName: coilNameField.stringValue, coilRadialPosition: radialPositionField.integerValue, amps: ampsField.doubleValue, currentDirection: (positiveCurrentButton.state == .on ? 1 : (negativeCurrentButton.state == .on ? -1 : 0)), capacitanceToPreviousCoil: radialCapacitance, capacitanceToGround:capacitanceToGroundField.doubleValue, innerRadius: innerDiameterField.doubleValue / 2.0, eddyLossPercentage:eddyLossField.doubleValue, phaseNum: phaseNum, sections: self.sections)
         
         NSApp.stopModal()
         self.window!.orderOut(self)
@@ -213,23 +243,27 @@ class CoilDlog: NSWindowController {
         wButton.state = .on
     }
     
-    @IBAction func handleDecoupled(_ sender: Any)
+    @IBAction func handlePhaseNumGroup(_ sender: NSButton)
     {
-        if (self.phaseNum == 1)
+        if sender == phase1Button
         {
-            decoupledCheckbox.state = .on
-            radialCapacitanceField.isEnabled = false;
-            radialCapacitanceField.stringValue = "0"
-            self.radialCapacitance = 0.0
-            self.phaseNum = 0;
+            self.phaseNum = 1
+            radialCapacitanceField.isEnabled = true
         }
-        else
+        else if sender == phase2Button
         {
-            decoupledCheckbox.state = .off
-            radialCapacitanceField.isEnabled = true;
-            self.phaseNum = 1;
+            self.phaseNum = 2
+            radialCapacitanceField.isEnabled = false
+            radialCapacitance = 0.0
+        }
+        else if sender == phase3Button
+        {
+            self.phaseNum = 3
+            radialCapacitanceField.isEnabled = false
+            radialCapacitance = 0.0
         }
     }
+    
     
     @IBAction func doneButtonPushed(_ sender: AnyObject)
     {

@@ -179,8 +179,21 @@ class AppController: NSObject {
         
         if let archive = NSKeyedUnarchiver.unarchiveObject(withFile: url.path) as? PhaseModel
         {
-            self.theModel = archive.model
+            self.theModel = []
             self.phaseDefinition = archive.phase
+            
+            for nextSection in archive.model
+            {
+                if nextSection.N == 0.0
+                {
+                    DLog("Got one!")
+                }
+                else
+                {
+                    self.theModel!.append(nextSection)
+                }
+            }
+            
             NSDocumentController.shared.noteNewRecentDocumentURL(url)
             
             return true
@@ -229,8 +242,20 @@ class AppController: NSObject {
             
             if let archive = NSKeyedUnarchiver.unarchiveObject(withFile: openFilePanel.url!.path) as? PhaseModel
             {
-                self.theModel = archive.model
+                self.theModel = []
                 self.phaseDefinition = archive.phase
+                
+                for nextSection in archive.model
+                {
+                    if nextSection.N == 0.0
+                    {
+                        DLog("Got one!")
+                    }
+                    else
+                    {
+                        self.theModel!.append(nextSection)
+                    }
+                }
                 
                 NSDocumentController.shared.noteNewRecentDocumentURL(openFilePanel.url!)
             }
@@ -579,6 +604,11 @@ class AppController: NSObject {
             var sectionNumberOffset = 0
             for nextAxialSection in axialSections
             {
+                // we need to make sure that the user didn't mistakenly add another section when he didn't really want to
+                if nextAxialSection.numDisks <= 0
+                {
+                    continue
+                }
                 // This will work even if the user accidentally pressed "Next" when he didn't want to add another section, as long as he didn't enter a non-zero value for "number of disks" (the dolt).
                 for currentSection in 0..<Int(nextAxialSection.numDisks)
                 {
@@ -659,7 +689,7 @@ class AppController: NSObject {
                 }
             }
             
-            // we only go through the next loop if this isn't the first coil AND the capacitance to previous coil is non-zero (if it is zero, this must be a coil on another phase)
+            // we only go through the next loop if this isn't the first coil AND the capacitance to previous coil is non-zero (If it is zero, this must be a coil on another phase. This is a rather lame method in that it forces the modelling of only a single coil on "other" phases)
             if (theCoilNum > 0) && (theCoil.capacitanceToPreviousCoil != 0)
             {
                 // let previousEndIndex = currentStartIndex - 1
@@ -712,19 +742,21 @@ class AppController: NSObject {
             DLog("Calculating mutual inductances")
             while diskArray.count > 0
             {
-                self.currentProgressIndicator.UpdateIndicator(value: diskCount - Double(diskArray.count))
+                DispatchQueue.main.async {
+                    self.currentProgressIndicator.UpdateIndicator(value: diskCount - Double(diskArray.count))
+                }
                 
                 let nDisk = diskArray.remove(at: 0)
                 
                 DLog("Calculating to: \(nDisk.data.sectionID)")
                 
-                let nIsUncoupled = (phase.coils[nDisk.coilRef].phaseNum == 0 ? true : false)
+                // let nIsUncoupled = (phase.coils[nDisk.coilRef].phaseNum == 0 ? true : false)
                 
                 for otherDisk in diskArray
                 {
-                    let otherIsUncoupled = (phase.coils[otherDisk.coilRef].phaseNum == 0 ? true : false)
+                    // let otherIsUncoupled = (phase.coils[otherDisk.coilRef].phaseNum == 0 ? true : false)
                     
-                    if (nIsUncoupled != otherIsUncoupled)
+                    if (phase.coils[nDisk.coilRef].phaseNum != phase.coils[otherDisk.coilRef].phaseNum)
                     {
                         continue
                     }

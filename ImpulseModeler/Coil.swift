@@ -34,7 +34,7 @@ class Coil:NSObject, NSCoding
     /// The average eddy-loss percentage of dc resistance for the coil
     let eddyLossPercentage:Double
     
-    /// Variable to decide if we need to consider intercoil capacitances and mutual inductances (ie: is this coil decoupled from the others?). For now, we use the simplification that the "main" coils are on phase 1, while any others are on phase 0 (if I ever need to fix this to allow for more than one other phase, this assumption will need to be modified)
+    /// Variable to decide if we need to consider intercoil capacitances and mutual inductances (ie: is this coil decoupled from the others?). For now, we use the simplification that the "main" coils are on phase 1, while any others are on phases 2 or 3. Note that for now, only a single coil can be defined for phase 2 and/or 3
     let phaseNum:Int
     
     var sections:[AxialSection]?
@@ -64,9 +64,19 @@ class Coil:NSObject, NSCoding
         let innerRadius = aDecoder.decodeDouble(forKey: "InnerRadius")
         let eddyLossPercentage = aDecoder.decodeDouble(forKey: "EddyLossPercentage")
         let sections = aDecoder.decodeObject(forKey: "Sections") as! [AxialSection]
+        
+        var validSections:[AxialSection] = []
+        for nextSection in sections
+        {
+            if nextSection.numDisks > 0
+            {
+                validSections.append(nextSection)
+            }
+        }
+        
         let phaseNum = aDecoder.decodeInteger(forKey: "PhaseNumber")
         
-        self.init(coilName:coilName, coilRadialPosition:coilRadialPosition, amps:amps, currentDirection:currentDirection, capacitanceToPreviousCoil:capacitanceToPreviousCoil, capacitanceToGround:capacitanceToGround, innerRadius:innerRadius, eddyLossPercentage:eddyLossPercentage, phaseNum:phaseNum, sections:sections)
+        self.init(coilName:coilName, coilRadialPosition:coilRadialPosition, amps:amps, currentDirection:currentDirection, capacitanceToPreviousCoil:capacitanceToPreviousCoil, capacitanceToGround:capacitanceToGround, innerRadius:innerRadius, eddyLossPercentage:eddyLossPercentage, phaseNum:phaseNum, sections:validSections)
     }
     
     func encode(with aCoder: NSCoder) {
@@ -79,8 +89,40 @@ class Coil:NSObject, NSCoding
         aCoder.encode(self.capacitanceToGround, forKey: "CapToGround")
         aCoder.encode(self.innerRadius, forKey: "InnerRadius")
         aCoder.encode(self.eddyLossPercentage, forKey: "EddyLossPercentage")
-        aCoder.encode(self.sections, forKey: "Sections")
+        
+        var validSections:[AxialSection] = []
+        for nextSection in self.sections!
+        {
+            if nextSection.numDisks > 0
+            {
+                validSections.append(nextSection)
+            }
+        }
+        
+        aCoder.encode(validSections, forKey: "Sections")
+        
         aCoder.encode(self.phaseNum, forKey: "PhaseNumber")
+    }
+    
+    /// The actual number of axial sections (ie: the ones where numDisks is non-zero)
+    var numAxialSections:Int {
+        get
+        {
+            var result = 0
+            
+            if let sects = self.sections
+            {
+                for nextSection in sects
+                {
+                    if nextSection.numDisks > 0
+                    {
+                        result += 1
+                    }
+                }
+            }
+            
+            return result
+        }
     }
     
     /// The total number of disks in the coil

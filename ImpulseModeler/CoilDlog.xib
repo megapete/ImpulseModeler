@@ -11,11 +11,13 @@
                 <outlet property="ampsField" destination="vp2-tp-UNa" id="s3D-Cq-pUG"/>
                 <outlet property="capacitanceToGroundField" destination="QBx-hT-ADJ" id="cAF-Cg-VeK"/>
                 <outlet property="coilNameField" destination="Nax-yp-pND" id="6aO-AZ-2Rx"/>
-                <outlet property="decoupledCheckbox" destination="Qbd-XA-e5U" id="3OD-a8-vrU"/>
                 <outlet property="eddyLossField" destination="jhm-0P-2VL" id="1op-Ht-N9m"/>
                 <outlet property="innerDiameterField" destination="jFP-VE-BR4" id="HSV-Pg-yfa"/>
                 <outlet property="negativeCurrentButton" destination="gVh-Yi-vnA" id="Iah-d4-qOR"/>
                 <outlet property="noCurrentButton" destination="HxG-cT-1IP" id="JEi-MJ-Jth"/>
+                <outlet property="phase1Button" destination="Q8y-qm-371" id="l9d-bt-tZq"/>
+                <outlet property="phase2Button" destination="6Z5-bh-Vj0" id="CAM-Pk-hsz"/>
+                <outlet property="phase3Button" destination="ymb-rj-Gya" id="Wpu-Rn-ADy"/>
                 <outlet property="positiveCurrentButton" destination="1xI-bQ-Prd" id="xtc-sD-04V"/>
                 <outlet property="prevButton" destination="sq8-ee-ZVa" id="qh7-Op-8s0"/>
                 <outlet property="radialCapacitanceField" destination="csJ-tG-uJr" id="TLu-YS-ehD"/>
@@ -274,15 +276,46 @@ Gw
                             <action selector="handleCurrDirGroup:" target="-2" id="JfX-1a-ESB"/>
                         </connections>
                     </button>
-                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Qbd-XA-e5U">
-                        <rect key="frame" x="18" y="100" width="193" height="18"/>
+                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Q8y-qm-371">
+                        <rect key="frame" x="74" y="102" width="28" height="18"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                        <buttonCell key="cell" type="check" title="Different phase (decoupled)" bezelStyle="regularSquare" imagePosition="left" inset="2" id="6ao-v7-0bR">
+                        <buttonCell key="cell" type="radio" title="1" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="RZ2-9B-QgJ">
                             <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
                         <connections>
-                            <action selector="handleDecoupled:" target="-2" id="kDu-Xq-F1q"/>
+                            <action selector="handlePhaseNumGroup:" target="-2" id="iEq-bl-vz5"/>
+                        </connections>
+                    </button>
+                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6Z5-bh-Vj0">
+                        <rect key="frame" x="107" y="102" width="28" height="18"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="radio" title="2" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="QNo-Py-jVH">
+                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="handlePhaseNumGroup:" target="-2" id="g7C-IN-eqQ"/>
+                        </connections>
+                    </button>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ztn-sd-h1u">
+                        <rect key="frame" x="22" y="103" width="45" height="17"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Phase:" id="zh4-F0-qBZ">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ymb-rj-Gya">
+                        <rect key="frame" x="140" y="102" width="28" height="18"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="radio" title="3" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="4ep-mw-n5S">
+                            <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="handlePhaseNumGroup:" target="-2" id="gqi-7G-o7s"/>
                         </connections>
                     </button>
                 </subviews>
