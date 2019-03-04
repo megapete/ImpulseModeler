@@ -87,6 +87,8 @@ class AppController: NSObject {
     @IBOutlet weak var runSimMenuItem: NSMenuItem!
     @IBOutlet weak var saveModelMenuItem: NSMenuItem!
     @IBOutlet weak var modifyModelMenuItem: NSMenuItem!
+    @IBOutlet weak var saveMatricesMenuItem: NSMenuItem!
+    
 
     @IBOutlet weak var mainWindow: NSWindow!
     
@@ -731,20 +733,20 @@ class AppController: NSObject {
         self.currentProgressIndicator.UpdateIndicator(value: 0.0, minValue: 0.0, maxValue: diskCount, text: "Calculating mutual inductances...")
         
         // open the sheet with the progress indicator
-        self.mainWindow.beginSheet(self.currentProgressIndicator.window!, completionHandler: nil)
+        //** self.mainWindow.beginSheet(self.currentProgressIndicator.window!, completionHandler: nil)
         
         // create a serial queue
-        let mutIndQueue = DispatchQueue(label: "com.huberistech.mutual_inductance_calculation")
+        //** let mutIndQueue = DispatchQueue(label: "com.huberistech.mutual_inductance_calculation")
         
         // we need to call .async with our queue so that a non-main thread is created
-        mutIndQueue.async {
+        //**mutIndQueue.async {
             
             DLog("Calculating mutual inductances")
             while diskArray.count > 0
             {
-                DispatchQueue.main.async {
-                    self.currentProgressIndicator.UpdateIndicator(value: diskCount - Double(diskArray.count))
-                }
+                //** DispatchQueue.main.async {
+                //**    self.currentProgressIndicator.UpdateIndicator(value: diskCount - Double(diskArray.count))
+                //** }
                 
                 let nDisk = diskArray.remove(at: 0)
                 
@@ -778,13 +780,70 @@ class AppController: NSObject {
                 }
             }
             
-            self.mainWindow.endSheet(self.currentProgressIndicator.window!)
+            //**self.mainWindow.endSheet(self.currentProgressIndicator.window!)
             
             DLog("Done!")
             
-        } // end mutIndQueue.async
+        //** } // end mutIndQueue.async
         
     }
+    
+    // Save the C, M, R, A, and B matrices in CSV style. All the created file names will have the same prefix (supplied by the user) with an appended '_M', _C', '_R', '_A', '_B' to indicate the different matrices.
+    @IBAction func handleSaveMatrices(_ sender: Any)
+    {
+        let saveFilePanel = NSSavePanel()
+        
+        saveFilePanel.title = "Save Model Matrices"
+        saveFilePanel.message = "Enter the prefix to use for the files"
+        saveFilePanel.nameFieldLabel = "Prefix:"
+        saveFilePanel.canCreateDirectories = true
+        saveFilePanel.allowedFileTypes = ["txt"]
+        saveFilePanel.allowsOtherFileTypes = false
+        
+        if (saveFilePanel.runModal().rawValue == NSFileHandlingPanelOKButton)
+        {
+            guard let filePrefixUrl = saveFilePanel.url
+                else
+            {
+                DLog("Bad file name")
+                return
+            }
+            
+            let filePrefix = filePrefixUrl.deletingPathExtension().lastPathComponent
+            
+            let pathUrl = filePrefixUrl.deletingLastPathComponent()
+            
+            let bbModel = PCH_BlueBookModel(theModel: self.theModel!, phase: self.phaseDefinition!)
+            
+            let matrices = [bbModel.M, bbModel.C, bbModel.R, bbModel.A, bbModel.B]
+            let fileSuffixes = ["_M", "_C", "_R", "_A", "_B"]
+            
+            for i in 0..<matrices.count
+            {
+                var fileString = matrices[i].description
+                fileString.removeFirst()
+                
+                // fix column beginnings and ends
+                fileString = fileString.replacingOccurrences(of: "| ", with: "")
+                fileString = fileString.replacingOccurrences(of: " |", with: "")
+                // replace spaces between entries with commas
+                fileString = fileString.replacingOccurrences(of: "   ", with: ",")
+                
+                let currFileSuffix = filePrefix + fileSuffixes[i] + ".txt"
+                let fileURL = pathUrl.appendingPathComponent(currFileSuffix)
+                
+                do {
+                    try fileString.write(to: fileURL, atomically: true, encoding: String.Encoding.utf8)
+                }
+                catch {
+                    ALog("Could not write file!")
+                }
+            }
+            
+            DLog("Done writing files")
+        }
+    }
+    
     
     override func validateMenuItem(_ menuItem: NSMenuItem) -> Bool
     {
@@ -793,7 +852,7 @@ class AppController: NSObject {
             return self.phaseDefinition != nil && self.theModel == nil
         }
         
-        if (menuItem == self.saveCirFileMenuItem) || (menuItem == self.runSimMenuItem) || (menuItem == self.saveModelMenuItem) || (menuItem == self.modifyModelMenuItem)
+        if (menuItem == self.saveCirFileMenuItem) || (menuItem == self.runSimMenuItem) || (menuItem == self.saveModelMenuItem) || (menuItem == self.modifyModelMenuItem) || (menuItem == self.saveMatricesMenuItem)
         {
             return self.theModel != nil
         }

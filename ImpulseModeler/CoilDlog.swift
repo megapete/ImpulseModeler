@@ -146,6 +146,7 @@ class CoilDlog: NSWindowController {
         
         var currentSectionReferenceNumber = 0
         
+        var lastSection:AxialSection? = nil
         while (!doneSections)
         {
             var sectionExists = false
@@ -162,6 +163,11 @@ class CoilDlog: NSWindowController {
             else
             {
                 self.sections = Array()
+            }
+            
+            if section == nil
+            {
+                section = lastSection
             }
             
             let axialDlog = AxialSectionDlog()
@@ -181,6 +187,8 @@ class CoilDlog: NSWindowController {
                 {
                     self.sections!.append(runResult.section!)
                 }
+                
+                lastSection = runResult.section
                 
                 if (runResult.result == AxialSectionDlog.DlogResult.done)
                 {

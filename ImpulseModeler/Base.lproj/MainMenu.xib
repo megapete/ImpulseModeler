@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="13771" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="13771"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="14460.31"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -22,6 +22,7 @@
                 <outlet property="modifyModelMenuItem" destination="6Mh-zH-hUk" id="mH7-Eg-XaM"/>
                 <outlet property="runSimMenuItem" destination="SYD-vz-rAL" id="k1O-4g-yIy"/>
                 <outlet property="saveCirFileMenuItem" destination="CMY-na-8SV" id="kPF-Ea-rkO"/>
+                <outlet property="saveMatricesMenuItem" destination="b5z-go-MeY" id="JHz-G9-7Zc"/>
                 <outlet property="saveModelMenuItem" destination="pxx-59-PXV" id="KTL-9a-vMo"/>
             </connections>
         </customObject>
@@ -114,6 +115,12 @@
                             <menuItem title="Save Model…" keyEquivalent="s" id="pxx-59-PXV">
                                 <connections>
                                     <action selector="handleSaveModel:" target="Ubf-fF-CrH" id="mBX-PS-H0c"/>
+                                </connections>
+                            </menuItem>
+                            <menuItem title="Save Matrices…" id="b5z-go-MeY">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="handleSaveMatrices:" target="Ubf-fF-CrH" id="pao-I5-u3i"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Save '.cir' File…" keyEquivalent="s" id="CMY-na-8SV">
