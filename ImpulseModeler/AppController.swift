@@ -413,15 +413,17 @@ class AppController: NSObject {
             {
                 DLog("Simulation failed!")
                 // if we get failure, we need to close the progress indicator before returning
-                self.mainWindow.endSheet(self.currentProgressIndicator.window!)
+                DispatchQueue.main.sync { self.mainWindow.endSheet(self.currentProgressIndicator.window!) }
                 return
             }
             
             // since the simulation is done, we close the progress indicator
-            self.mainWindow.endSheet(self.currentProgressIndicator.window!)
+            // DispatchQueue.main.sync { self.mainWindow.endSheet(self.currentProgressIndicator.window!) }
             
             // we want to save the impres file using an NSSavePanel, but that is UI, which CANNOT be done in any thread except the main thread. We dispatch a sync call to the main thread to take care of this.
             DispatchQueue.main.sync {
+                
+                self.mainWindow.endSheet(self.currentProgressIndicator.window!)
                 
                 var bbModelSections = Array<PCH_BB_ModelSection>()
                 for nextSection in self.theModel!
