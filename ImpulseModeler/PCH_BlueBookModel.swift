@@ -213,6 +213,35 @@ class PCH_BlueBookModel: NSObject {
 
     }
     
+    // Output a PCH_Matrix (as a CSV file) to the user's Documents folder with the given name (which should include the ".txt" extension)
+    func OutputMatrix(wMatrix:PCH_Matrix, fileName:String)
+    {
+        guard let docUrl = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else
+        {
+            DLog("Could not access Documents directory")
+            return
+        }
+        
+        let fileUrl = docUrl.appendingPathComponent(fileName)
+        
+        var fileString = wMatrix.description
+        fileString.removeFirst()
+        
+        // fix column beginnings and ends
+        fileString = fileString.replacingOccurrences(of: "| ", with: "")
+        fileString = fileString.replacingOccurrences(of: " |", with: "")
+        // replace spaces between entries with commas
+        fileString = fileString.replacingOccurrences(of: "   ", with: ",")
+        
+        do {
+            try fileString.write(to: fileUrl, atomically: true, encoding: String.Encoding.utf8)
+        }
+        catch {
+            ALog("Could not write file!")
+        }
+        
+        DLog("Done writing matrix")
+    }
     
     
     func SimulateWithConnections(_ connections:[(fromNode:Int, toNodes:[Int])], sourceConnection:(source:PCH_Source, toNode:Int), timeSteps:[PCH_BB_TimeStepInfo], progIndicatorWindow:PCH_ProgressIndicatorWindow? = nil) -> (times:[Double], V:PCH_Matrix, I:PCH_Matrix)?
@@ -302,10 +331,14 @@ class PCH_BlueBookModel: NSObject {
             }
         }
         
+        
+        
         // Set the row for the node connected to the source
         var newRow = [Double](repeatElement(0.0, count: C.numCols))
         newRow[sourceConnection.toNode] = 1.0
         newC.SetRow(sourceConnection.toNode, buffer: newRow)
+        
+        // self.OutputMatrix(wMatrix: newC, fileName: "Matrix_Cprime.txt")
         
         let sectionCount = self.A.numCols
         let nodeCount = self.A.numRows
@@ -328,8 +361,6 @@ class PCH_BlueBookModel: NSObject {
         
         while simTime <= simulationEndTime
         {
-            
-            
             if (currentTimeStepIndex + 1 < timeSteps.count)
             {
                 if simTime >= timeSteps[currentTimeStepIndex + 1].startTime
@@ -370,20 +401,29 @@ class PCH_BlueBookModel: NSObject {
                 AI[nextConnection.fromNode, 0] = newAI
             }
             
+            // self.OutputMatrix(wMatrix: AI, fileName: "Matrix_AIprime.txt")
+            
             // Now the shot, using Runge-Kutta
             AI[sourceConnection.toNode, 0] = sourceConnection.source.dV(simTime)
             let an = newC.SolveWith(AI)!
             
+            // self.OutputMatrix(wMatrix: an, fileName: "Matrix_an.txt")
+            
             AI[sourceConnection.toNode, 0] = sourceConnection.source.dV(simTime + currentTimeStep / 2.0)
             let bn = newC.SolveWith(AI)!
+            // self.OutputMatrix(wMatrix: bn, fileName: "Matrix_bn_cn.txt")
             let cn = bn
             
             AI[sourceConnection.toNode, 0] = sourceConnection.source.dV(simTime + currentTimeStep)
             let dn = newC.SolveWith(AI)!
+            // self.OutputMatrix(wMatrix: dn, fileName: "Matrix_dn.txt")
             
-            let newV = V + currentTimeStep/6.0 * (an + 2.0 * bn + 2.0 * cn + dn)
+            let bcV = V + currentTimeStep/12.0 * (an + 2.0 * bn + 2.0 * cn + dn)
+            let dV = V + currentTimeStep/6.0 * (an + 2.0 * bn + 2.0 * cn + dn)
+            let newV = dV
+            // self.OutputMatrix(wMatrix: newV, fileName: "Matrix_V.txt")
             
-            guard let BV = (B * newV)
+            guard let BV = (B * V)
             else
             {
                 ALog("B*V multiply failed")
@@ -403,15 +443,15 @@ class PCH_BlueBookModel: NSObject {
             let aan = M.SolveWith(rtSide)!
             
             var newI = I + (currentTimeStep/2.0 * aan)
-            rtSide = BV - (R * newI)!
+            rtSide = (B * bcV)! - (R * newI)!
             let bbn = M.SolveWith(rtSide)!
             
             newI = I + (currentTimeStep/2.0 * bbn)
-            rtSide = BV - (R * newI)!
+            rtSide = (B * bcV)! - (R * newI)!
             let ccn = M.SolveWith(rtSide)!
             
             newI = I + (currentTimeStep * ccn)
-            rtSide = BV - (R * newI)!
+            rtSide = (B * dV)! - (R * newI)!
             let ddn = M.SolveWith(rtSide)!
             
             newI = I + currentTimeStep/6.0 * (aan + 2.0 * bbn + 2.0 * ccn + ddn)
