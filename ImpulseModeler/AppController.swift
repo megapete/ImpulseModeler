@@ -917,7 +917,8 @@ class AppController: NSObject {
                     continue
                 }
                 
-                let nsName = String(format: "CP%@%03d", nextSectionID, shuntCapSerialNum)
+                let nsName1 = String(format: "CP1%@%03d", nextSectionID, shuntCapSerialNum)
+                let nsName2 = String(format: "CP2%@%03d", nextSectionID, shuntCapSerialNum)
                 
                 /*
                  let shuntID = nextShuntCap.0
@@ -929,17 +930,22 @@ class AppController: NSObject {
                  }
                  */
                 
-                var shuntNode = String()
+                var shuntNode1 = String()
+                var shuntNode2 = ""
                 if (nextShuntSection.coilRef == -1)
                 {
-                    shuntNode = "0"
+                    shuntNode1 = "0"
+                    shuntNode2 = "0"
                 }
                 else
                 {
-                    shuntNode = String(format: "%@I%03d", coilArray[nextShuntSection.coilRef].coilName, nextShuntSection.data.nodes.inNode)
+                    shuntNode1 = String(format: "%@I%03d", coilArray[nextShuntSection.coilRef].coilName, nextShuntSection.data.nodes.inNode)
+                    shuntNode2 = String(format: "%@I%03d", coilArray[nextShuntSection.coilRef].coilName, nextShuntSection.data.nodes.outNode)
+                    
                 }
                 
-                fString += nsName + " " + inNode + " " + shuntNode + String(format: " %.4E\n", nextShuntCap.value)
+                fString += nsName1 + " " + inNode + " " + shuntNode1 + String(format: " %.4E\n", nextShuntCap.value / 2.0)
+                fString += nsName2 + " " + outNode + " " + shuntNode2 + String(format: " %.4E\n", nextShuntCap.value / 2.0)
                 
                 shuntCapSerialNum += 1
             }
@@ -987,11 +993,14 @@ class AppController: NSObject {
         }
         
         
-        // TODO: Add code for the connection that interests us
-        fString += "\n* Connections\n\n"
+        // TODO: Add code for the connection that interests us (very particular to the case we're testing)
+        fString += "\n* Connections\n"
+        fString += "RLVNEUT LVBOT 0 1.0E-9\n"
+        fString += "RLVLINE LVTOP 0 1.0E-9\n"
+        fString += "RHVNEUT HVBOT 0 1.0E-9\n\n"
         
         // The shot
-        fString += "* Impulse shot\nVBIL HVTOP 0 EXP(0 566.5k 0 2.2E-7 1.0E-6 7.0E-5)\n\n"
+        fString += "* Impulse shot\nVBIL HVTOP 0 EXP(0 360.5k 0 2.2E-7 1.0E-6 7.0E-5)\n\n"
         
         // Options required to make this work most of the time
         fString += "* options for LTSpice\n.OPTIONS reltol=0.02 trtol=7 abstol=1e-6 vntol=1e-4 method=gear\n\n"
