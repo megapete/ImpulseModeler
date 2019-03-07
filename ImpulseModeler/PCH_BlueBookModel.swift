@@ -377,6 +377,9 @@ class PCH_BlueBookModel: NSObject {
                 return nil
             }
             
+            self.FixAI(AI, groundNodes: groundedNodes, connections: connections)
+            
+            /*
             for nextGroundedNode in groundedNodes
             {
                 AI[nextGroundedNode, 0] = 0.0
@@ -400,6 +403,7 @@ class PCH_BlueBookModel: NSObject {
                 
                 AI[nextConnection.fromNode, 0] = newAI
             }
+             */
             
             // self.OutputMatrix(wMatrix: AI, fileName: "Matrix_AIprime.txt")
             
@@ -483,5 +487,32 @@ class PCH_BlueBookModel: NSObject {
         
         return (savedTimes, savedValuesV, savedValuesI)
     
+    }
+    
+    func FixAI(_ AI:PCH_Matrix, groundNodes:Set<Int>, connections:[(fromNode:Int, toNodes:[Int])])
+    {
+        for nextGroundedNode in groundNodes
+        {
+            AI[nextGroundedNode, 0] = 0.0
+        }
+        
+        // Fix the "connected" nodes
+        for nextConnection in connections
+        {
+            // Grounded nodes were taken care of immediately above
+            if (nextConnection.toNodes.contains(-1))
+            {
+                continue
+            }
+            
+            var newAI:Double = AI[nextConnection.fromNode, 0]
+            for nextToNode in nextConnection.toNodes
+            {
+                newAI += AI[nextToNode,0]
+                AI[nextToNode, 0] = 0.0
+            }
+            
+            AI[nextConnection.fromNode, 0] = newAI
+        }
     }
 }
