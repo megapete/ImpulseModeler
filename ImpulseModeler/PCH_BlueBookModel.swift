@@ -379,54 +379,6 @@ class PCH_BlueBookModel: NSObject {
             
             self.FixAI(AI, groundNodes: groundedNodes, connections: connections)
             
-            /*
-            for nextGroundedNode in groundedNodes
-            {
-                AI[nextGroundedNode, 0] = 0.0
-            }
-            
-            // Fix the "connected" nodes
-            for nextConnection in connections
-            {
-                // Grounded nodes were taken care of immediately above
-                if (nextConnection.toNodes.contains(-1))
-                {
-                    continue
-                }
-                
-                var newAI:Double = AI[nextConnection.fromNode, 0]
-                for nextToNode in nextConnection.toNodes
-                {
-                    newAI += AI[nextToNode,0]
-                    AI[nextToNode, 0] = 0.0
-                }
-                
-                AI[nextConnection.fromNode, 0] = newAI
-            }
-             */
-            
-            // self.OutputMatrix(wMatrix: AI, fileName: "Matrix_AIprime.txt")
-            
-            // Now the shot, using Runge-Kutta
-            AI[sourceConnection.toNode, 0] = sourceConnection.source.dV(simTime)
-            let an = newC.SolveWith(AI)!
-            
-            // self.OutputMatrix(wMatrix: an, fileName: "Matrix_an.txt")
-            
-            AI[sourceConnection.toNode, 0] = sourceConnection.source.dV(simTime + currentTimeStep / 2.0)
-            let bn = newC.SolveWith(AI)!
-            // self.OutputMatrix(wMatrix: bn, fileName: "Matrix_bn_cn.txt")
-            let cn = bn
-            
-            AI[sourceConnection.toNode, 0] = sourceConnection.source.dV(simTime + currentTimeStep)
-            let dn = newC.SolveWith(AI)!
-            // self.OutputMatrix(wMatrix: dn, fileName: "Matrix_dn.txt")
-            
-            let bcV = V + currentTimeStep/12.0 * (an + 2.0 * bn + 2.0 * cn + dn)
-            let dV = V + currentTimeStep/6.0 * (an + 2.0 * bn + 2.0 * cn + dn)
-            let newV = dV
-            // self.OutputMatrix(wMatrix: newV, fileName: "Matrix_V.txt")
-            
             guard let BV = (B * V)
             else
             {
@@ -441,24 +393,50 @@ class PCH_BlueBookModel: NSObject {
                 return nil
             }
             
-            var rtSide = BV - RI
+            AI[sourceConnection.toNode, 0] = sourceConnection.source.dV(simTime)
+            let an = newC.SolveWith(AI)!
             
+            var rtSide = BV - RI
             // The current derivative dI/dt _is_ a function of I, so this is a more "traditional" calculation using Runge-Kutta.
             let aan = M.SolveWith(rtSide)!
-            
+            DLog("Current slope: \(aan)")
             var newI = I + (currentTimeStep/2.0 * aan)
-            rtSide = (B * bcV)! - (R * newI)!
+            var newAI = (A * newI)!
+            // DLog("AI (before): \(newAI)")
+            self.FixAI(newAI, groundNodes: groundedNodes, connections: connections)
+            // DLog("AI (after): \(newAI)")
+            newAI[sourceConnection.toNode, 0] = sourceConnection.source.dV(simTime + currentTimeStep / 2.0)
+            let bn = newC.SolveWith(newAI)!
+            let bv = V + currentTimeStep/2.0 * an
+            
+            rtSide = (B * bv)! - (R * newI)!
             let bbn = M.SolveWith(rtSide)!
             
             newI = I + (currentTimeStep/2.0 * bbn)
-            rtSide = (B * bcV)! - (R * newI)!
+            newAI = (A * newI)!
+            self.FixAI(newAI, groundNodes: groundedNodes, connections: connections)
+            
+            newAI[sourceConnection.toNode, 0] = sourceConnection.source.dV(simTime + currentTimeStep / 2.0)
+            let cn = newC.SolveWith(newAI)!
+            let cv = V + currentTimeStep/2.0 * bn
+            
+            rtSide = (B * cv)! - (R * newI)!
             let ccn = M.SolveWith(rtSide)!
             
             newI = I + (currentTimeStep * ccn)
-            rtSide = (B * dV)! - (R * newI)!
+            newAI = (A * newI)!
+            self.FixAI(newAI, groundNodes: groundedNodes, connections: connections)
+            
+            newAI[sourceConnection.toNode, 0] = sourceConnection.source.dV(simTime + currentTimeStep)
+            let dn = newC.SolveWith(newAI)!
+            let dv = V + currentTimeStep * cn
+            
+            rtSide = (B * dv)! - (R * newI)!
             let ddn = M.SolveWith(rtSide)!
             
             newI = I + currentTimeStep/6.0 * (aan + 2.0 * bbn + 2.0 * ccn + ddn)
+            // DLog("I: \(newI)")
+            let newV = V + currentTimeStep/6.0 * (an + 2.0 * bn + 2.0 * cn + dn)
             
             if simTime >= nextSaveTime
             {
