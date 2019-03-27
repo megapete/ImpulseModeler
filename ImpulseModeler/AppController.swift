@@ -735,13 +735,15 @@ class AppController: NSObject {
         self.currentProgressIndicator.UpdateIndicator(value: 0.0, minValue: 0.0, maxValue: diskCount, text: "Calculating mutual inductances...")
         
         // open the sheet with the progress indicator
-        //** self.mainWindow.beginSheet(self.currentProgressIndicator.window!, completionHandler: nil)
+        self.mainWindow.beginSheet(self.currentProgressIndicator.window!, completionHandler: {responseCode in
+            DLog("Ended sheet")
+        })
         
         // create a serial queue
-        //** let mutIndQueue = DispatchQueue(label: "com.huberistech.mutual_inductance_calculation")
+        let mutIndQueue = DispatchQueue(label: "com.huberistech.mutual_inductance_calculation")
         
         // we need to call .async with our queue so that a non-main thread is created
-        //**mutIndQueue.async {
+        mutIndQueue.async {
             
             DLog("Calculating mutual inductances")
             while diskArray.count > 0
@@ -782,11 +784,11 @@ class AppController: NSObject {
                 }
             }
             
-            //**self.mainWindow.endSheet(self.currentProgressIndicator.window!)
+            DispatchQueue.main.async {self.mainWindow.endSheet(self.currentProgressIndicator.window!)}
             
-            DLog("Done!")
+            DLog("Done muties!")
             
-        //** } // end mutIndQueue.async
+        } // end mutIndQueue.async
         
     }
     

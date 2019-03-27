@@ -13,7 +13,7 @@
 // 4) Create a dispatch queue ("myqueue") and use an .async call on the long-time code you want to run
 // 5) Occasionaly, within the long-time code, call DispatchQueue.main.async { myProgressIndicatorWindow.UpdateIndicator(value: updatedValue) }
 // NOTE: It is necessary to call the update function on the main thread
-// 6) When the long-time code is done (but you are still in the myqueue.async block) call endSheet
+// 6) When the long-time code is done (but you are still in the myqueue.async block) call endSheet, BUT!!!! Make sure you encapsulate the call in a "DispatchQueue.main.async" block.
 
 import Cocoa
 
