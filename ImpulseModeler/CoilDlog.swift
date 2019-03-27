@@ -47,7 +47,7 @@ class CoilDlog: NSWindowController {
     
     override var windowNibName: NSNib.Name!
     {
-        return NSNib.Name("CoilDlog")
+        return "CoilDlog"
     }
     
     override func windowDidLoad()

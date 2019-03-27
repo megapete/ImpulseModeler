@@ -29,7 +29,7 @@ class PCH_ProgressIndicatorWindow: NSWindowController {
     
     convenience init()
     {
-        self.init(windowNibName: NSNib.Name(rawValue: "PCH_ProgressIndicatorWindow"))
+        self.init(windowNibName: "PCH_ProgressIndicatorWindow")
     }
     
     func ResetIndicator()

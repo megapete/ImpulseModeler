@@ -849,7 +849,7 @@ class AppController: NSObject {
     }
     
     
-    override func validateMenuItem(_ menuItem: NSMenuItem) -> Bool
+    func validateMenuItem(_ menuItem: NSMenuItem) -> Bool
     {
         if (menuItem == self.createModelMenuItem)
         {

@@ -68,10 +68,12 @@ struct Complex:CustomStringConvertible, Hashable
     var real:Double
     var imag:Double
     
+    /*
     var hashValue: Int
     {
         return self.real.hashValue ^ self.imag.hashValue &* 16777619
     }
+    */
     
     static func == (lhs:Complex, rhs:Complex) -> Bool
     {

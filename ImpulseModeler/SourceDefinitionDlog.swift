@@ -21,7 +21,7 @@ class SourceDefinitionDlog: NSWindowController {
     // override the windowNibName property becuase we only ever open this nib file from this controller
     override var windowNibName: NSNib.Name!
     {
-        return NSNib.Name("SourceDefinitionDlog")
+        return "SourceDefinitionDlog"
     }
     
     override func windowDidLoad()

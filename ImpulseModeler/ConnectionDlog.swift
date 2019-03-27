@@ -21,7 +21,7 @@ class ConnectionDlog: NSWindowController, NSWindowDelegate
     
     override var windowNibName: NSNib.Name!
     {
-        return NSNib.Name("ConnectionDlog")
+        return "ConnectionDlog"
     }
     
     override func windowDidLoad()

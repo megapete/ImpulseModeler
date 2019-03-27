@@ -51,7 +51,7 @@ class AxialSectionDlog: NSWindowController {
     
     override var windowNibName: NSNib.Name!
     {
-        return NSNib.Name("AxialSectionDlog")
+        return "AxialSectionDlog"
     }
     
     override func windowDidLoad()
