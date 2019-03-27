@@ -400,7 +400,9 @@ class AppController: NSObject {
         self.currentProgressIndicator.UpdateIndicator(value: 0.0, minValue: 0.0, maxValue: 100.0E-6, text: "Running Simulation...")
         
         // open the sheet with the progress indicator
-        self.mainWindow.beginSheet(self.currentProgressIndicator.window!, completionHandler: nil)
+        self.mainWindow.beginSheet(self.currentProgressIndicator.window!, completionHandler: {responseCode in
+            DLog("Ended sheet")
+        })
         
         // create a serial queue
         let simQueue = DispatchQueue(label: "com.huberistech.bil_simulation")
@@ -417,8 +419,6 @@ class AppController: NSObject {
                 return
             }
             
-            // since the simulation is done, we close the progress indicator
-            // DispatchQueue.main.sync { self.mainWindow.endSheet(self.currentProgressIndicator.window!) }
             
             // we want to save the impres file using an NSSavePanel, but that is UI, which CANNOT be done in any thread except the main thread. We dispatch a sync call to the main thread to take care of this.
             DispatchQueue.main.sync {
