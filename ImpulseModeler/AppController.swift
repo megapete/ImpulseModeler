@@ -679,7 +679,7 @@ class AppController: NSObject {
             // We only run through this loop if the ground capacitance is non-zero
             if coilCapacitanceToGround != 0.0
             {
-                let capacitancePerUnitHeight = coilCapacitanceToGround / theCoil.Height()
+                let capacitancePerUnitHeight = coilCapacitanceToGround / (theCoil.Height() * unitFactor)
                 
                 for sectionIndex in currentStartIndex...currentEndIndex
                 {
@@ -748,9 +748,9 @@ class AppController: NSObject {
             DLog("Calculating mutual inductances")
             while diskArray.count > 0
             {
-                //** DispatchQueue.main.async {
-                //**    self.currentProgressIndicator.UpdateIndicator(value: diskCount - Double(diskArray.count))
-                //** }
+                DispatchQueue.main.async {
+                    self.currentProgressIndicator.UpdateIndicator(value: diskCount - Double(diskArray.count))
+                }
                 
                 let nDisk = diskArray.remove(at: 0)
                 
