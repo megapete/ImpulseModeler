@@ -399,8 +399,8 @@ class PCH_BlueBookModel: NSObject {
             var rtSide = BV - RI
             // The current derivative dI/dt _is_ a function of I, so this is a more "traditional" calculation using Runge-Kutta.
             let aan = M.SolveWith(rtSide)!
-            DLog("Current slope: \(aan)")
-            DLog("Voltage slope: \(an)")
+            // DLog("Current slope: \(aan)")
+            // DLog("Voltage slope: \(an)")
             var newI = I + (currentTimeStep/2.0 * aan)
             var newAI = (A * newI)!
             // DLog("AI (before): \(newAI)")
@@ -439,7 +439,7 @@ class PCH_BlueBookModel: NSObject {
             // DLog("I: \(newI)")
             let newV = V + currentTimeStep/6.0 * (an + 2.0 * bn + 2.0 * cn + dn)
             
-            if simTime >= nextSaveTime
+            if simTime >= nextSaveTime && currentSaveRow < numSavedTimeSteps
             {
                 savedTimes.append(simTime)
                 DLog("Saving at time: \(simTime) (diff: \(nextSaveTime - simTime)")
