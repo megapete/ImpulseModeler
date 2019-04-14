@@ -392,8 +392,8 @@ class AppController: NSObject {
         
         // we'll set up three time step structs for BIL simulations
         var timeStepArray:[PCH_BB_TimeStepInfo] = []
-        timeStepArray.append(PCH_BB_TimeStepInfo(startTime: 0.0, endTime: 2.0E-6, timeStep: 1.0E-9, saveTimeStep: 1.0E-9))
-        timeStepArray.append(PCH_BB_TimeStepInfo(startTime: 2.0E-6, endTime: 50.0E-6, timeStep: 10.0E-9, saveTimeStep: 100.0E-9))
+        timeStepArray.append(PCH_BB_TimeStepInfo(startTime: 0.0, endTime: 10.0E-6, timeStep: 1.0E-9, saveTimeStep: 10.0E-9))
+        timeStepArray.append(PCH_BB_TimeStepInfo(startTime: 10.0E-6, endTime: 50.0E-6, timeStep: 5.0E-9, saveTimeStep: 50.0E-9))
         timeStepArray.append(PCH_BB_TimeStepInfo(startTime: 50.0E-6, endTime: 100.0E-6, timeStep: 100.0E-9, saveTimeStep: 100.0E-9))
         
         // uodate the progress indicator to reflect the maximum time of the impulse shot
