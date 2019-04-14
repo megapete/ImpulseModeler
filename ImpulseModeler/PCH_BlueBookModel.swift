@@ -49,7 +49,7 @@ class PCH_BlueBookModel: NSObject {
         }
         let nodeCount = sectionCount + axialSectionCount
         
-        // change this to symmetric or positive definite if it's possible to get those solvers to work correctlty
+        // consider changing this to symmetric or positive definite if it's possible to get those solvers to work correctlty
         let M_type = PCH_Matrix.types.generalMatrix
         self.M = PCH_Matrix(numRows: sectionCount, numCols: sectionCount, matrixPrecision: PCH_Matrix.precisions.doublePrecision, matrixType: M_type)
         
