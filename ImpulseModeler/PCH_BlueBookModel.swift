@@ -49,7 +49,9 @@ class PCH_BlueBookModel: NSObject {
         }
         let nodeCount = sectionCount + axialSectionCount
         
-        self.M = PCH_Matrix(numRows: sectionCount, numCols: sectionCount, matrixPrecision: PCH_Matrix.precisions.doublePrecision, matrixType: PCH_Matrix.types.positiveDefinite)
+        // change this to symmetric or positive definite if it's possible to get those solvers to work correctlty
+        let M_type = PCH_Matrix.types.generalMatrix
+        self.M = PCH_Matrix(numRows: sectionCount, numCols: sectionCount, matrixPrecision: PCH_Matrix.precisions.doublePrecision, matrixType: M_type)
         
         self.R = PCH_Matrix(numRows: sectionCount, numCols: sectionCount, matrixPrecision: PCH_Matrix.precisions.doublePrecision, matrixType: PCH_Matrix.types.diagonalMatrix)
         
@@ -107,7 +109,12 @@ class PCH_BlueBookModel: NSObject {
                 if (mutSection.data.serialNumber > currentSectionNumber)
                 {
                     M[currentSectionNumber, mutSection.data.serialNumber] = mutInd
-                    // M[section.data.serialNumber, currentSectionNumber] = mutInd
+                    
+                    // for a general matrix, set the symmetric entry
+                    if M_type == .generalMatrix
+                    {
+                        M[mutSection.data.serialNumber, currentSectionNumber] = mutInd
+                    }
                 }
             }
             
@@ -434,6 +441,20 @@ class PCH_BlueBookModel: NSObject {
             
             rtSide = (B * dv)! - (R * newI)!
             let ddn = M.SolveWith(rtSide)!
+            
+            /*
+            if simTime > 0.5E-6
+            {
+                OutputMatrix(wMatrix: (B * dv)!, fileName: "Imp_BV")
+                OutputMatrix(wMatrix: (R * newI)!, fileName: "Imp_RI")
+                OutputMatrix(wMatrix: ddn, fileName: "Imp_DN")
+                OutputMatrix(wMatrix: rtSide, fileName: "Imp_rtside")
+                OutputMatrix(wMatrix: M, fileName: "Imp_M")
+                // OutputMatrix(wMatrix: (M * ddn)!, fileName: "Imp_LeftSide")
+                
+                DLog("Saved matrices")
+            }
+             */
             
             newI = I + currentTimeStep/6.0 * (aan + 2.0 * bbn + 2.0 * ccn + ddn)
             // DLog("I: \(newI)")
