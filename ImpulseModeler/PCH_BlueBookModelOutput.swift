@@ -104,15 +104,15 @@ class PCH_BlueBookModelOutput: NSObject, NSCoding {
     {
         DLog("Decoding Times...")
         let timeArray = aDecoder.decodeObject(forKey: "Times") as! [Double]
-        DLog("Done!/n/nDecoding Sections...")
+        DLog("Done!\n\nDecoding Sections...")
         let sections = aDecoder.decodeObject(forKey: "Sections") as! [PCH_BB_ModelSection]
-        DLog("Done!/n/nDecoding Voltages...")
+        DLog("Done!\n\nDecoding Voltages...")
         // let voltageNodes = aDecoder.decodeObject(forKey: "VoltageNodes") as! [String]
         let voltsArray = aDecoder.decodeObject(forKey: "Volts") as! [[Double]]
-        DLog("Done!/n/nDecoding Currents...")
+        DLog("Done!\n\nDecoding Currents...")
         // let deviceIDs = aDecoder.decodeObject(forKey: "DeviceIDs") as! [String]
         let ampsArray = aDecoder.decodeObject(forKey: "Amps") as! [[Double]]
-        DLog("Done!/n/nInitializing local memory...")
+        DLog("Done!\n\nInitializing local memory...")
         self.init(timeArray:timeArray, sections:sections, voltsArray:voltsArray, ampsArray:ampsArray)
         DLog("Done!")
     }
