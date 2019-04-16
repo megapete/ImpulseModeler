@@ -598,7 +598,7 @@ class AppController: NSObject {
                 continue
             }
             
-            var zCurrent = nextCoil.CoilBottom(phase.core.height, centerOffset: phase.core.coilCenterOffset) * unitFactor
+            var zCurrent = nextCoil.CoilBottom(phase.core.height * phase.core.htFactor, centerOffset: phase.core.coilCenterOffset) * unitFactor
             let coilID = nextCoil.coilName
             
             DLog("Creating disks")

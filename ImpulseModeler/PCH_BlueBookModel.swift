@@ -366,6 +366,22 @@ class PCH_BlueBookModel: NSObject {
         
         var currentTimeStep = timeSteps[currentTimeStepIndex].timeStep
         
+        DLog("M-matrix condition number: \(self.M.ConditionNumber())")
+        let mEigenvalues = self.M.Eigenvalues()
+        for nextValue in mEigenvalues
+        {
+            if (nextValue.real < 0)
+            {
+                DLog("Found negative eigenvalue!")
+            }
+            else if (nextValue.imag != 0)
+            {
+                DLog("Found imaginary component!")
+            }
+        }
+        DLog("C-matrix condition number: \(self.C.ConditionNumber())")
+        DLog("Modified-C-matrix condition number: \(newC.ConditionNumber())")
+        
         while simTime <= simulationEndTime
         {
             if (currentTimeStepIndex + 1 < timeSteps.count)
