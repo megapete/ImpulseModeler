@@ -433,7 +433,7 @@ class AppController: NSObject {
                     bbModelSections.append(nextBBSection)
                 }
                 
-                let bbModelOutput = PCH_BlueBookModelOutput(timeArray: resultMatrices.times, sections:bbModelSections, voltsMatrix: resultMatrices.V, ampsMatrix: resultMatrices.I)
+                let bbModelOutput = PCH_BlueBookModelOutput(timeArray: resultMatrices.times, sections:bbModelSections, voltsMatrix: resultMatrices.V, ampsMatrix: resultMatrices.I, vDiffMatrix: resultMatrices.vDiff)
                 
                 let saveFilePanel = NSSavePanel()
                 

@@ -61,7 +61,10 @@ class PCH_BlueBookModelOutput: NSObject, NSCoding {
     // The first index is the time index, followed by the device index
     var ampsArray:[[Double]]
     
-    init(timeArray:[Double], sections:[PCH_BB_ModelSection], voltsArray:[[Double]], ampsArray:[[Double]])
+    // An array for holding the maximum voltage that appears between nodes. In the interest of keeping the file size down, these values are stored as an "upper triangular" square matrix without the main diagonal (which would be all zeroes). To access the voltage difference between node X (row) and node Y (col) (with Y > X, and both zero-based), the index is X + Y(Y-1)/2. Similarly, the size of the array (for N = numNodes) is N(N-1)/2.
+    var maxVoltDiffArray:[Double]
+    
+    init(timeArray:[Double], sections:[PCH_BB_ModelSection], voltsArray:[[Double]], ampsArray:[[Double]], maxVoltDiffArray:[Double])
     {
         self.timeArray = timeArray
         self.sections = sections
@@ -69,9 +72,10 @@ class PCH_BlueBookModelOutput: NSObject, NSCoding {
         self.voltsArray = voltsArray
         // self.deviceIDs = deviceIDs
         self.ampsArray = ampsArray
+        self.maxVoltDiffArray = maxVoltDiffArray
     }
     
-    convenience init(timeArray:[Double], sections:[PCH_BB_ModelSection], voltsMatrix:PCH_Matrix, ampsMatrix:PCH_Matrix)
+    convenience init(timeArray:[Double], sections:[PCH_BB_ModelSection], voltsMatrix:PCH_Matrix, ampsMatrix:PCH_Matrix, vDiffMatrix:PCH_Matrix)
     {
         // Initialize the voltage array
         var voltsArray = Array(repeatElement(Array(repeatElement(0.0, count: voltsMatrix.numCols)), count: voltsMatrix.numRows))
@@ -97,7 +101,20 @@ class PCH_BlueBookModelOutput: NSObject, NSCoding {
             }
         }
         
-        self.init(timeArray:timeArray, sections:sections, voltsArray:voltsArray, ampsArray:ampsArray)
+        // Initialize the max delta V array. See the definition of maxVoltDiffArray for the way the size is calculated
+        let nodeCount = vDiffMatrix.numCols
+        var maxVDiffArray = Array(repeatElement(0.0, count: nodeCount * (nodeCount - 1) / 2))
+        
+        for nextRow in 0..<(vDiffMatrix.numRows - 1)
+        {
+            for nextCol in (nextRow + 1)..<vDiffMatrix.numCols
+            {
+                // see the definition of maxVoltDiffArray for the way the index is calculated
+                maxVDiffArray[nextRow + nextCol*(nextCol-1)/2] = vDiffMatrix[nextRow, nextCol]
+            }
+        }
+        
+        self.init(timeArray:timeArray, sections:sections, voltsArray:voltsArray, ampsArray:ampsArray, maxVoltDiffArray:maxVDiffArray)
     }
     
     convenience required init?(coder aDecoder: NSCoder)
@@ -112,8 +129,10 @@ class PCH_BlueBookModelOutput: NSObject, NSCoding {
         DLog("Done!\n\nDecoding Currents...")
         // let deviceIDs = aDecoder.decodeObject(forKey: "DeviceIDs") as! [String]
         let ampsArray = aDecoder.decodeObject(forKey: "Amps") as! [[Double]]
+        DLog("Done!\n\nDecoding Max Voltage Differences...")
+        let vDiffArray = aDecoder.decodeObject(forKey: "Diffs") as! [Double]
         DLog("Done!\n\nInitializing local memory...")
-        self.init(timeArray:timeArray, sections:sections, voltsArray:voltsArray, ampsArray:ampsArray)
+        self.init(timeArray:timeArray, sections:sections, voltsArray:voltsArray, ampsArray:ampsArray, maxVoltDiffArray:vDiffArray)
         DLog("Done!")
     }
     
@@ -126,5 +145,6 @@ class PCH_BlueBookModelOutput: NSObject, NSCoding {
         aCoder.encode(self.voltsArray, forKey:"Volts")
         // aCoder.encode(self.deviceIDs, forKey:"DeviceIDs")
         aCoder.encode(self.ampsArray, forKey:"Amps")
+        aCoder.encode(self.maxVoltDiffArray, forKey: "Diffs")
     }
 }

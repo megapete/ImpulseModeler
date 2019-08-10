@@ -251,7 +251,7 @@ class PCH_BlueBookModel: NSObject {
     }
     
     
-    func SimulateWithConnections(_ connections:[(fromNode:Int, toNodes:[Int])], sourceConnection:(source:PCH_Source, toNode:Int), timeSteps:[PCH_BB_TimeStepInfo], progIndicatorWindow:PCH_ProgressIndicatorWindow? = nil) -> (times:[Double], V:PCH_Matrix, I:PCH_Matrix)?
+    func SimulateWithConnections(_ connections:[(fromNode:Int, toNodes:[Int])], sourceConnection:(source:PCH_Source, toNode:Int), timeSteps:[PCH_BB_TimeStepInfo], progIndicatorWindow:PCH_ProgressIndicatorWindow? = nil) -> (times:[Double], V:PCH_Matrix, I:PCH_Matrix, vDiff:PCH_Matrix)?
     {
         guard timeSteps.count > 0 else
         {
@@ -352,6 +352,7 @@ class PCH_BlueBookModel: NSObject {
         
         var I = PCH_Matrix(numVectorElements: sectionCount, vectorPrecision: PCH_Matrix.precisions.doublePrecision)
         var V = PCH_Matrix(numVectorElements: nodeCount, vectorPrecision: PCH_Matrix.precisions.doublePrecision)
+        let deltaV = PCH_Matrix(numRows: nodeCount, numCols: nodeCount, matrixPrecision: .doublePrecision, matrixType: .symmetricMatrix)
         
         // let numSavedTimeSteps = Int(round(totalTime / saveTimeStep)) + 1
         
@@ -366,7 +367,8 @@ class PCH_BlueBookModel: NSObject {
         
         var currentTimeStep = timeSteps[currentTimeStepIndex].timeStep
         
-        DLog("M-matrix condition number: \(self.M.ConditionNumber())")
+        // DLog("M-matrix condition number: \(self.M.ConditionNumber())")
+        /*
         let mEigenvalues = self.M.Eigenvalues()
         for nextValue in mEigenvalues
         {
@@ -379,8 +381,9 @@ class PCH_BlueBookModel: NSObject {
                 DLog("Found imaginary component!")
             }
         }
-        DLog("C-matrix condition number: \(self.C.ConditionNumber())")
-        DLog("Modified-C-matrix condition number: \(newC.ConditionNumber())")
+         */
+        // DLog("C-matrix condition number: \(self.C.ConditionNumber())")
+        // DLog("Modified-C-matrix condition number: \(newC.ConditionNumber())")
         
         while simTime <= simulationEndTime
         {
@@ -498,11 +501,31 @@ class PCH_BlueBookModel: NSObject {
             V = newV
             I = newI
             
+            UpdateMaxDiffs(vVector: V, vDiffs: deltaV)
+            
             simTime += currentTimeStep
         }
         
-        return (savedTimes, savedValuesV, savedValuesI)
+        return (savedTimes, savedValuesV, savedValuesI, deltaV)
     
+    }
+    
+    func UpdateMaxDiffs(vVector:PCH_Matrix, vDiffs:PCH_Matrix)
+    {
+        // We don't care about the values on the main diagonal (they're always zero) so we only iterate to numRows-1. Also, knowing the way that PCH_Matrix accesses sytmetric matrices, we make sure that the row number (baseNode) is always less than the column (targetNode).
+        for baseNode in 0..<(vVector.numRows - 1)
+        {
+            for targetNode in (baseNode + 1)..<vDiffs.numCols
+            {
+                let oldMax:Double = vDiffs[baseNode, targetNode]
+                let testDiff:Double = fabs(vVector[baseNode, 0] - vVector[targetNode, 0])
+                
+                if testDiff > oldMax
+                {
+                    vDiffs[baseNode, targetNode] = testDiff
+                }
+            }
+        }
     }
     
     func FixAI(_ AI:PCH_Matrix, groundNodes:Set<Int>, connections:[(fromNode:Int, toNodes:[Int])])
