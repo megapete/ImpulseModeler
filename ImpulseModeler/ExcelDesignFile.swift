@@ -16,6 +16,7 @@ class ExcelDesignFile: NSObject
     {
         var coilPos:Int = -1
         
+        var minTurns:Double = 0.0
         var nomTurns:Double = 0.0
         var maxTurns:Double = 0.0
         
@@ -66,7 +67,7 @@ class ExcelDesignFile: NSObject
         let termNum:Int
         let currentDirection:Int
         
-        let coil:CoilData
+        var coilIndex:Int = -1
     }
     
     // General Info
@@ -87,19 +88,22 @@ class ExcelDesignFile: NSObject
     let scFactor:Double
     let systemGVA:Double
     
+    var terminals:[TerminalData] = []
+    var coils:[CoilData] = Array(repeating: CoilData(), count: 8)
+    
     enum DesignFileError: Error
     {
         case InvalidDesignFile
         case InvalidNumber(badString:String)
     }
     
-    init(withURL:URL)
+    init(withURL file:URL) throws
     {
         var fileString = ""
         
         do
         {
-            try fileString = String(contentsOf: designFile)
+            try fileString = String(contentsOf: file)
         }
         catch
         {
@@ -110,7 +114,7 @@ class ExcelDesignFile: NSObject
         var currentIndex = 0
         
         // early checks to see if this is a valid design file
-        if fileLines.count < 44 // design file version 2 has 44 lines
+        if fileLines.count < 44 // design file version 2 has at least 44 lines
         {
             throw DesignFileError.InvalidDesignFile
         }
@@ -122,6 +126,7 @@ class ExcelDesignFile: NSObject
             throw DesignFileError.InvalidDesignFile
         }
         
+        // for now, we only accept file version 2
         let fileVersion = Int(currentLine[7])
         if fileVersion == nil || fileVersion! != 2
         {
@@ -129,72 +134,321 @@ class ExcelDesignFile: NSObject
         }
         
         // version 2 of the Excel file is all in inches and we want meters, so:
-        let convFactor = 25.4 / 1000.0
+        let convFactor = meterPerInch
         
-        guard let numPhases = Int(currentLine[0]) else
+        guard let nPhases = Int(currentLine[0]) else
         {
-            throw DesignFileError.InvalidNumber(badString: "Bad Num Phases: " + currentLine[5])
+            throw DesignFileError.InvalidNumber(badString: "Bad Num Phases: " + currentLine[0])
         }
         
-        guard var coreDiameter = Double(currentLine[5]) else
+        self.numPhases = nPhases
+        
+        guard let freq = Double(currentLine[1]) else
+        {
+            throw DesignFileError.InvalidNumber(badString: "Bad Frequency: " + currentLine[1])
+        }
+        
+        self.frequency = freq
+        
+        guard let tRise = Double(currentLine[2]) else
+        {
+            throw DesignFileError.InvalidNumber(badString: "Bad Temp Rise: " + currentLine[2])
+        }
+        
+        self.tempRise = tRise
+        
+        guard let fans1 = Double(currentLine[3]) else
+        {
+            throw DesignFileError.InvalidNumber(badString: "Bad ONAF1: " + currentLine[3])
+        }
+        
+        self.onaf1 = fans1
+        
+        guard let fans2 = Double(currentLine[4]) else
+        {
+            throw DesignFileError.InvalidNumber(badString: "Bad ONAF2: " + currentLine[4])
+        }
+        
+        self.onaf2 = fans2
+        
+        guard let coreDia = Double(currentLine[5]) else
         {
             throw DesignFileError.InvalidNumber(badString: "Bad Core Diameter: " + currentLine[5])
         }
         
-        coreDiameter *= convFactor
+        self.coreDiameter = coreDia * convFactor
         
-        guard var windowHt = Double(currentLine[6]) else
+        guard let windHt = Double(currentLine[6]) else
         {
             throw DesignFileError.InvalidNumber(badString: "Bad Core Window height: " + currentLine[6])
         }
         
-        windowHt *= convFactor
+        self.windowHt = windHt * convFactor
         
-        let core = Core(diameter: coreDiameter, height: windowHt)
-        
-        // If we got to here, we'll assume that this is a valid Excel design file and stop checking things
+        // If we got to here, we'll assume that this is a valid Excel design file and stop checking things so closely
         currentIndex += 1
         
-        // Coil data
-        var coils:[CoilData] = []
-        while currentIndex < 9
+        // There are 8 rows of terminal data
+        for termOffset in 0..<8
         {
-            currentLine = fileLines[currentIndex].components(separatedBy: .whitespaces)
+            let nextTermLine = fileLines[currentIndex + termOffset].components(separatedBy: .whitespaces)
             
-            coils.append(CoilData(numPhases: numPhases, lineVolts: Double(currentLine[0])!, MVA: Double(currentLine[1])!, Connection: currentLine[2], termNum: Int(currentLine[3])!, currentDir: Int(currentLine[4])!))
+            let nextTerm = TerminalData(lineVolts: Double(nextTermLine[0])!, kVA: Double(nextTermLine[1])!, connection: nextTermLine[2], termNum: Int(nextTermLine[3])!, currentDirection: Int(nextTermLine[4])!)
             
-            currentIndex += 1
+            self.terminals.append(nextTerm)
         }
+        currentIndex += 8
         
-        // Row
+        // The next line is the mapping of each terminal to its corresponding coil
         currentLine = fileLines[currentIndex].components(separatedBy: .whitespaces)
         
-        var coilIndex = 0
-        for nextRow in currentLine
+        for i in 0..<8
         {
-            if let rowNum = Int(nextRow)
-            {
-                coils[coilIndex].coilPos = rowNum - 1
-            }
+            let nextMapping = currentLine[i]
             
-            coilIndex += 1
+            if let coilPos = Int(nextMapping)
+            {
+                self.terminals[i].coilIndex = coilPos - 1
+            }
         }
         
-        // we don't care about min turns
-        currentIndex += 2
+        currentIndex += 1
+        currentLine = fileLines[currentIndex].components(separatedBy: .whitespaces)
+        
+        // Min turns
+        for i in 0..<8
+        {
+            if let turns = Double(currentLine[i])
+            {
+                // the design spreadsheet puts a crazy big number of turns for coils that aren't actually defined
+                if turns < 100000
+                {
+                    self.coils[i].minTurns = turns
+                }
+            }
+        }
+        
+        currentIndex += 1
+        currentLine = fileLines[currentIndex].components(separatedBy: .whitespaces)
         
         // Nom turns
+        for i in 0..<8
+        {
+            if let turns = Double(currentLine[i])
+            {
+                // the design spreadsheet puts a crazy big number of turns for coils that aren't actually defined
+                if turns < 100000
+                {
+                    self.coils[i].nomTurns = turns
+                }
+            }
+        }
+        
+        currentIndex += 1
         currentLine = fileLines[currentIndex].components(separatedBy: .whitespaces)
         
-        for var nextCoil in coils
+        // Max turns
+        for i in 0..<8
         {
-            if nextCoil.coilPos < 0
+            if let turns = Double(currentLine[i])
             {
-                continue
+                // the design spreadsheet puts a crazy big number of turns for coils that aren't actually defined
+                if turns < 100000
+                {
+                    self.coils[i].maxTurns = turns
+                }
             }
-            
-            nextCoil.nomTurns = Double(currentLine[nextCoil.coilPos])!
         }
+        
+        currentIndex += 1
+        currentLine = fileLines[currentIndex].components(separatedBy: .whitespaces)
+        
+        // Electrical Heights
+        for i in 0..<8
+        {
+            if let elHt = Double(currentLine[i])
+            {
+                self.coils[i].elecHt = elHt
+            }
+        }
+        
+        currentIndex += 1
+        currentLine = fileLines[currentIndex].components(separatedBy: .whitespaces)
+        
+        // Axial Spiral Sections?
+        for i in 0..<8
+        {
+            self.coils[i].isHelical = currentLine[i] == "Y"
+        }
+        
+        currentIndex += 1
+        currentLine = fileLines[currentIndex].components(separatedBy: .whitespaces)
+        
+        // Double Stack?
+        for i in 0..<8
+        {
+            self.coils[i].isDoubleStack = currentLine[i] == "Y"
+        }
+        
+        currentIndex += 1
+        currentLine = fileLines[currentIndex].components(separatedBy: .whitespaces)
+        
+        // Multiple Start?
+        for i in 0..<8
+        {
+            self.coils[i].isMultipleStart = currentLine[i] == "Y"
+        }
+        
+        currentIndex += 1
+        currentLine = fileLines[currentIndex].components(separatedBy: .whitespaces)
+        
+        // Num Axial Sections
+        for i in 0..<8
+        {
+            if let nAxSect = Double(currentLine[i])
+            {
+                self.coils[i].numAxialSections = nAxSect
+            }
+        }
+        
+        currentIndex += 1
+        currentLine = fileLines[currentIndex].components(separatedBy: .whitespaces)
+        
+        // Axial Gaps (unshrunk)
+        for i in 0..<8
+        {
+            if let axGap = Double(currentLine[i])
+            {
+                self.coils[i].axialGaps = axGap
+            }
+        }
+        
+        currentIndex += 1
+        currentLine = fileLines[currentIndex].components(separatedBy: .whitespaces)
+        
+        // Axial Spacer Width
+        for i in 0..<8
+        {
+            if let spW = Double(currentLine[i])
+            {
+                self.coils[i].axialSpacerWidth = spW
+            }
+        }
+        
+        currentIndex += 1
+        currentLine = fileLines[currentIndex].components(separatedBy: .whitespaces)
+        
+        // Num Axial Columns
+        for i in 0..<8
+        {
+            if let nextNum = Double(currentLine[i])
+            {
+                self.coils[i].numAxialColumns = nextNum
+            }
+        }
+        
+        currentIndex += 1
+        currentLine = fileLines[currentIndex].components(separatedBy: .whitespaces)
+        
+        // Num Radial Sections
+        for i in 0..<8
+        {
+            if let nextNum = Double(currentLine[i])
+            {
+                self.coils[i].numRadialSections = nextNum
+            }
+        }
+        
+        currentIndex += 1
+        currentLine = fileLines[currentIndex].components(separatedBy: .whitespaces)
+        
+        // Interlayer (radial) insulation
+        for i in 0..<8
+        {
+            if let nextNum = Double(currentLine[i])
+            {
+                self.coils[i].insulationBetRadialSections = nextNum
+            }
+        }
+        
+        currentIndex += 1
+        currentLine = fileLines[currentIndex].components(separatedBy: .whitespaces)
+        
+        // Num Radial Ducts
+        for i in 0..<8
+        {
+            if let nextNum = Double(currentLine[i])
+            {
+                self.coils[i].numRadialDucts = nextNum
+            }
+        }
+        
+        currentIndex += 1
+        currentLine = fileLines[currentIndex].components(separatedBy: .whitespaces)
+        
+        // Radial duct dimension
+        for i in 0..<8
+        {
+            if let nextNum = Double(currentLine[i])
+            {
+                self.coils[i].radialDuctDimn = nextNum
+            }
+        }
+        
+        currentIndex += 1
+        currentLine = fileLines[currentIndex].components(separatedBy: .whitespaces)
+        
+        // Num Radial Columns
+        for i in 0..<8
+        {
+            if let nextNum = Double(currentLine[i])
+            {
+                self.coils[i].numRadialColumns = nextNum
+            }
+        }
+        
+        currentIndex += 1
+        currentLine = fileLines[currentIndex].components(separatedBy: .whitespaces)
+        
+        // Conductor type
+        for i in 0..<8
+        {
+            self.coils[i].condType = currentLine[i]
+        }
+        
+        currentIndex += 1
+        currentLine = fileLines[currentIndex].components(separatedBy: .whitespaces)
+        
+        // Num Conductors Axial
+        for i in 0..<8
+        {
+            if let nextNum = Int(currentLine[i])
+            {
+                self.coils[i].numCondAxial = nextNum
+            }
+        }
+        
+        currentIndex += 1
+        currentLine = fileLines[currentIndex].components(separatedBy: .whitespaces)
+        
+        // Num Conductors Radial
+        for i in 0..<8
+        {
+            if let nextNum = Int(currentLine[i])
+            {
+                self.coils[i].numCondRadial = nextNum
+            }
+        }
+        
+        currentIndex += 1
+        currentLine = fileLines[currentIndex].components(separatedBy: .whitespaces)
+        
+        // Conductor shape
+        for i in 0..<8
+        {
+            self.coils[i].condShape = currentLine[i]
+        }
+        
     }
     
 }
