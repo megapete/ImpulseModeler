@@ -8,6 +8,8 @@
 
 import Foundation
 
+// NOTE (Oct. 2019): For now, helical, layer, and sheet windings are represented as ground cylinders. This will eventually change but it will need an extensive rewrite of this class. 
+
 class Coil:NSObject, NSCoding
 {
     /// The name to which we will refer to the coil (the node and device names will also incorporate this string, which is usually in the form "LV", "HV", etc.

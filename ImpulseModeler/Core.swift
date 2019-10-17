@@ -18,7 +18,7 @@ class Core:NSObject, NSCoding
     
     let coilCenterOffset:Double
     
-    init(diameter:Double, height:Double, htFactor:Double, coilCenterOffset:Double)
+    init(diameter:Double, height:Double, htFactor:Double = 3.0, coilCenterOffset:Double = 0.0)
     {
         self.diameter = diameter
         self.height = height

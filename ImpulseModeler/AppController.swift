@@ -213,6 +213,13 @@ class AppController: NSObject {
     }
     
     // Menu Handlers
+    @IBAction func handleOpenDesignFile(_ sender: Any)
+    {
+        // Handler to open a design file created by Excel (same as the file for AndersenFE)
+        
+    }
+    
+    
     
     @IBAction func handleOpenModel(_ sender: AnyObject)
     {
