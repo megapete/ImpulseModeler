@@ -48,7 +48,7 @@ class ExcelDesignFile: NSObject
         var strandA:Double = 0.0
         var strandR:Double = 0.0
         
-        var strandsPerCable:Double = 1.0
+        var ctcStrandsPerCable:Double = 1.0
         
         var axialCenterPack:Double = 0.0
         var axialDVgap1:Double = 0.0
@@ -57,17 +57,45 @@ class ExcelDesignFile: NSObject
         var bottomEdgeDistance:Double = 0.0
         
         var coilID:Double = 0.0
+        
+        var groundClearance:Double = 0.0
     }
     
     struct TerminalData
     {
         let lineVolts:Double
-        let kVA:Double
+        let kVA:Double // will already be divided by the number of phases
         let connection:String
         let termNum:Int
         let currentDirection:Int
         
         var coilIndex:Int = -1
+        
+        var phaseVolts:Double {
+            
+            get
+            {
+                if self.coilIndex < 0
+                {
+                    return 0.0
+                }
+                
+                return self.lineVolts / (self.connection == "Y" ? SQRT3 : 1.0)
+            }
+        }
+        
+        var phaseAmps:Double {
+            
+            get
+            {
+                if self.coilIndex < 0
+                {
+                    return 0.0
+                }
+                
+                return self.kVA * 1000.0 / self.phaseVolts
+            }
+        }
     }
     
     // General Info
@@ -193,7 +221,7 @@ class ExcelDesignFile: NSObject
         {
             let nextTermLine = fileLines[currentIndex + termOffset].components(separatedBy: .whitespaces)
             
-            let nextTerm = TerminalData(lineVolts: Double(nextTermLine[0])!, kVA: Double(nextTermLine[1])!, connection: nextTermLine[2], termNum: Int(nextTermLine[3])!, currentDirection: Int(nextTermLine[4])!)
+            let nextTerm = TerminalData(lineVolts: Double(nextTermLine[0])!, kVA: Double(nextTermLine[1])! / Double(self.numPhases), connection: nextTermLine[2], termNum: Int(nextTermLine[3])!, currentDirection: Int(nextTermLine[4])!)
             
             self.terminals.append(nextTerm)
         }
@@ -449,6 +477,178 @@ class ExcelDesignFile: NSObject
             self.coils[i].condShape = currentLine[i]
         }
         
+        currentIndex += 1
+        currentLine = fileLines[currentIndex].components(separatedBy: .whitespaces)
+        
+        // Total Radial Paper in one turn
+        for i in 0..<8
+        {
+            if let nextNum = Double(currentLine[i])
+            {
+                self.coils[i].totalPaperThicknessInOneTurnRadially = nextNum
+            }
+        }
+        
+        currentIndex += 1
+        currentLine = fileLines[currentIndex].components(separatedBy: .whitespaces)
+        
+        // Strand Axial dimension
+        for i in 0..<8
+        {
+            if let nextNum = Double(currentLine[i])
+            {
+                self.coils[i].strandA = nextNum
+            }
+        }
+        
+        currentIndex += 1
+        currentLine = fileLines[currentIndex].components(separatedBy: .whitespaces)
+        
+        // Strand Radial Dimension
+        for i in 0..<8
+        {
+            if let nextNum = Double(currentLine[i])
+            {
+                self.coils[i].strandR = nextNum
+            }
+        }
+        
+        currentIndex += 1
+        currentLine = fileLines[currentIndex].components(separatedBy: .whitespaces)
+        
+        // Strands per cable (CTC)
+        for i in 0..<8
+        {
+            if let nextNum = Double(currentLine[i])
+            {
+                self.coils[i].ctcStrandsPerCable = nextNum
+            }
+        }
+        
+        currentIndex += 1
+        currentLine = fileLines[currentIndex].components(separatedBy: .whitespaces)
+        
+        // Axial center pack
+        for i in 0..<8
+        {
+            if let nextNum = Double(currentLine[i])
+            {
+                self.coils[i].axialCenterPack = nextNum
+            }
+        }
+        
+        currentIndex += 1
+        currentLine = fileLines[currentIndex].components(separatedBy: .whitespaces)
+        
+        // Axial Upper Gap
+        for i in 0..<8
+        {
+            if let nextNum = Double(currentLine[i])
+            {
+                self.coils[i].axialDVgap1 = nextNum
+            }
+        }
+        
+        currentIndex += 1
+        currentLine = fileLines[currentIndex].components(separatedBy: .whitespaces)
+        
+        // Axial Lower Gap
+        for i in 0..<8
+        {
+            if let nextNum = Double(currentLine[i])
+            {
+                self.coils[i].axialDVgap2 = nextNum
+            }
+        }
+        
+        currentIndex += 1
+        currentLine = fileLines[currentIndex].components(separatedBy: .whitespaces)
+        
+        // Bottom edge distance
+        for i in 0..<8
+        {
+            if let nextNum = Double(currentLine[i])
+            {
+                self.coils[i].bottomEdgeDistance = nextNum
+            }
+        }
+        
+        currentIndex += 1
+        currentLine = fileLines[currentIndex].components(separatedBy: .whitespaces)
+        
+        // Coil ID
+        for i in 0..<8
+        {
+            if let nextNum = Double(currentLine[i])
+            {
+                self.coils[i].coilID = nextNum
+            }
+        }
+        
+        currentIndex += 1
+        currentLine = fileLines[currentIndex].components(separatedBy: .whitespaces)
+        
+        // Overbuild allowance
+        if let nextNum = Double(currentLine[0])
+        {
+            self.overbuildAllowance = nextNum
+        }
+        else
+        {
+            throw DesignFileError.InvalidNumber(badString: "Overbuild allowance:" + currentLine[0])
+        }
+        
+        
+        currentIndex += 1
+        currentLine = fileLines[currentIndex].components(separatedBy: .whitespaces)
+        
+        // Max Ground clearance
+        for i in 0..<8
+        {
+            if let nextNum = Double(currentLine[i])
+            {
+                self.coils[i].groundClearance = nextNum
+            }
+        }
+        
+        currentIndex += 1
+        currentLine = fileLines[currentIndex].components(separatedBy: .whitespaces)
+        
+        // Short Circuit Factor
+        if let nextNum = Double(currentLine[0])
+        {
+            self.scFactor = nextNum
+        }
+        else
+        {
+            throw DesignFileError.InvalidNumber(badString: "Short Circuit Factor:" + currentLine[0])
+        }
+        
+        currentIndex += 1
+        currentLine = fileLines[currentIndex].components(separatedBy: .whitespaces)
+        
+        // System GVA
+        if let nextNum = Double(currentLine[0])
+        {
+            self.systemGVA = nextNum
+        }
+        else
+        {
+            throw DesignFileError.InvalidNumber(badString: "System GVA:" + currentLine[0])
+        }
+        
+        currentIndex += 1
+        currentLine = fileLines[currentIndex].components(separatedBy: .whitespaces)
+        
+        // Axial distance betweenn CTC cables (if any)
+        for i in 0..<8
+        {
+            if let nextNum = Double(currentLine[i])
+            {
+                self.coils[i].axialGapBetweenCables = nextNum
+            }
+        }
+
     }
     
 }
