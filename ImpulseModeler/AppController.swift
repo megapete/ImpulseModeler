@@ -251,13 +251,11 @@ class AppController: NSObject {
                 {
                     let designFile = try ExcelDesignFile(withURL: xlFile)
                 }
-                catch let error as ExcelDesignFile.DesignFileError
-                {
-                    
-                }
                 catch
                 {
-                    
+                    let alert = NSAlert(error: error)
+                    let _ = alert.runModal()
+                    return
                 }
             }
             else
@@ -627,8 +625,6 @@ class AppController: NSObject {
             if (saveYesOrNo.runModal() == NSApplication.ModalResponse.alertFirstButtonReturn)
             {
                 self.handleSaveModel(self)
-                
-                self.currentModelIsDirty = false
             }
             
             DLog("Note: This will destroy the existing model")

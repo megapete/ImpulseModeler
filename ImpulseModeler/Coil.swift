@@ -106,6 +106,59 @@ class Coil:NSObject, NSCoding
         aCoder.encode(self.phaseNum, forKey: "PhaseNumber")
     }
     
+    class func CoilUsing(xlFileCoil:ExcelDesignFile.CoilData, coilName:String, capacitanceToPreviousCoil:Double, capacitanceToGround:Double, eddyLossPercentage:Double, phaseNum:Int) -> Coil
+    {
+        return Coil(coilName: coilName, coilRadialPosition: 0, amps: 0.0, currentDirection: 0, capacitanceToPreviousCoil: capacitanceToPreviousCoil, capacitanceToGround: capacitanceToGround, innerRadius: 0.0, eddyLossPercentage: eddyLossPercentage, phaseNum: 0)
+    }
+    
+    class func CapacitanceBetweenCoils(innerOD:Double, outerID:Double, innerH:Double, outerH:Double, numSpacers:Int) -> Double
+    {
+        // most variable names come from the Excel Impulse Distribution sheet
+        
+        let R_gap = (innerOD + outerID) / 4.0
+        let H = (innerH + outerH) / 2.0
+        let W_s = 0.75 * meterPerInch
+        let N_s = Double(numSpacers)
+        let f_s = N_s * W_s / (2.0 * π * R_gap)
+        let N_press = floor(((outerID - innerOD) / 2.0) / 0.0084)
+        let t_press = 0.08 * meterPerInch * N_press
+        let t_stick = (outerID - innerOD) / 2.0 - t_press
+        
+        
+        
+        let result = 2.0 * π * ε0 * R_gap * H * ((f_s / (t_press / εBoard + t_stick / εBoard)) + ((1.0 - f_s) / (t_press / εBoard + t_stick / εOil)))
+        
+        return result
+    }
+    
+    class func CapacitanceFromCoilToTank(coilOD:Double, coilHt:Double, tankDim:Double) -> Double
+    {
+        // we assume that there are two tubes of 1/8" over the finished coil
+        
+        let H = coilHt
+        let s = tankDim / 2.0
+        let t_solid = 2.0 * 0.125 * meterPerInch
+        let t_oil = s - coilOD / 2.0 - t_solid
+        
+        let result = 2.0 * π * ε0 * H / acosh(s / (coilOD / 2.0)) * ((t_oil + t_solid) / ((t_oil / εOil) + (t_solid / εBoard)))
+        
+        return result
+    }
+    
+    class func CapacitanceBetweenPhases(legCenters:Double, coilOD:Double, coilHt:Double) -> Double
+    {
+        // we assume that there are two tubes of 1/8" over EACH of the finished coils
+        
+        let H = coilHt
+        let s = legCenters / 2.0
+        let t_solid = 5 * 0.125 * meterPerInch // the '5' comes from the Excel design sheet
+        let t_oil = legCenters - coilOD - t_solid
+        
+        let result = π * ε0 * H / acosh(s / (coilOD / 2.0)) * ((t_oil + t_solid) / ((t_oil / εOil) + (t_solid / εBoard)))
+        
+        return result
+    }
+    
     /// The actual number of axial sections (ie: the ones where numDisks is non-zero)
     var numAxialSections:Int {
         get

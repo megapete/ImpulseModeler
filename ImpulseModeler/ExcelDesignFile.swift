@@ -125,16 +125,26 @@ class ExcelDesignFile: NSObject
         enum errorType
         {
             case InvalidDesignFile
-            case InvalidNumber(badString:String)
+            case InvalidNumber
         }
         
-        let type:errorType
+        let info:String
+        let type:DesignFileError.errorType
         
         var localizedDescription: String
         {
             get
             {
-                return "HaHa"
+                if self.type == .InvalidDesignFile
+                {
+                    return "This is not a valid design file!"
+                }
+                else if self.type == .InvalidNumber
+                {
+                    return "An invalid number was found: " + self.info
+                }
+                
+                return "An unknown error has occurred"
             }
         }
     }
@@ -158,7 +168,7 @@ class ExcelDesignFile: NSObject
         // early checks to see if this is a valid design file
         if fileLines.count < 44 // design file version 2 has at least 44 lines
         {
-            let error = DesignFileError(type: .InvalidDesignFile)
+            let error = DesignFileError(info: "", type: .InvalidDesignFile)
             throw error
         }
         
@@ -166,7 +176,7 @@ class ExcelDesignFile: NSObject
         
         if currentLine.count != 8
         {
-            let error = DesignFileError(type: .InvalidDesignFile)
+            let error = DesignFileError(info: "", type: .InvalidDesignFile)
             throw error
         }
         
@@ -174,65 +184,72 @@ class ExcelDesignFile: NSObject
         let fileVersion = Int(currentLine[7])
         if fileVersion == nil || fileVersion! != 2
         {
-            let error = DesignFileError(type: .InvalidDesignFile)
+            let error = DesignFileError(info: "", type: .InvalidDesignFile)
             throw error
         }
         
         // version 2 of the Excel file is all in inches and we want meters, so:
         let convFactor = meterPerInch
         
-        guard let nPhases = Int(currentLine[0]) else
+        var index = 0
+        guard let nPhases = Int(currentLine[index]) else
         {
-            let error = DesignFileError(type: .InvalidNumber(badString: "Bad Num Phases: " + currentLine[0]))
+            let error = DesignFileError(info: "Bad Num Phases:" + currentLine[index], type: .InvalidNumber)
             throw error
             
         }
         
         self.numPhases = nPhases
         
-        guard let freq = Double(currentLine[1]) else
+        index += 1
+        guard let freq = Double(currentLine[index]) else
         {
-            let error = DesignFileError(type: .InvalidNumber(badString: "Bad Frequency: " + currentLine[1]))
+            let error = DesignFileError(info: "Bad frequency:" + currentLine[index], type: .InvalidNumber)
             throw error
         }
         
         self.frequency = freq
         
-        guard let tRise = Double(currentLine[2]) else
+        index += 1
+        guard let tRise = Double(currentLine[index]) else
         {
-            let error = DesignFileError(type: .InvalidNumber(badString: "Bad Temp Rise: " + currentLine[2]))
+            let error = DesignFileError(info: "Bad Temp Rise:" + currentLine[index], type: .InvalidNumber)
             throw error
         }
         
         self.tempRise = tRise
         
-        guard let fans1 = Double(currentLine[3]) else
+        index += 1
+        guard let fans1 = Double(currentLine[index]) else
         {
-            let error = DesignFileError(type: .InvalidNumber(badString: "Bad ONAF1: " + currentLine[3]))
+            let error = DesignFileError(info: "Bad ONAF1:" + currentLine[index], type: .InvalidNumber)
             throw error
         }
         
         self.onaf1 = fans1
         
-        guard let fans2 = Double(currentLine[4]) else
+        index += 1
+        guard let fans2 = Double(currentLine[index]) else
         {
-            let error = DesignFileError(type: .InvalidNumber(badString: "Bad ONAF2: " + currentLine[4]))
+            let error = DesignFileError(info: "Bad ONAF2:" + currentLine[index], type: .InvalidNumber)
             throw error
         }
         
         self.onaf2 = fans2
         
-        guard let coreDia = Double(currentLine[5]) else
+        index += 1
+        guard let coreDia = Double(currentLine[index]) else
         {
-            let error = DesignFileError(type: .InvalidNumber(badString: "Bad Core Diameter: " + currentLine[5]))
+            let error = DesignFileError(info: "Bad Core Diameter:" + currentLine[index], type: .InvalidNumber)
             throw error
         }
         
         self.coreDiameter = coreDia * convFactor
         
-        guard let windHt = Double(currentLine[6]) else
+        index += 1
+        guard let windHt = Double(currentLine[index]) else
         {
-            let error = DesignFileError(type: .InvalidNumber(badString: "Bad Core Window Height: " + currentLine[6]))
+            let error = DesignFileError(info: "Bad Window Height:" + currentLine[index], type: .InvalidNumber)
             throw error
         }
         
@@ -620,7 +637,7 @@ class ExcelDesignFile: NSObject
         }
         else
         {
-            let error = DesignFileError(type: .InvalidNumber(badString: "Overbuild allowance: " + currentLine[0]))
+            let error = DesignFileError(info: "Bad Overbuild Allowance:" + currentLine[0], type: .InvalidNumber)
             throw error
         }
         
@@ -647,7 +664,7 @@ class ExcelDesignFile: NSObject
         }
         else
         {
-            let error = DesignFileError(type: .InvalidNumber(badString: "Bad SC Factor: " + currentLine[0]))
+            let error = DesignFileError(info: "Bad SC Factor:" + currentLine[0], type: .InvalidNumber)
             throw error
         }
         
@@ -661,7 +678,7 @@ class ExcelDesignFile: NSObject
         }
         else
         {
-            let error = DesignFileError(type: .InvalidNumber(badString: "Bad System GVA: " + currentLine[0]))
+            let error = DesignFileError(info: "Bad System GVA:" + currentLine[0], type: .InvalidNumber)
             throw error
         }
         

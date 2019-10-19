@@ -32,6 +32,11 @@ func e(_ arg:Double) -> Double
 /// Handy constant for 3-phase applications
 let SQRT3 = sqrt(3.0)
 
+/// Relative dielectric constants for certain materials
+let εPaper = 3.5 // oil-soaked
+let εOil = 2.2
+let εBoard = 4.5 // oil-soaked
+
 
 /// Function for converting an array of type [Data] (saved in C or Objective-C to an array of type "C-struct". This is handy for when an array of structs is saved in Objective-C using a call like this: [someDataArray addObject:[NSData dataWithBytes:&cStructInstance length:sizeof(struct cStruct)]]
 func ConvertDataArray<T>(dataArray:[Data]) -> [T]?
