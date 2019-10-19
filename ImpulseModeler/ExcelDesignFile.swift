@@ -8,6 +8,7 @@
 
 // This is intended to be a portable class that can be used by any Swift program to get at the data passed by the Excel desig file to the AndersenFE program. There are also a number of functions to "massage" the raw data. All data is converted from inches to meters before storing.
 
+import Foundation
 import Cocoa
 
 class ExcelDesignFile: NSObject
@@ -119,10 +120,23 @@ class ExcelDesignFile: NSObject
     var terminals:[TerminalData] = []
     var coils:[CoilData] = Array(repeating: CoilData(), count: 8)
     
-    enum DesignFileError: Error
+    struct DesignFileError:Error
     {
-        case InvalidDesignFile
-        case InvalidNumber(badString:String)
+        enum errorType
+        {
+            case InvalidDesignFile
+            case InvalidNumber(badString:String)
+        }
+        
+        let type:errorType
+        
+        var localizedDescription: String
+        {
+            get
+            {
+                return "HaHa"
+            }
+        }
     }
     
     init(withURL file:URL) throws
@@ -144,21 +158,24 @@ class ExcelDesignFile: NSObject
         // early checks to see if this is a valid design file
         if fileLines.count < 44 // design file version 2 has at least 44 lines
         {
-            throw DesignFileError.InvalidDesignFile
+            let error = DesignFileError(type: .InvalidDesignFile)
+            throw error
         }
         
         var currentLine = fileLines[currentIndex].components(separatedBy: .whitespaces)
         
         if currentLine.count != 8
         {
-            throw DesignFileError.InvalidDesignFile
+            let error = DesignFileError(type: .InvalidDesignFile)
+            throw error
         }
         
         // for now, we only accept file version 2
         let fileVersion = Int(currentLine[7])
         if fileVersion == nil || fileVersion! != 2
         {
-            throw DesignFileError.InvalidDesignFile
+            let error = DesignFileError(type: .InvalidDesignFile)
+            throw error
         }
         
         // version 2 of the Excel file is all in inches and we want meters, so:
@@ -166,49 +183,57 @@ class ExcelDesignFile: NSObject
         
         guard let nPhases = Int(currentLine[0]) else
         {
-            throw DesignFileError.InvalidNumber(badString: "Bad Num Phases: " + currentLine[0])
+            let error = DesignFileError(type: .InvalidNumber(badString: "Bad Num Phases: " + currentLine[0]))
+            throw error
+            
         }
         
         self.numPhases = nPhases
         
         guard let freq = Double(currentLine[1]) else
         {
-            throw DesignFileError.InvalidNumber(badString: "Bad Frequency: " + currentLine[1])
+            let error = DesignFileError(type: .InvalidNumber(badString: "Bad Frequency: " + currentLine[1]))
+            throw error
         }
         
         self.frequency = freq
         
         guard let tRise = Double(currentLine[2]) else
         {
-            throw DesignFileError.InvalidNumber(badString: "Bad Temp Rise: " + currentLine[2])
+            let error = DesignFileError(type: .InvalidNumber(badString: "Bad Temp Rise: " + currentLine[2]))
+            throw error
         }
         
         self.tempRise = tRise
         
         guard let fans1 = Double(currentLine[3]) else
         {
-            throw DesignFileError.InvalidNumber(badString: "Bad ONAF1: " + currentLine[3])
+            let error = DesignFileError(type: .InvalidNumber(badString: "Bad ONAF1: " + currentLine[3]))
+            throw error
         }
         
         self.onaf1 = fans1
         
         guard let fans2 = Double(currentLine[4]) else
         {
-            throw DesignFileError.InvalidNumber(badString: "Bad ONAF2: " + currentLine[4])
+            let error = DesignFileError(type: .InvalidNumber(badString: "Bad ONAF2: " + currentLine[4]))
+            throw error
         }
         
         self.onaf2 = fans2
         
         guard let coreDia = Double(currentLine[5]) else
         {
-            throw DesignFileError.InvalidNumber(badString: "Bad Core Diameter: " + currentLine[5])
+            let error = DesignFileError(type: .InvalidNumber(badString: "Bad Core Diameter: " + currentLine[5]))
+            throw error
         }
         
         self.coreDiameter = coreDia * convFactor
         
         guard let windHt = Double(currentLine[6]) else
         {
-            throw DesignFileError.InvalidNumber(badString: "Bad Core Window height: " + currentLine[6])
+            let error = DesignFileError(type: .InvalidNumber(badString: "Bad Core Window Height: " + currentLine[6]))
+            throw error
         }
         
         self.windowHt = windHt * convFactor
@@ -595,7 +620,8 @@ class ExcelDesignFile: NSObject
         }
         else
         {
-            throw DesignFileError.InvalidNumber(badString: "Overbuild allowance:" + currentLine[0])
+            let error = DesignFileError(type: .InvalidNumber(badString: "Overbuild allowance: " + currentLine[0]))
+            throw error
         }
         
         
@@ -621,7 +647,8 @@ class ExcelDesignFile: NSObject
         }
         else
         {
-            throw DesignFileError.InvalidNumber(badString: "Short Circuit Factor:" + currentLine[0])
+            let error = DesignFileError(type: .InvalidNumber(badString: "Bad SC Factor: " + currentLine[0]))
+            throw error
         }
         
         currentIndex += 1
@@ -634,7 +661,8 @@ class ExcelDesignFile: NSObject
         }
         else
         {
-            throw DesignFileError.InvalidNumber(badString: "System GVA:" + currentLine[0])
+            let error = DesignFileError(type: .InvalidNumber(badString: "Bad System GVA: " + currentLine[0]))
+            throw error
         }
         
         currentIndex += 1

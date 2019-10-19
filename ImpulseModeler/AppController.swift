@@ -6,6 +6,7 @@
 //  Copyright © 2016 Peter Huber. All rights reserved.
 //
 
+import Foundation
 import Cocoa
 
 // A helper class to allow saving to and restoring from files
@@ -98,11 +99,14 @@ class AppController: NSObject {
     // The model in the format required by the routine for making a spice ".cir" file
     var theModel:[PCH_DiskSection]?
     
+    // to avoid asking to save for nothing
+    var currentModelIsDirty:Bool = false
+    
     override init()
     {
         // This is the best way I've found to actually "preload" the progress indicator window class and make it "load" its window from the nib
         self.currentProgressIndicator = PCH_ProgressIndicatorWindow()
-        super.init() // doesn't do anything but Swift complains if we don't call this
+        super.init() // doesn't do anything but Swift complains if we don't call this (at least, it USED to)
         
     }
     
@@ -165,7 +169,7 @@ class AppController: NSObject {
     
     func openModel(_ url:URL) -> Bool
     {
-        if (self.theModel != nil)
+        if (self.theModel != nil) && self.currentModelIsDirty
         {
             let saveYesOrNo = NSAlert()
             saveYesOrNo.messageText = "This will destroy the current model! Do you wish to save it before proceeding?"
@@ -198,6 +202,8 @@ class AppController: NSObject {
             
             NSDocumentController.shared.noteNewRecentDocumentURL(url)
             
+            self.currentModelIsDirty = false
+            
             return true
         }
         else
@@ -215,7 +221,50 @@ class AppController: NSObject {
     // Menu Handlers
     @IBAction func handleOpenDesignFile(_ sender: Any)
     {
+        if (self.theModel != nil) && self.currentModelIsDirty
+        {
+            let saveYesOrNo = NSAlert()
+            saveYesOrNo.messageText = "This will destroy the current model! Do you wish to save it before proceeding?"
+            saveYesOrNo.alertStyle = NSAlert.Style.warning
+            saveYesOrNo.addButton(withTitle: "Yes")
+            saveYesOrNo.addButton(withTitle: "No")
+            
+            if (saveYesOrNo.runModal() == NSApplication.ModalResponse.alertFirstButtonReturn)
+            {
+                self.handleSaveModel(self)
+            }
+        }
+        
         // Handler to open a design file created by Excel (same as the file for AndersenFE)
+        let openFilePanel = NSOpenPanel()
+        
+        openFilePanel.title = "Open Excel-generated Design File"
+        openFilePanel.message = "Select the file to open"
+        openFilePanel.allowedFileTypes = ["txt"]
+        openFilePanel.allowsOtherFileTypes = false
+        
+        if openFilePanel.runModal() == .OK
+        {
+            if let xlFile = openFilePanel.url
+            {
+                do
+                {
+                    let designFile = try ExcelDesignFile(withURL: xlFile)
+                }
+                catch let error as ExcelDesignFile.DesignFileError
+                {
+                    
+                }
+                catch
+                {
+                    
+                }
+            }
+            else
+            {
+                ALog("Couldn't get file")
+            }
+        }
         
     }
     
@@ -223,7 +272,7 @@ class AppController: NSObject {
     
     @IBAction func handleOpenModel(_ sender: AnyObject)
     {
-        if (self.theModel != nil)
+        if (self.theModel != nil) && self.currentModelIsDirty
         {
             let saveYesOrNo = NSAlert()
             saveYesOrNo.messageText = "This will destroy the current model! Do you wish to save it before proceeding?"
@@ -267,6 +316,8 @@ class AppController: NSObject {
                 }
                 
                 NSDocumentController.shared.noteNewRecentDocumentURL(openFilePanel.url!)
+                
+                self.currentModelIsDirty = false
             }
         }
     }
@@ -283,7 +334,7 @@ class AppController: NSObject {
         if (saveFilePanel.runModal().rawValue == NSFileHandlingPanelOKButton)
         {
             guard let newFileURL = saveFilePanel.url
-                else
+            else
             {
                 DLog("Bad file name")
                 return
@@ -291,14 +342,15 @@ class AppController: NSObject {
             
             let archive = PhaseModel(phase: self.phaseDefinition!, model: self.theModel!)
             
-            let archiveResult = NSKeyedArchiver.archiveRootObject(archive, toFile: newFileURL.path)
-            
-            if (!archiveResult)
+            if NSKeyedArchiver.archiveRootObject(archive, toFile: newFileURL.path)
+            {
+                self.currentModelIsDirty = false
+            }
+            else
             {
                 DLog("Couldn't write the file!")
             }
             
-            DLog("Finished writing file")
         }
     }
     
@@ -564,7 +616,7 @@ class AppController: NSObject {
             return
         }
         
-        if (theModel != nil)
+        if (theModel != nil) && self.currentModelIsDirty
         {
             let saveYesOrNo = NSAlert()
             saveYesOrNo.messageText = "This will destroy the current model! Do you wish to save it before proceeding?"
@@ -575,6 +627,8 @@ class AppController: NSObject {
             if (saveYesOrNo.runModal() == NSApplication.ModalResponse.alertFirstButtonReturn)
             {
                 self.handleSaveModel(self)
+                
+                self.currentModelIsDirty = false
             }
             
             DLog("Note: This will destroy the existing model")
@@ -797,6 +851,8 @@ class AppController: NSObject {
             
         } // end mutIndQueue.async
         
+        self.currentModelIsDirty = true
+        
     }
     
     // Save the C, M, R, A, and B matrices in CSV style. All the created file names will have the same prefix (supplied by the user) with an appended '_M', _C', '_R', '_A', '_B' to indicate the different matrices.
@@ -863,7 +919,12 @@ class AppController: NSObject {
             return self.phaseDefinition != nil && self.theModel == nil
         }
         
-        if (menuItem == self.saveCirFileMenuItem) || (menuItem == self.runSimMenuItem) || (menuItem == self.saveModelMenuItem) || (menuItem == self.modifyModelMenuItem) || (menuItem == self.saveMatricesMenuItem)
+        if menuItem == self.saveModelMenuItem
+        {
+            return self.theModel != nil && self.currentModelIsDirty
+        }
+        
+        if (menuItem == self.saveCirFileMenuItem) || (menuItem == self.runSimMenuItem) || (menuItem == self.modifyModelMenuItem) || (menuItem == self.saveMatricesMenuItem)
         {
             return self.theModel != nil
         }
@@ -1074,7 +1135,7 @@ class AppController: NSObject {
         
         let oldPhase = self.phaseDefinition
         
-        if (self.theModel != nil)
+        if (self.theModel != nil) && self.currentModelIsDirty
         {
             let saveYesOrNo = NSAlert()
             saveYesOrNo.messageText = "This will destroy the current model! Do you wish to save them before proceeding?"
@@ -1163,5 +1224,7 @@ class AppController: NSObject {
         }
         
         self.phaseDefinition = Phase(core: newCore, coils: coils!)
+        
+        self.currentModelIsDirty = true
     }
 }

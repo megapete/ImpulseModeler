@@ -8,7 +8,7 @@
 
 import Foundation
 
-// NOTE (Oct. 2019): For now, helical, layer, and sheet windings are represented as ground cylinders. This will eventually change but it will need an extensive rewrite of this class. 
+// NOTE (Oct. 2019): For now, helical, layer, and sheet windings are represented as a "single disc". This will eventually change but it will need an extensive rewrite of this class. 
 
 class Coil:NSObject, NSCoding
 {
