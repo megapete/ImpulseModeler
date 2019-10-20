@@ -250,6 +250,27 @@ class AppController: NSObject {
                 do
                 {
                     let designFile = try ExcelDesignFile(withURL: xlFile)
+                    
+                    let newCore = Core(diameter: designFile.coreDiameter, height: designFile.windowHt, legCenters: designFile.legCenters)
+                    
+                    var lastCoil = ExcelDesignFile.CoilData()
+                    
+                    
+                    var lastOD = designFile.coreDiameter
+                    var lastHt = designFile.coils[0].elecHt
+                    
+                    for nextCoilIndex in 0..<8
+                    {
+                        let terminal = designFile.terminals[nextCoilIndex]
+                        let coil = designFile.coils[nextCoilIndex]
+                        if terminal.coilIndex < 8
+                        {
+                            let capToPreviousCoil = Coil.CapacitanceBetweenCoils(innerOD: lastOD, outerID: coil.coilID, innerH: lastHt, outerH: coil.elecHt, numSpacers: Int(coil.numRadialColumns))
+                            
+                            
+                        }
+                    }
+                    
                 }
                 catch
                 {

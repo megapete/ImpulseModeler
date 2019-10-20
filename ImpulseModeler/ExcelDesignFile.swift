@@ -60,6 +60,60 @@ class ExcelDesignFile: NSObject
         var coilID:Double = 0.0
         
         var groundClearance:Double = 0.0
+        
+        var eddyLossAvePU = 0.1
+        
+        var radialStrandsPerTurn:Double {
+            get
+            {
+                if self.condType == "CTC"
+                {
+                    return ceil(self.ctcStrandsPerCable / 2.0) * Double(numCondRadial)
+                }
+                else if self.condType == "D"
+                {
+                    return 2.0 * Double(numCondRadial)
+                }
+                else
+                {
+                    return 1.0 * Double(numCondRadial)
+                }
+            }
+        }
+        
+        var numTurnsRadially:Double {
+            get
+            {
+                if self.isHelical || self.isMultipleStart
+                {
+                    return self.numRadialSections
+                }
+                
+                return ceil(self.maxTurns / self.numAxialSections)
+            }
+        }
+        
+        var radialBuild:Double {
+            get
+            {
+                var result = self.numTurnsRadially * (self.radialStrandsPerTurn * self.strandR + self.totalPaperThicknessInOneTurnRadially) + self.numRadialDucts * self.radialDuctDimn
+                
+                if self.isHelical || self.isMultipleStart
+                {
+                    let numInsuls = self.numTurnsRadially - 1.0 - self.numRadialDucts
+                    result += numInsuls * self.insulationBetRadialSections
+                }
+                
+                return result
+            }
+        }
+        
+        var coilOD:Double {
+            get
+            {
+                return self.coilID + 2.0 * self.radialBuild
+            }
+        }
     }
     
     struct TerminalData
@@ -70,7 +124,7 @@ class ExcelDesignFile: NSObject
         let termNum:Int
         let currentDirection:Int
         
-        var coilIndex:Int = -1
+        var coilIndex:Int = 100 // put a large number here to make sorting easier
         
         var phaseVolts:Double {
             
@@ -111,11 +165,15 @@ class ExcelDesignFile: NSObject
     
     let coreDiameter:Double
     let windowHt:Double
+    let legCenters:Double
+    
+    let tankDepth:Double
     
     let overbuildAllowance:Double
     
     let scFactor:Double
     let systemGVA:Double
+
     
     var terminals:[TerminalData] = []
     var coils:[CoilData] = Array(repeating: CoilData(), count: 8)
@@ -126,6 +184,7 @@ class ExcelDesignFile: NSObject
         {
             case InvalidDesignFile
             case InvalidNumber
+            case InvalidFileVersion
         }
         
         let info:String
@@ -142,6 +201,10 @@ class ExcelDesignFile: NSObject
                 else if self.type == .InvalidNumber
                 {
                     return "An invalid number was found: " + self.info
+                }
+                else if self.type == .InvalidFileVersion
+                {
+                    return "The lowest acceptable file version is 3. This is version: " + self.info
                 }
                 
                 return "An unknown error has occurred"
@@ -162,13 +225,14 @@ class ExcelDesignFile: NSObject
             throw error
         }
         
-        let fileLines = fileString.components(separatedBy: .newlines)
+        let fileLines = fileString.components(separatedBy: .newlines).filter({$0 != ""})
+        
         var currentIndex = 0
         
         // early checks to see if this is a valid design file
-        if fileLines.count < 44 // design file version 2 has at least 44 lines
+        if fileLines.count < 46 // design file version 3 has at least 46 lines
         {
-            let error = DesignFileError(info: "", type: .InvalidDesignFile)
+            let error = DesignFileError(info: "\(fileLines.count)", type: .InvalidFileVersion)
             throw error
         }
         
@@ -180,15 +244,20 @@ class ExcelDesignFile: NSObject
             throw error
         }
         
-        // for now, we only accept file version 2
+        // for now, we only accept file version 3 and higher
         let fileVersion = Int(currentLine[7])
-        if fileVersion == nil || fileVersion! != 2
+        if fileVersion == nil
         {
             let error = DesignFileError(info: "", type: .InvalidDesignFile)
             throw error
         }
+        else if fileVersion! < 3
+        {
+            let error = DesignFileError(info: currentLine[7], type: .InvalidFileVersion)
+            throw error
+        }
         
-        // version 2 of the Excel file is all in inches and we want meters, so:
+        // version 3 and less of the Excel file is all in inches and we want meters, so:
         let convFactor = meterPerInch
         
         var index = 0
@@ -282,6 +351,9 @@ class ExcelDesignFile: NSObject
             }
         }
         
+        // sort the array by the coil position (innermost-to-outermost)
+        self.terminals.sort(by: {$0.coilIndex < $1.coilIndex})
+        
         currentIndex += 1
         currentLine = fileLines[currentIndex].components(separatedBy: .whitespaces)
         
@@ -338,7 +410,7 @@ class ExcelDesignFile: NSObject
         {
             if let elHt = Double(currentLine[i])
             {
-                self.coils[i].elecHt = elHt
+                self.coils[i].elecHt = elHt * convFactor
             }
         }
         
@@ -389,7 +461,7 @@ class ExcelDesignFile: NSObject
         {
             if let axGap = Double(currentLine[i])
             {
-                self.coils[i].axialGaps = axGap
+                self.coils[i].axialGaps = axGap * convFactor
             }
         }
         
@@ -401,7 +473,7 @@ class ExcelDesignFile: NSObject
         {
             if let spW = Double(currentLine[i])
             {
-                self.coils[i].axialSpacerWidth = spW
+                self.coils[i].axialSpacerWidth = spW * convFactor
             }
         }
         
@@ -437,7 +509,7 @@ class ExcelDesignFile: NSObject
         {
             if let nextNum = Double(currentLine[i])
             {
-                self.coils[i].insulationBetRadialSections = nextNum
+                self.coils[i].insulationBetRadialSections = nextNum * convFactor
             }
         }
         
@@ -461,7 +533,7 @@ class ExcelDesignFile: NSObject
         {
             if let nextNum = Double(currentLine[i])
             {
-                self.coils[i].radialDuctDimn = nextNum
+                self.coils[i].radialDuctDimn = nextNum * convFactor
             }
         }
         
@@ -527,7 +599,7 @@ class ExcelDesignFile: NSObject
         {
             if let nextNum = Double(currentLine[i])
             {
-                self.coils[i].totalPaperThicknessInOneTurnRadially = nextNum
+                self.coils[i].totalPaperThicknessInOneTurnRadially = nextNum * convFactor
             }
         }
         
@@ -539,7 +611,7 @@ class ExcelDesignFile: NSObject
         {
             if let nextNum = Double(currentLine[i])
             {
-                self.coils[i].strandA = nextNum
+                self.coils[i].strandA = nextNum * convFactor
             }
         }
         
@@ -551,7 +623,7 @@ class ExcelDesignFile: NSObject
         {
             if let nextNum = Double(currentLine[i])
             {
-                self.coils[i].strandR = nextNum
+                self.coils[i].strandR = nextNum * convFactor
             }
         }
         
@@ -575,7 +647,7 @@ class ExcelDesignFile: NSObject
         {
             if let nextNum = Double(currentLine[i])
             {
-                self.coils[i].axialCenterPack = nextNum
+                self.coils[i].axialCenterPack = nextNum * convFactor
             }
         }
         
@@ -587,7 +659,7 @@ class ExcelDesignFile: NSObject
         {
             if let nextNum = Double(currentLine[i])
             {
-                self.coils[i].axialDVgap1 = nextNum
+                self.coils[i].axialDVgap1 = nextNum * convFactor
             }
         }
         
@@ -599,7 +671,7 @@ class ExcelDesignFile: NSObject
         {
             if let nextNum = Double(currentLine[i])
             {
-                self.coils[i].axialDVgap2 = nextNum
+                self.coils[i].axialDVgap2 = nextNum * convFactor
             }
         }
         
@@ -611,7 +683,7 @@ class ExcelDesignFile: NSObject
         {
             if let nextNum = Double(currentLine[i])
             {
-                self.coils[i].bottomEdgeDistance = nextNum
+                self.coils[i].bottomEdgeDistance = nextNum * convFactor
             }
         }
         
@@ -623,7 +695,7 @@ class ExcelDesignFile: NSObject
         {
             if let nextNum = Double(currentLine[i])
             {
-                self.coils[i].coilID = nextNum
+                self.coils[i].coilID = nextNum * convFactor
             }
         }
         
@@ -650,7 +722,7 @@ class ExcelDesignFile: NSObject
         {
             if let nextNum = Double(currentLine[i])
             {
-                self.coils[i].groundClearance = nextNum
+                self.coils[i].groundClearance = nextNum * convFactor
             }
         }
         
@@ -690,8 +762,48 @@ class ExcelDesignFile: NSObject
         {
             if let nextNum = Double(currentLine[i])
             {
-                self.coils[i].axialGapBetweenCables = nextNum
+                self.coils[i].axialGapBetweenCables = nextNum * convFactor
             }
+        }
+        
+        currentIndex += 1
+        currentLine = fileLines[currentIndex].components(separatedBy: .whitespaces)
+        
+        // Eddy Loss (file value is in %, we need PU)
+        for i in 0..<8
+        {
+            if let nextNum = Double(currentLine[i])
+            {
+                self.coils[i].eddyLossAvePU = nextNum / 100.0
+            }
+        }
+        
+        currentIndex += 1
+        currentLine = fileLines[currentIndex].components(separatedBy: .whitespaces)
+        
+        // Leg Centers (for version >= 3, this is already im meters)
+        if let nextNum = Double(currentLine[0])
+        {
+            self.legCenters = nextNum
+        }
+        else
+        {
+            let error = DesignFileError(info: "Bad Leg Centers:" + currentLine[0], type: .InvalidNumber)
+            throw error
+        }
+        
+        currentIndex += 1
+        currentLine = fileLines[currentIndex].components(separatedBy: .whitespaces)
+        
+        // Tank depth
+        if let nextNum = Double(currentLine[0])
+        {
+            self.tankDepth = nextNum
+        }
+        else
+        {
+            let error = DesignFileError(info: "Bad Tank Depth:" + currentLine[0], type: .InvalidNumber)
+            throw error
         }
 
     }

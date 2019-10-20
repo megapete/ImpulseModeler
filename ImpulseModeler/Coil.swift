@@ -124,8 +124,6 @@ class Coil:NSObject, NSCoding
         let t_press = 0.08 * meterPerInch * N_press
         let t_stick = (outerID - innerOD) / 2.0 - t_press
         
-        
-        
         let result = 2.0 * π * ε0 * R_gap * H * ((f_s / (t_press / εBoard + t_stick / εBoard)) + ((1.0 - f_s) / (t_press / εBoard + t_stick / εOil)))
         
         return result
@@ -254,7 +252,7 @@ class AxialSection:NSObject, NSCoding
     let bottomDiskSerialCapacitance:Double
     let commonDiskSerialCapacitance:Double
     
-    /// Static ring info (for drawing)
+    /// Static ring info (for drawing). It is assumed that the spacer between the disc and the static ring is equal to half the interDiskDimn
     let topStaticRing:Bool
     let bottomStaticRing:Bool
     

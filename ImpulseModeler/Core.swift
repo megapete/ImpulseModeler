@@ -18,10 +18,13 @@ class Core:NSObject, NSCoding
     
     let coilCenterOffset:Double
     
-    init(diameter:Double, height:Double, htFactor:Double = 3.0, coilCenterOffset:Double = 0.0)
+    let legCenters:Double
+    
+    init(diameter:Double, height:Double, legCenters:Double, htFactor:Double = 3.0, coilCenterOffset:Double = 0.0)
     {
         self.diameter = diameter
         self.height = height
+        self.legCenters = legCenters
         self.htFactor = htFactor
         self.coilCenterOffset = coilCenterOffset
     }
@@ -32,8 +35,9 @@ class Core:NSObject, NSCoding
         let height = aDecoder.decodeDouble(forKey: "Height")
         let htFactor = aDecoder.decodeDouble(forKey: "HeightFactor")
         let coilCenterOffset = aDecoder.decodeDouble(forKey: "CoilCenterOffset")
+        let legCenters = aDecoder.decodeDouble(forKey: "LegCenters")
         
-        self.init(diameter:diameter, height:height, htFactor:htFactor, coilCenterOffset:coilCenterOffset)
+        self.init(diameter:diameter, height:height, legCenters:legCenters, htFactor:htFactor, coilCenterOffset:coilCenterOffset)
     }
     
     func encode(with aCoder: NSCoder) {
@@ -42,5 +46,6 @@ class Core:NSObject, NSCoding
         aCoder.encode(self.height, forKey: "Height")
         aCoder.encode(self.htFactor, forKey: "HeightFactor")
         aCoder.encode(self.coilCenterOffset, forKey: "CoilCenterOffset")
+        aCoder.encode(self.legCenters, forKey:"LegCenters")
     }
 }
