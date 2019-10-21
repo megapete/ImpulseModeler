@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="15400" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="15400"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="CoilNameDlog" customModule="ImpulseModeler" customModuleProvider="target">
+            <connections>
+                <outlet property="coil1name" destination="dQV-26-BTg" id="HGs-JJ-cpg"/>
+                <outlet property="coil2name" destination="hlX-eg-IYg" id="PPY-P2-Zhj"/>
+                <outlet property="coil3name" destination="GzG-En-F5R" id="mpE-CZ-IBI"/>
+                <outlet property="coil4name" destination="f4D-qH-Z9U" id="GMH-SP-3D3"/>
+                <outlet property="coil5name" destination="vJ4-3q-dOL" id="0Iv-jN-ZrK"/>
+                <outlet property="coil6name" destination="oqr-9P-wtV" id="2HZ-tz-8Su"/>
+                <outlet property="coil7name" destination="Nej-pf-PfQ" id="F8k-xB-sjA"/>
+                <outlet property="coil8name" destination="Cs7-tE-iuK" id="2G5-zu-5WQ"/>
+                <outlet property="window" destination="F0z-JX-Cv5" id="gIp-Ho-8D9"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <window title="Coil Names" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="F0z-JX-Cv5">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
+            <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+            <rect key="contentRect" x="196" y="240" width="444" height="272"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
+            <view key="contentView" id="se5-gp-TjO">
+                <rect key="frame" x="0.0" y="0.0" width="444" height="272"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="T2S-K4-SDB">
+                        <rect key="frame" x="67" y="210" width="55" height="16"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Coil 1:" id="a6S-H7-frk">
+                            <font key="font" usesAppearanceFont="YES"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="dQV-26-BTg">
+                        <rect key="frame" x="125" y="207" width="84" height="21"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="sju-UO-cHg">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="W8O-UB-Av9">
+                        <rect key="frame" x="71" y="181" width="51" height="16"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Coil 2:" id="azg-Dg-scL">
+                            <font key="font" usesAppearanceFont="YES"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="hlX-eg-IYg">
+                        <rect key="frame" x="125" y="178" width="84" height="21"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="2aX-cp-wBu">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="XH9-xC-fPh">
+                        <rect key="frame" x="75" y="152" width="47" height="16"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Coil 3:" id="yW4-cT-d6l">
+                            <font key="font" usesAppearanceFont="YES"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="GzG-En-F5R">
+                        <rect key="frame" x="125" y="149" width="84" height="21"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="AyK-LV-MnN">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ix4-b1-Wpy">
+                        <rect key="frame" x="79" y="123" width="43" height="16"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Coil 4:" id="0aw-DO-3EV">
+                            <font key="font" usesAppearanceFont="YES"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="f4D-qH-Z9U">
+                        <rect key="frame" x="125" y="120" width="84" height="21"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="0G8-Ib-SxQ">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="g0t-Xl-4vq">
+                        <rect key="frame" x="227" y="210" width="39" height="16"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Coil 5:" id="mXf-Vn-K6w">
+                            <font key="font" usesAppearanceFont="YES"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="vJ4-3q-dOL">
+                        <rect key="frame" x="273" y="207" width="84" height="21"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="JZP-2l-0gv">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="b9D-Oi-byC">
+                        <rect key="frame" x="227" y="181" width="43" height="16"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Coil 6:" id="bSR-ku-Ur9">
+                            <font key="font" usesAppearanceFont="YES"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="oqr-9P-wtV">
+                        <rect key="frame" x="273" y="178" width="84" height="21"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="V0W-23-anv">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Yof-Om-dfh">
+                        <rect key="frame" x="223" y="152" width="47" height="16"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Coil 7:" id="NeN-VU-LyT">
+                            <font key="font" usesAppearanceFont="YES"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Nej-pf-PfQ">
+                        <rect key="frame" x="273" y="149" width="84" height="21"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="X6l-4S-RFH">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tx5-RH-9HM">
+                        <rect key="frame" x="227" y="123" width="43" height="16"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <textFieldCell key="cell" lineBreakMode="clipping" alignment="right" title="Coil 8:" id="hqm-zi-P3h">
+                            <font key="font" usesAppearanceFont="YES"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Cs7-tE-iuK">
+                        <rect key="frame" x="273" y="120" width="84" height="21"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="cqV-Oz-SCD">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Jo4-ki-huj">
+                        <rect key="frame" x="282" y="40" width="88" height="32"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="push" title="Ok" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="2sa-V6-6Ms">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="handleOkay:" target="-2" id="Vq1-Qi-wt0"/>
+                        </connections>
+                    </button>
+                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Ahn-Sj-GhX">
+                        <rect key="frame" x="201" y="40" width="82" height="32"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <buttonCell key="cell" type="push" title="Cancel" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="FzZ-9Q-pPM">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                            <string key="keyEquivalent" base64-UTF8="YES">
+Gw
+</string>
+                        </buttonCell>
+                        <connections>
+                            <action selector="handleCancel:" target="-2" id="GNH-hz-Xxw"/>
+                        </connections>
+                    </button>
+                </subviews>
+            </view>
+            <connections>
+                <outlet property="delegate" destination="-2" id="0bl-1N-AYu"/>
+            </connections>
+            <point key="canvasLocation" x="122" y="148"/>
+        </window>
+    </objects>
+</document>

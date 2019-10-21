@@ -15,8 +15,6 @@ class ExcelDesignFile: NSObject
 {
     struct CoilData
     {
-        var coilPos:Int = -1
-        
         var minTurns:Double = 0.0
         var nomTurns:Double = 0.0
         var maxTurns:Double = 0.0
@@ -62,6 +60,13 @@ class ExcelDesignFile: NSObject
         var groundClearance:Double = 0.0
         
         var eddyLossAvePU = 0.1
+        
+        var effectiveHt:Double {
+            get
+            {
+                return self.elecHt - self.axialCenterPack - self.axialDVgap1 - self.axialDVgap2
+            }
+        }
         
         var radialStrandsPerTurn:Double {
             get
@@ -174,9 +179,25 @@ class ExcelDesignFile: NSObject
     let scFactor:Double
     let systemGVA:Double
 
-    
     var terminals:[TerminalData] = []
     var coils:[CoilData] = Array(repeating: CoilData(), count: 8)
+    
+    var numCoils:Int {
+        get
+        {
+            var result = 0
+            
+            for nextTerm in terminals
+            {
+                if nextTerm.coilIndex < 9
+                {
+                    result += 1
+                }
+            }
+            
+            return result
+        }
+    }
     
     struct DesignFileError:Error
     {

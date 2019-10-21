@@ -251,13 +251,42 @@ class AppController: NSObject {
                 {
                     let designFile = try ExcelDesignFile(withURL: xlFile)
                     
+                    var coilNames = ["LV", "HV", "RV"]
+                    if (designFile.numCoils > 3)
+                    {
+                        coilNames.insert("TV", at: 0)
+                    }
+                    var defaultNameString = ""
+                    for nextName in coilNames
+                    {
+                        defaultNameString += nextName + ", "
+                    }
+                    
+                    defaultNameString.removeLast(2)
+                    
+                    let coilNameAlert = NSAlert()
+                    coilNameAlert.alertStyle = .informational
+                    coilNameAlert.messageText = "The design file shows \(designFile.numCoils) coils."
+                    coilNameAlert.informativeText = "Do you wish to use default names (\(defaultNameString)) or deine your own custom names?"
+                    coilNameAlert.addButton(withTitle: "Default")
+                    coilNameAlert.addButton(withTitle: "Custom")
+                    
+                    if coilNameAlert.runModal() == .alertSecondButtonReturn
+                    {
+                        let nameDlog = CoilNameDlog()
+                        nameDlog.SetNumCoilsAndRun(numCoils: designFile.numCoils)
+                        
+                        DLog("Here I am")
+                    }
+                    
                     let newCore = Core(diameter: designFile.coreDiameter, height: designFile.windowHt, legCenters: designFile.legCenters)
                     
-                    var lastCoil = ExcelDesignFile.CoilData()
+                    var newCoils:[Coil] = []
                     
+                    var lastCoil = Coil()
                     
                     var lastOD = designFile.coreDiameter
-                    var lastHt = designFile.coils[0].elecHt
+                    var lastHt = designFile.coils[0].effectiveHt
                     
                     for nextCoilIndex in 0..<8
                     {
@@ -267,9 +296,20 @@ class AppController: NSObject {
                         {
                             let capToPreviousCoil = Coil.CapacitanceBetweenCoils(innerOD: lastOD, outerID: coil.coilID, innerH: lastHt, outerH: coil.elecHt, numSpacers: Int(coil.numRadialColumns))
                             
+                            let impCoil = Coil(coilName: coilNames[nextCoilIndex], coilRadialPosition: nextCoilIndex, amps: terminal.phaseAmps, currentDirection: terminal.currentDirection, capacitanceToPreviousCoil: capToPreviousCoil, capacitanceToGround: 0.0, innerRadius: coil.coilID / 2.0, eddyLossPercentage: coil.eddyLossAvePU * 100.0, phaseNum: 1)
                             
+                            newCoils.append(impCoil)
+                            
+                            lastCoil = impCoil
+                            lastOD = coil.coilOD
+                            lastHt = coil.effectiveHt
                         }
                     }
+                    
+                    // calculate lastCoil's capacitances to other phases and to the tank
+                    let gndCap = Coil.CapacitanceBetweenPhases(legCenters: newCore.legCenters, coilOD: lastOD, coilHt: lastHt) + Coil.CapacitanceFromCoilToTank(coilOD: lastOD, coilHt: lastHt, tankDim: designFile.tankDepth)
+                    
+                    lastCoil.capacitanceToGround = gndCap
                     
                 }
                 catch

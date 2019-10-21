@@ -28,7 +28,7 @@ class Coil:NSObject, NSCoding
     let capacitanceToPreviousCoil:Double
     
     /// Capacitance to the tank or other ground (usually 0, except for the last coil, or capacitance to a shield)
-    let capacitanceToGround:Double
+    var capacitanceToGround:Double
 
     /// The innerRadius of the coil
     let innerRadius:Double
@@ -53,6 +53,12 @@ class Coil:NSObject, NSCoding
         self.eddyLossPercentage = eddyLossPercentage
         self.sections = sections
         self.phaseNum = phaseNum
+    }
+    
+    // Dummy init
+    override convenience init()
+    {
+        self.init(coilName: "", coilRadialPosition: 0, amps: 0.0, currentDirection: 0, capacitanceToPreviousCoil: 0.0, capacitanceToGround: 0.0, innerRadius: 0.0, eddyLossPercentage: 0.0, phaseNum: 0)
     }
     
     convenience required init?(coder aDecoder: NSCoder)
