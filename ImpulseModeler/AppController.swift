@@ -273,10 +273,11 @@ class AppController: NSObject {
                     
                     if coilNameAlert.runModal() == .alertSecondButtonReturn
                     {
-                        let nameDlog = CoilNameDlog()
-                        nameDlog.SetNumCoilsAndRun(numCoils: designFile.numCoils)
+                        // Get the custom names
+                        let coilNameDlog = CoilNameDialog()
+                        coilNameDlog.showWindow(nil)
+                        coilNameDlog.SetNumCoils(numCoils: designFile.numCoils)
                         
-                        DLog("Here I am")
                     }
                     
                     let newCore = Core(diameter: designFile.coreDiameter, height: designFile.windowHt, legCenters: designFile.legCenters)

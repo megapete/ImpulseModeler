@@ -10,8 +10,6 @@
 		D301D8B22041EC0500A6B453 /* PCH_ProgressIndicatorWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = D301D8B02041EC0500A6B453 /* PCH_ProgressIndicatorWindow.swift */; };
 		D301D8B32041EC0500A6B453 /* PCH_ProgressIndicatorWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = D301D8B12041EC0500A6B453 /* PCH_ProgressIndicatorWindow.xib */; };
 		D309E31A2358F5E300F10710 /* ExcelDesignFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = D309E3192358F5E300F10710 /* ExcelDesignFile.swift */; };
-		D309E31D235E04CA00F10710 /* CoilNameDlog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D309E31B235E04CA00F10710 /* CoilNameDlog.swift */; };
-		D309E31E235E04CA00F10710 /* CoilNameDlog.xib in Resources */ = {isa = PBXBuildFile; fileRef = D309E31C235E04CA00F10710 /* CoilNameDlog.xib */; };
 		D30C14521DDB97B60046BC55 /* SourceDefinitionDlog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D30C14501DDB97B60046BC55 /* SourceDefinitionDlog.swift */; };
 		D30C14531DDB97B60046BC55 /* SourceDefinitionDlog.xib in Resources */ = {isa = PBXBuildFile; fileRef = D30C14511DDB97B60046BC55 /* SourceDefinitionDlog.xib */; };
 		D30C14561DDBB6A60046BC55 /* ConnectionDlog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D30C14541DDBB6A60046BC55 /* ConnectionDlog.swift */; };
@@ -34,6 +32,8 @@
 		D34094971DC2904F00F1658B /* PCH_Matrix.swift in Sources */ = {isa = PBXBuildFile; fileRef = D34094931DC2904F00F1658B /* PCH_Matrix.swift */; };
 		D34094981DC2904F00F1658B /* PCH_SectionData.swift in Sources */ = {isa = PBXBuildFile; fileRef = D34094941DC2904F00F1658B /* PCH_SectionData.swift */; };
 		D340949A1DC2926E00F1658B /* Phase.swift in Sources */ = {isa = PBXBuildFile; fileRef = D34094991DC2926E00F1658B /* Phase.swift */; };
+		D3658BF0235E696600D1407A /* CoilNameDialog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3658BEE235E696600D1407A /* CoilNameDialog.swift */; };
+		D3658BF1235E696600D1407A /* CoilNameDialog.xib in Resources */ = {isa = PBXBuildFile; fileRef = D3658BEF235E696600D1407A /* CoilNameDialog.xib */; };
 		D37146911DC3D5FC00823F20 /* CoilDlog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D371468F1DC3D5FC00823F20 /* CoilDlog.swift */; };
 		D37146921DC3D5FC00823F20 /* CoilDlog.xib in Resources */ = {isa = PBXBuildFile; fileRef = D37146901DC3D5FC00823F20 /* CoilDlog.xib */; };
 		D37146941DC9161600823F20 /* PCH_BlueBookModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D37146931DC9161600823F20 /* PCH_BlueBookModel.swift */; };
@@ -46,8 +46,6 @@
 		D301D8B02041EC0500A6B453 /* PCH_ProgressIndicatorWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PCH_ProgressIndicatorWindow.swift; sourceTree = "<group>"; };
 		D301D8B12041EC0500A6B453 /* PCH_ProgressIndicatorWindow.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PCH_ProgressIndicatorWindow.xib; sourceTree = "<group>"; };
 		D309E3192358F5E300F10710 /* ExcelDesignFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExcelDesignFile.swift; sourceTree = "<group>"; };
-		D309E31B235E04CA00F10710 /* CoilNameDlog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoilNameDlog.swift; sourceTree = "<group>"; };
-		D309E31C235E04CA00F10710 /* CoilNameDlog.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CoilNameDlog.xib; sourceTree = "<group>"; };
 		D30C14501DDB97B60046BC55 /* SourceDefinitionDlog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SourceDefinitionDlog.swift; sourceTree = "<group>"; };
 		D30C14511DDB97B60046BC55 /* SourceDefinitionDlog.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SourceDefinitionDlog.xib; sourceTree = "<group>"; };
 		D30C14541DDBB6A60046BC55 /* ConnectionDlog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectionDlog.swift; sourceTree = "<group>"; };
@@ -73,6 +71,8 @@
 		D34094931DC2904F00F1658B /* PCH_Matrix.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PCH_Matrix.swift; path = ../../InductanceCalculator/InductanceCalculator/PCH_Matrix.swift; sourceTree = "<group>"; };
 		D34094941DC2904F00F1658B /* PCH_SectionData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PCH_SectionData.swift; path = ../../InductanceCalculator/InductanceCalculator/PCH_SectionData.swift; sourceTree = "<group>"; };
 		D34094991DC2926E00F1658B /* Phase.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Phase.swift; sourceTree = "<group>"; };
+		D3658BEE235E696600D1407A /* CoilNameDialog.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoilNameDialog.swift; sourceTree = "<group>"; };
+		D3658BEF235E696600D1407A /* CoilNameDialog.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CoilNameDialog.xib; sourceTree = "<group>"; };
 		D371468F1DC3D5FC00823F20 /* CoilDlog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoilDlog.swift; sourceTree = "<group>"; };
 		D37146901DC3D5FC00823F20 /* CoilDlog.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CoilDlog.xib; sourceTree = "<group>"; };
 		D37146931DC9161600823F20 /* PCH_BlueBookModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PCH_BlueBookModel.swift; sourceTree = "<group>"; };
@@ -126,8 +126,8 @@
 				D34094891DC28A7000F1658B /* Coil.swift */,
 				D34094991DC2926E00F1658B /* Phase.swift */,
 				D309E3192358F5E300F10710 /* ExcelDesignFile.swift */,
-				D309E31B235E04CA00F10710 /* CoilNameDlog.swift */,
-				D309E31C235E04CA00F10710 /* CoilNameDlog.xib */,
+				D3658BEE235E696600D1407A /* CoilNameDialog.swift */,
+				D3658BEF235E696600D1407A /* CoilNameDialog.xib */,
 				D30C14541DDBB6A60046BC55 /* ConnectionDlog.swift */,
 				D30C14551DDBB6A60046BC55 /* ConnectionDlog.xib */,
 				D30C14581DDBB79A0046BC55 /* ConnectionDlogView.swift */,
@@ -221,12 +221,12 @@
 			files = (
 				D34094861DC2855900F1658B /* CoreInputDlog.xib in Resources */,
 				D301D8B32041EC0500A6B453 /* PCH_ProgressIndicatorWindow.xib in Resources */,
-				D309E31E235E04CA00F10710 /* CoilNameDlog.xib in Resources */,
 				D30C14531DDB97B60046BC55 /* SourceDefinitionDlog.xib in Resources */,
 				D30C14571DDBB6A60046BC55 /* ConnectionDlog.xib in Resources */,
 				D34094501DC14BA200F1658B /* Assets.xcassets in Resources */,
 				D34094531DC14BA200F1658B /* MainMenu.xib in Resources */,
 				D32896971DC3888100984012 /* AxialSectionDlog.xib in Resources */,
+				D3658BF1235E696600D1407A /* CoilNameDialog.xib in Resources */,
 				D37146921DC3D5FC00823F20 /* CoilDlog.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -246,9 +246,9 @@
 				D30C14521DDB97B60046BC55 /* SourceDefinitionDlog.swift in Sources */,
 				D34094961DC2904F00F1658B /* PCH_DiskSection.swift in Sources */,
 				D34094881DC289FF00F1658B /* Core.swift in Sources */,
-				D309E31D235E04CA00F10710 /* CoilNameDlog.swift in Sources */,
 				D340947E1DC2761400F1658B /* PCH_Defs.swift in Sources */,
 				D371469C1DC9284800823F20 /* PCH_Source.swift in Sources */,
+				D3658BF0235E696600D1407A /* CoilNameDialog.swift in Sources */,
 				D34094851DC2855900F1658B /* CoreInputDlog.swift in Sources */,
 				D3B8CCBE20A0828D00102039 /* GlobalDefs.swift in Sources */,
 				D34094951DC2904F00F1658B /* PCH_BlueBookFunctions.swift in Sources */,
