@@ -274,9 +274,7 @@ class AppController: NSObject {
                     if coilNameAlert.runModal() == .alertSecondButtonReturn
                     {
                         // Get the custom names
-                        let coilNameDlog = CoilNameDialog()
-                        coilNameDlog.showWindow(nil)
-                        coilNameDlog.SetNumCoils(numCoils: designFile.numCoils)
+                        
                         
                     }
                     
