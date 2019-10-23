@@ -15,6 +15,8 @@
 		D30C14561DDBB6A60046BC55 /* ConnectionDlog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D30C14541DDBB6A60046BC55 /* ConnectionDlog.swift */; };
 		D30C14571DDBB6A60046BC55 /* ConnectionDlog.xib in Resources */ = {isa = PBXBuildFile; fileRef = D30C14551DDBB6A60046BC55 /* ConnectionDlog.xib */; };
 		D30C14591DDBB79A0046BC55 /* ConnectionDlogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D30C14581DDBB79A0046BC55 /* ConnectionDlogView.swift */; };
+		D322FBA62360F7B800B9F5C8 /* GetCoilDetails.xib in Resources */ = {isa = PBXBuildFile; fileRef = D322FBA52360F7B800B9F5C8 /* GetCoilDetails.xib */; };
+		D322FBA82360FE1400B9F5C8 /* GetCoilDetailsDlogBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = D322FBA72360FE1400B9F5C8 /* GetCoilDetailsDlogBox.swift */; };
 		D32896961DC3888100984012 /* AxialSectionDlog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D32896941DC3888100984012 /* AxialSectionDlog.swift */; };
 		D32896971DC3888100984012 /* AxialSectionDlog.xib in Resources */ = {isa = PBXBuildFile; fileRef = D32896951DC3888100984012 /* AxialSectionDlog.xib */; };
 		D340944E1DC14BA200F1658B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D340944D1DC14BA200F1658B /* AppDelegate.swift */; };
@@ -52,6 +54,8 @@
 		D30C14541DDBB6A60046BC55 /* ConnectionDlog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectionDlog.swift; sourceTree = "<group>"; };
 		D30C14551DDBB6A60046BC55 /* ConnectionDlog.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = ConnectionDlog.xib; sourceTree = "<group>"; };
 		D30C14581DDBB79A0046BC55 /* ConnectionDlogView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConnectionDlogView.swift; sourceTree = "<group>"; };
+		D322FBA52360F7B800B9F5C8 /* GetCoilDetails.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = GetCoilDetails.xib; sourceTree = "<group>"; };
+		D322FBA72360FE1400B9F5C8 /* GetCoilDetailsDlogBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GetCoilDetailsDlogBox.swift; sourceTree = "<group>"; };
 		D32896941DC3888100984012 /* AxialSectionDlog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AxialSectionDlog.swift; sourceTree = "<group>"; };
 		D32896951DC3888100984012 /* AxialSectionDlog.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AxialSectionDlog.xib; sourceTree = "<group>"; };
 		D340944A1DC14BA200F1658B /* ImpulseModeler.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ImpulseModeler.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -126,6 +130,8 @@
 				D3F3010A1DCFCA530039B04A /* PCH_BlueBookModelOutput.swift */,
 				D36142972360C25A0060B31B /* GetCoilNamesDlogBox.swift */,
 				D36142952360C1080060B31B /* GetCoilNames.xib */,
+				D322FBA72360FE1400B9F5C8 /* GetCoilDetailsDlogBox.swift */,
+				D322FBA52360F7B800B9F5C8 /* GetCoilDetails.xib */,
 				D371469B1DC9284800823F20 /* PCH_Source.swift */,
 				D34094871DC289FF00F1658B /* Core.swift */,
 				D34094891DC28A7000F1658B /* Coil.swift */,
@@ -228,6 +234,7 @@
 				D30C14571DDBB6A60046BC55 /* ConnectionDlog.xib in Resources */,
 				D36142962360C1080060B31B /* GetCoilNames.xib in Resources */,
 				D34094501DC14BA200F1658B /* Assets.xcassets in Resources */,
+				D322FBA62360F7B800B9F5C8 /* GetCoilDetails.xib in Resources */,
 				D34094531DC14BA200F1658B /* MainMenu.xib in Resources */,
 				D32896971DC3888100984012 /* AxialSectionDlog.xib in Resources */,
 				D37146921DC3D5FC00823F20 /* CoilDlog.xib in Resources */,
@@ -249,6 +256,7 @@
 				D30C14521DDB97B60046BC55 /* SourceDefinitionDlog.swift in Sources */,
 				D34094961DC2904F00F1658B /* PCH_DiskSection.swift in Sources */,
 				D34094881DC289FF00F1658B /* Core.swift in Sources */,
+				D322FBA82360FE1400B9F5C8 /* GetCoilDetailsDlogBox.swift in Sources */,
 				D340947E1DC2761400F1658B /* PCH_Defs.swift in Sources */,
 				D371469C1DC9284800823F20 /* PCH_Source.swift in Sources */,
 				D36142942360AC810060B31B /* PCH_BaseClass_DialogBox.swift in Sources */,

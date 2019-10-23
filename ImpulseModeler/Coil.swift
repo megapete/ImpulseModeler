@@ -114,6 +114,7 @@ class Coil:NSObject, NSCoding
     
     class func CoilUsing(xlFileCoil:ExcelDesignFile.CoilData, coilName:String, capacitanceToPreviousCoil:Double, capacitanceToGround:Double, eddyLossPercentage:Double, phaseNum:Int) -> Coil
     {
+        
         return Coil(coilName: coilName, coilRadialPosition: 0, amps: 0.0, currentDirection: 0, capacitanceToPreviousCoil: capacitanceToPreviousCoil, capacitanceToGround: capacitanceToGround, innerRadius: 0.0, eddyLossPercentage: eddyLossPercentage, phaseNum: 0)
     }
     
