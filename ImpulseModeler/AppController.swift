@@ -274,8 +274,12 @@ class AppController: NSObject {
                     if coilNameAlert.runModal() == .alertSecondButtonReturn
                     {
                         // Get the custom names
+                        let getNamesDlog = GetCoilNamesDlogBox(numCoils: designFile.numCoils)
                         
-                        
+                        if getNamesDlog.runModal() == .OK
+                        {
+                            coilNames = getNamesDlog.namesArray
+                        }
                     }
                     
                     let newCore = Core(diameter: designFile.coreDiameter, height: designFile.windowHt, legCenters: designFile.legCenters)
@@ -295,7 +299,9 @@ class AppController: NSObject {
                         {
                             let capToPreviousCoil = Coil.CapacitanceBetweenCoils(innerOD: lastOD, outerID: coil.coilID, innerH: lastHt, outerH: coil.elecHt, numSpacers: Int(coil.numRadialColumns))
                             
-                            let impCoil = Coil(coilName: coilNames[nextCoilIndex], coilRadialPosition: nextCoilIndex, amps: terminal.phaseAmps, currentDirection: terminal.currentDirection, capacitanceToPreviousCoil: capToPreviousCoil, capacitanceToGround: 0.0, innerRadius: coil.coilID / 2.0, eddyLossPercentage: coil.eddyLossAvePU * 100.0, phaseNum: 1)
+                            let impCoil = Coil.CoilUsing(xlFileCoil: coil, coilName: coilNames[nextCoilIndex], capacitanceToPreviousCoil: capToPreviousCoil, capacitanceToGround: 0.0, eddyLossPercentage: coil.eddyLossAvePU, phaseNum: 1)
+                            
+                            // let tmpCoil = Coil(coilName: coilNames[nextCoilIndex], coilRadialPosition: nextCoilIndex, amps: terminal.phaseAmps, currentDirection: terminal.currentDirection, capacitanceToPreviousCoil: capToPreviousCoil, capacitanceToGround: 0.0, innerRadius: coil.coilID / 2.0, eddyLossPercentage: coil.eddyLossAvePU * 100.0, phaseNum: 1)
                             
                             newCoils.append(impCoil)
                             
