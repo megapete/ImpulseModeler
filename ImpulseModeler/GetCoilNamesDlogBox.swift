@@ -48,7 +48,7 @@ class GetCoilNamesDlogBox:PCH_DialogBox
     {
         self.numCoils = min(8, numCoils)
         
-        super.init(viewNibFileName: "GetCoilNames", windowTitle: "Coil Names")
+        super.init(viewNibFileName: "GetCoilNames", windowTitle: "Coil Names", hideCancel: false)
         
         do
         {

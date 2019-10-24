@@ -34,7 +34,7 @@ class GetCoilDetailsDlogBox: PCH_DialogBox {
     
     init(coilName:String)
     {
-        super.init(viewNibFileName: "GetCoilDetails", windowTitle: "Coil Details for \(coilName)")
+        super.init(viewNibFileName: "GetCoilDetails", windowTitle: "Coil Details for \(coilName)", hideCancel: true)
         
         do
         {

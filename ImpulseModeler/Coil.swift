@@ -134,8 +134,76 @@ class Coil:NSObject, NSCoding
         // disk coils can only be regulating windings if they are "double-stack"
         detailsDbox.regulatingWdg.isEnabled = xlFileCoil.isDoubleStack
         
+        // TODO: Implement in-coil winding rings (if necessary)
+        detailsDbox.windingRing.isEnabled = false
+        
+        let _ = detailsDbox.runModal()
+        
+        let lineAtTop = detailsDbox.lineAtTop.state == .on
+        let lineAtCenter = detailsDbox.lineAtCenter.state = .on
+        let regWdg = detailsDbox.regulatingWdg.state = .on
+        
+        let staticRingAtTop = detailsDbox.topStaticRing.state == .on
+        let staticRingAtCenter = detailsDbox.centerStaticRing.state == .on
+        let staticRingAtBottom = detailsDbox.bottomStaticRing.state == .on
+        
+        // A "major" section is one that holds the "entire" turns of the coil. That is, for a transfoermer with volts-per-turn equal to V/N (where V = phase volts), a major section has N turns.
+        let majorSections = (xlFileCoil.isDoubleStack ? 2.0 : 1.0)
+        
+        let hasTaps = xlFileCoil.maxTurns != xlFileCoil.nomTurns
+        
+        
+        
         
         return Coil(coilName: coilName, coilRadialPosition: 0, amps: 0.0, currentDirection: 0, capacitanceToPreviousCoil: capacitanceToPreviousCoil, capacitanceToGround: capacitanceToGround, innerRadius: 0.0, eddyLossPercentage: eddyLossPercentage, phaseNum: 0)
+    }
+    
+    class func GeneralDiskSeriesCapacitance(turnsCap:Double, capToDiskBelow:Double, capToDiskAbove:Double) -> Double
+    {
+        let Ya = capToDiskAbove / (capToDiskAbove + capToDiskBelow)
+        let Ya_2 = Ya * Ya
+        let Yb = capToDiskBelow / (capToDiskAbove + capToDiskBelow)
+        let Yb_2 = Yb * Yb
+        let a = sqrt(2.0 * (capToDiskAbove + capToDiskBelow) / turnsCap)
+        let a_2 = a * a
+        
+        let result = turnsCap * ((Ya_2 + Yb_2) * a / tanh(a) + 2.0 * Ya * Yb * a / sinh(a) + Ya * Yb * a_2)
+        
+        return result
+    }
+    
+    class func CapacitanceBetweenDisks(diskID:Double, diskOD:Double, keySpacerT:Double, keySpacerFactor:Double, paperBetweenTurns:Double) -> Double
+    {
+        let rIn = diskID / 2.0
+        let rOut = diskOD / 2.0
+        
+        let fSpacer = keySpacerFactor / (paperBetweenTurns / εPaper + keySpacerT / εBoard)
+        let fOil = (1.0 - keySpacerFactor) / (paperBetweenTurns / εPaper + keySpacerT / εOil)
+        
+        let result = ε0 * π * (rOut * rOut - rIn * rIn) * (fSpacer + fOil)
+        
+        return result
+    }
+    
+    class func KeySpacerFactor(numColumns:Double, spacerW:Double, lmt:Double) -> Double
+    {
+        let result = numColumns * spacerW / lmt
+        
+        return result
+    }
+    
+    class func CapacitanceOfDiskTurns(capBetweenTurns:Double, numTurns:Double) -> Double
+    {
+        let result = capBetweenTurns * (numTurns - 1.0) / (numTurns * numTurns)
+        
+        return result
+    }
+    
+    class func CapacitanceBetweenTurns(turnLength:Double, condW:Double, paperBetweenTurns:Double) -> Double
+    {
+        let result = ε0 * εPaper * turnLength * (condW + 2.0 * paperBetweenTurns) / paperBetweenTurns
+        
+        return result
     }
     
     /// Resistance of copper conductor at 20C
