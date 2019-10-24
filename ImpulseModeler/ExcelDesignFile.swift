@@ -61,13 +61,16 @@ class ExcelDesignFile: NSObject
         
         var eddyLossAvePU = 0.1
         
+        var overbuildAllowance = 1.06
+        
         var effectiveHt:Double {
             get
             {
-                return self.elecHt - self.axialCenterPack - self.axialDVgap1 - self.axialDVgap2
+                return self.elecHt - (self.axialCenterPack + self.axialDVgap1 + self.axialDVgap2) * 0.98
             }
         }
         
+        /// This property returns the "rounded-up" number of radial strands per CTC cable
         var radialStrandsPerTurn:Double {
             get
             {
@@ -86,6 +89,45 @@ class ExcelDesignFile: NSObject
             }
         }
         
+        var axialStrandsPerTurn:Double {
+            get
+            {
+                var result = Double(numCondAxial)
+                
+                if self.condType == "CTC"
+                {
+                    result *= 2.0
+                }
+                
+                return result
+            }
+        }
+        
+        var strandsPerTurn:Double {
+            get
+            {
+                if self.condType == "CTC"
+                {
+                    return self.ctcStrandsPerCable * Double(numCondRadial) * Double(numCondAxial)
+                }
+                else if self.condType == "D"
+                {
+                    return 2.0 * Double(numCondRadial) * Double(numCondAxial)
+                }
+                else
+                {
+                    return 1.0 * Double(numCondRadial) * Double(numCondAxial)
+                }
+            }
+        }
+        
+        var condAreaPerTurn:Double {
+            get
+            {
+                return strandR * strandA * self.strandsPerTurn
+            }
+        }
+        
         var numTurnsRadially:Double {
             get
             {
@@ -101,7 +143,7 @@ class ExcelDesignFile: NSObject
         var radialBuild:Double {
             get
             {
-                var result = self.numTurnsRadially * (self.radialStrandsPerTurn * self.strandR + self.totalPaperThicknessInOneTurnRadially) + self.numRadialDucts * self.radialDuctDimn
+                var result = self.numTurnsRadially * (self.radialStrandsPerTurn * self.strandR + self.totalPaperThicknessInOneTurnRadially) + self.numRadialDucts * self.radialDuctDimn * self.overbuildAllowance
                 
                 if self.isHelical || self.isMultipleStart
                 {
@@ -117,6 +159,13 @@ class ExcelDesignFile: NSObject
             get
             {
                 return self.coilID + 2.0 * self.radialBuild
+            }
+        }
+        
+        var lmt:Double {
+            get
+            {
+                return (self.coilID + self.radialBuild) * π
             }
         }
     }
@@ -727,6 +776,11 @@ class ExcelDesignFile: NSObject
         if let nextNum = Double(currentLine[0])
         {
             self.overbuildAllowance = nextNum
+            
+            for i in 0..<8
+            {
+                self.coils[i].overbuildAllowance = nextNum
+            }
         }
         else
         {

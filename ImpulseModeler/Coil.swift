@@ -112,10 +112,36 @@ class Coil:NSObject, NSCoding
         aCoder.encode(self.phaseNum, forKey: "PhaseNumber")
     }
     
-    class func CoilUsing(xlFileCoil:ExcelDesignFile.CoilData, coilName:String, capacitanceToPreviousCoil:Double, capacitanceToGround:Double, eddyLossPercentage:Double, phaseNum:Int) -> Coil
+    class func CoilUsing(xlFileCoil:ExcelDesignFile.CoilData, coilName:String, coilPosition:Int, connection:String, amps:Double, currentDirection:Int, capacitanceToPreviousCoil:Double, capacitanceToGround:Double, eddyLossPercentage:Double, phaseNum:Int) -> Coil
     {
+        // take care of the 'simple' case where the coil is a helix, layer, or sheet winding (any time numAxialSections <= 2)
+        // TODO: Develop a better method to represent helix, layer, and sheet windings
+        if xlFileCoil.isHelical || xlFileCoil.isMultipleStart || (xlFileCoil.numAxialSections <= 2)
+        {
+            // choose a sufficiently low number for series capacitance
+            let seriesCap = 1.0E-12
+            let coilResistance = ResistanceCu20(conductorArea: xlFileCoil.condAreaPerTurn, length: xlFileCoil.maxTurns * xlFileCoil.lmt)
+            let coilSize = NSSize(width: xlFileCoil.radialBuild, height: xlFileCoil.elecHt)
+            
+            let axialSection = AxialSection(sectionAxialPosition: 0, turns: xlFileCoil.maxTurns, numDisks: 1, topDiskSerialCapacitance: seriesCap, bottomDiskSerialCapacitance: seriesCap, commonDiskSerialCapacitance: seriesCap, topStaticRing: false, bottomStaticRing: false, isInterleaved: false, diskResistance: coilResistance, diskSize: coilSize, interDiskDimn: 0.0, overTopDiskDimn: 0.0, phaseNum: 1)
+            
+            return Coil(coilName: coilName, coilRadialPosition: coilPosition, amps: amps, currentDirection: currentDirection, capacitanceToPreviousCoil: capacitanceToPreviousCoil, capacitanceToGround: capacitanceToGround, innerRadius: xlFileCoil.coilID / 2.0, eddyLossPercentage: eddyLossPercentage, phaseNum: 1, sections: [axialSection])
+        }
+        
+        // It must be a disk coil, so throw up the Coil Details dialog box to get static/winding ring & interleave data
+        let detailsDbox = GetCoilDetailsDlogBox(coilName: coilName)
+        
+        // disk coils can only be regulating windings if they are "double-stack"
+        detailsDbox.regulatingWdg.isEnabled = xlFileCoil.isDoubleStack
+        
         
         return Coil(coilName: coilName, coilRadialPosition: 0, amps: 0.0, currentDirection: 0, capacitanceToPreviousCoil: capacitanceToPreviousCoil, capacitanceToGround: capacitanceToGround, innerRadius: 0.0, eddyLossPercentage: eddyLossPercentage, phaseNum: 0)
+    }
+    
+    /// Resistance of copper conductor at 20C
+    class func ResistanceCu20(conductorArea:Double, length:Double) -> Double
+    {
+        return 1.68e-8 * length / conductorArea
     }
     
     class func CapacitanceBetweenCoils(innerOD:Double, outerID:Double, innerH:Double, outerH:Double, numSpacers:Int) -> Double
