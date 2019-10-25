@@ -116,10 +116,20 @@ class Coil:NSObject, NSCoding
     {
         // take care of the 'simple' case where the coil is a helix, layer, or sheet winding (any time numAxialSections <= 2)
         // TODO: Develop a better method to represent helix, layer, and sheet windings
+        let isSheet = !xlFileCoil.isHelical && !xlFileCoil.isMultipleStart && xlFileCoil.numAxialSections <= 2
         if xlFileCoil.isHelical || xlFileCoil.isMultipleStart || (xlFileCoil.numAxialSections <= 2)
         {
-            // choose a sufficiently low number for series capacitance
-            let seriesCap = 1.0E-12
+            // choose a sufficiently low number for series capacitance - ultimately, I don't think this will matter anyway for a single coil section
+            var seriesCap = 1.0E-12
+            
+            // for now, we'll only consider the series capacitance of the turns for sheet windings (again, not that it makes a difference)
+            if isSheet
+            {
+                let turnCap = CapacitanceBetweenTurns(turnLength: xlFileCoil.lmt, condW: xlFileCoil.strandA * Double(xlFileCoil.numAxialSections), paperBetweenTurns: xlFileCoil.totalPaperThicknessInOneTurnRadially)
+                
+                seriesCap = CapacitanceOfDiskTurns(capBetweenTurns: turnCap, numTurns: xlFileCoil.maxTurns)
+            }
+            
             let coilResistance = ResistanceCu20(conductorArea: xlFileCoil.condAreaPerTurn, length: xlFileCoil.maxTurns * xlFileCoil.lmt)
             let coilSize = NSSize(width: xlFileCoil.radialBuild, height: xlFileCoil.elecHt)
             
@@ -134,7 +144,7 @@ class Coil:NSObject, NSCoding
         // disk coils can only be regulating windings if they are "double-stack"
         detailsDbox.regulatingWdg.isEnabled = xlFileCoil.isDoubleStack
         
-        // TODO: Implement in-coil winding rings (if necessary)
+        // TODO: Implement in-coil winding rings (if really necessary)
         detailsDbox.windingRing.isEnabled = false
         
         let _ = detailsDbox.runModal()
@@ -147,10 +157,10 @@ class Coil:NSObject, NSCoding
         let staticRingAtCenter = detailsDbox.centerStaticRing.state == .on
         let staticRingAtBottom = detailsDbox.bottomStaticRing.state == .on
         
-        // A "major" section is one that holds the "entire" turns of the coil. That is, for a transfoermer with volts-per-turn equal to V/N (where V = phase volts), a major section has N turns.
-        let majorSections = (xlFileCoil.isDoubleStack ? 2.0 : 1.0)
+        // A "major" section is one that holds the "entire" turns of the coil. That is, for a transformer with volts-per-turn equal to V/N (where V = phase volts), a major section has N turns.
         
-        let hasTaps = xlFileCoil.maxTurns != xlFileCoil.nomTurns
+        
+        
         
         
         
@@ -158,16 +168,65 @@ class Coil:NSObject, NSCoding
         return Coil(coilName: coilName, coilRadialPosition: 0, amps: 0.0, currentDirection: 0, capacitanceToPreviousCoil: capacitanceToPreviousCoil, capacitanceToGround: capacitanceToGround, innerRadius: 0.0, eddyLossPercentage: eddyLossPercentage, phaseNum: 0)
     }
     
-    class func GeneralDiskSeriesCapacitance(turnsCap:Double, capToDiskBelow:Double, capToDiskAbove:Double) -> Double
+    /// This function assumes that 'turnsCap' is for a "disk-pair". It then uses the the EndDiskWithStaticRingCapacitance function as though the double-disk is actually a single. Finally, it multiplies the resultant capacitance by 2 to get an "effective" capacitances (this sorta makes sense to me since teh static ring _is_ facing the interleave).
+    class func InterleavedEndDiskWithStaticRingCapacitance(turnsCap:Double, capToOtherDisk:Double, capToStaticRing:Double) -> Double
+    {
+        let pairCap = EndDiskWithStaticRingCapacitance(turnsCap: turnsCap, capToOtherDisk: capToOtherDisk, capToStaticRing: capToStaticRing)
+        
+        return pairCap * 2.0
+    }
+    
+    /// This function assumes that 'turnsCap' is for a "disk-pair". It then uses the standard method to calculate the series capacitance of the pair as if it was a single disk. Finally, it multiplies that calculated capacitance by 2 to get an "effective per-disk capacitance".
+    class func InterleavedCommonDiskCapacitance(turnsCap:Double, capToDiskAbove:Double, capToDiskBelow:Double) -> Double
+    {
+        let pairCap = CommonDiskCapacitance(turnsCap: turnsCap, capToDiskAbove: capToDiskAbove, capToDiskBelow: capToDiskBelow)
+        
+        return pairCap * 2.0
+    }
+    
+    // See the description above for other Interleaved calculations to see where I came up with the logic for this function.
+    /// This function assumes that 'turnsCap' is for a "disk-pair".
+    class func InterleavedTerminalDiskCapacitance(turnsCap:Double, capToOtherDisk:Double) -> Double
+    {
+        let pairCap = TerminalDiskCapacitance(turnsCap: turnsCap, capToOtherDisk: capToOtherDisk)
+        
+        return pairCap * 2.0
+    }
+    
+    class func InterleavedPairTurnsCapacitance(turnToTurnCap:Double, turnsPerDisk:Double) -> Double
+    {
+        return turnToTurnCap * (turnsPerDisk - 1) / 2.0
+    }
+    
+    class func TerminalDiskCapacitance(turnsCap:Double, capToOtherDisk:Double) -> Double
+    {
+        let alpha = sqrt(2.0 * capToOtherDisk / turnsCap)
+        
+        return turnsCap * alpha / tanh(alpha)
+    }
+    
+    class func EndDiskWithStaticRingCapacitance(turnsCap:Double, capToOtherDisk:Double, capToStaticRing:Double) -> Double
+    {
+        let Ya = capToStaticRing / (capToStaticRing + 2.0 * capToOtherDisk)
+        let Yb = 2.0 * capToOtherDisk / (capToStaticRing + 2.0 * capToOtherDisk)
+        let alpha = sqrt((capToStaticRing + 2.0 * capToOtherDisk) / turnsCap)
+        
+        return GeneralDiskSeriesCapacitance(Cs: turnsCap, Ya: Ya, Yb: Yb, alpha: alpha)
+    }
+    
+    class func CommonDiskCapacitance(turnsCap:Double, capToDiskAbove:Double, capToDiskBelow:Double) -> Double
     {
         let Ya = capToDiskAbove / (capToDiskAbove + capToDiskBelow)
-        let Ya_2 = Ya * Ya
         let Yb = capToDiskBelow / (capToDiskAbove + capToDiskBelow)
-        let Yb_2 = Yb * Yb
-        let a = sqrt(2.0 * (capToDiskAbove + capToDiskBelow) / turnsCap)
-        let a_2 = a * a
+        let alpha = sqrt(2.0 * (capToDiskAbove + capToDiskBelow) / turnsCap)
         
-        let result = turnsCap * ((Ya_2 + Yb_2) * a / tanh(a) + 2.0 * Ya * Yb * a / sinh(a) + Ya * Yb * a_2)
+        return GeneralDiskSeriesCapacitance(Cs: turnsCap, Ya: Ya, Yb: Yb, alpha: alpha)
+    }
+    
+    /// From DelVecchio Ed.2 Section 12.4, Formula 12.53
+    class func GeneralDiskSeriesCapacitance(Cs:Double, Ya:Double, Yb:Double, alpha:Double) -> Double
+    {
+        let result = Cs * ((Ya * Ya + Yb * Yb) * alpha / tanh(alpha) + 2.0 * Ya * Yb * alpha / sinh(alpha) + Ya * Yb * alpha * alpha)
         
         return result
     }

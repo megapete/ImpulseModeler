@@ -135,6 +135,10 @@ class ExcelDesignFile: NSObject
                 {
                     return self.numRadialSections
                 }
+                else if self.numAxialSections <= 2 // sheet winding
+                {
+                    return self.maxTurns
+                }
                 
                 return ceil(self.maxTurns / self.numAxialSections)
             }
