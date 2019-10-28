@@ -63,6 +63,21 @@ class ExcelDesignFile: NSObject
         
         var overbuildAllowance = 1.06
         
+        var paperOverOneTurn:Double {
+            get
+            {
+                let doublePaperPerStrand = meters(inches: 0.012)
+                
+                var result = self.totalPaperThicknessInOneTurnRadially / Double(self.numCondRadial)
+                if self.condType == "D"
+                {
+                    result -= Double(self.numCondRadial) * doublePaperPerStrand
+                }
+                
+                return result
+            }
+        }
+        
         var effectiveHt:Double {
             get
             {
@@ -106,18 +121,7 @@ class ExcelDesignFile: NSObject
         var strandsPerTurn:Double {
             get
             {
-                if self.condType == "CTC"
-                {
-                    return self.ctcStrandsPerCable * Double(numCondRadial) * Double(numCondAxial)
-                }
-                else if self.condType == "D"
-                {
-                    return 2.0 * Double(numCondRadial) * Double(numCondAxial)
-                }
-                else
-                {
-                    return 1.0 * Double(numCondRadial) * Double(numCondAxial)
-                }
+                return self.axialStrandsPerTurn * self.radialStrandsPerTurn
             }
         }
         

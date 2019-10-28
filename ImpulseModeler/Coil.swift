@@ -157,12 +157,70 @@ class Coil:NSObject, NSCoding
         let staticRingAtCenter = detailsDbox.centerStaticRing.state == .on
         let staticRingAtBottom = detailsDbox.bottomStaticRing.state == .on
         
-        // A "major" section is one that holds the "entire" turns of the coil. That is, for a transformer with volts-per-turn equal to V/N (where V = phase volts), a major section has N turns.
+        // Per-disk data
+        let turnsPerDisk = xlFileCoil.maxTurns / xlFileCoil.numAxialSections
+        let numStdGaps = xlFileCoil.numAxialSections - 1.0 - (xlFileCoil.axialCenterPack > 0.001 ? 1.0 : 0.0) - (xlFileCoil.axialDVgap1 > 0.001 ? 1.0 : 0.0) - (xlFileCoil.axialDVgap2 > 0.001 ? 1.0 : 0.0)
+        let totalAxialGapsDimn = (numStdGaps * xlFileCoil.axialGaps + xlFileCoil.axialCenterPack + xlFileCoil.axialDVgap1 + xlFileCoil.axialDVgap2) * 0.98
+        let diskAxialDimn = (xlFileCoil.elecHt - totalAxialGapsDimn) / xlFileCoil.numAxialSections
+        let diskSize = NSSize(width: xlFileCoil.radialBuild, height: diskAxialDimn)
+        let diskResistance = ResistanceCu20(conductorArea: xlFileCoil.condAreaPerTurn, length: turnsPerDisk * xlFileCoil.lmt)
+        let turnCap = CapacitanceBetweenTurns(turnLength: xlFileCoil.lmt, condW: diskAxialDimn, paperBetweenTurns: xlFileCoil.paperOverOneTurn)
+        let diskTurnsCap = CapacitanceOfDiskTurns(capBetweenTurns: turnCap, numTurns: turnsPerDisk)
+        let Fks = KeySpacerFactor(numColumns: xlFileCoil.numAxialColumns, spacerW: xlFileCoil.axialSpacerWidth, lmt: xlFileCoil.lmt)
+        let capBetweenDisks = CapacitanceBetweenDisks(diskID: xlFileCoil.coilID, diskOD: xlFileCoil.coilOD, keySpacerT: xlFileCoil.axialGaps, keySpacerFactor: Fks, paperBetweenTurns: xlFileCoil.paperOverOneTurn)
+        
+        // Static-ring dimensional data
+        let ringAxialGap = xlFileCoil.axialGaps / 2.0
+        let endRingAxialDimn = meters(inches: 0.625) + ringAxialGap * 0.98
+        let wdgRingAxialDimn = meters(inches: 0.625) + 2.0 * ringAxialGap * 0.98
+        
+        let isDelta = connection == "D"
+        
+        // handle interleaving
+        var interleavedRange:[Range<Int>]? = nil
+        let totalSections = Int(xlFileCoil.numAxialSections)
+        if detailsDbox.noInterleave.state == .off
+        {
+            if detailsDbox.fullInterleave.state == .on
+            {
+                let intRange = 0..<totalSections
+                interleavedRange = [intRange]
+            }
+            else
+            {
+                if let partialDisks = Int(detailsDbox.numPartialDisks.stringValue)
+                {
+                    if isDelta
+                    {
+                        interleavedRange = [0..<partialDisks, (totalSections - partialDisks)..<totalSections]
+                    }
+                    else if xlFileCoil.isDoubleStack && detailsDbox.lineAtCenter.state == .on
+                    {
+                        let midpoint = totalSections / 2
+                        interleavedRange = [(midpoint - partialDisks)..<(midpoint + partialDisks)]
+                    }
+                    else
+                    {
+                        interleavedRange = [(totalSections - partialDisks)..<totalSections]
+                    }
+                }
+            }
+        }
+        
+        let mainRange:[Range<Int>] = (xlFileCoil.isDoubleStack ? [0..<(totalSections / 2), (totalSections / 2)..<totalSections] : [0..<totalSections])
+        
+        let hasTaps = xlFileCoil.nomTurns != xlFileCoil.maxTurns
+        var minorRange:[Range<Int>]? = nil
+        if hasTaps
+        {
+            
+        }
         
         
-        
-        
-        
+        var axialSections:[AxialSection] = []
+        var currentAxialPosition = 0
+        var currentCumTurns = 0.0
+        var currentCumDisks = 0
         
         
         return Coil(coilName: coilName, coilRadialPosition: 0, amps: 0.0, currentDirection: 0, capacitanceToPreviousCoil: capacitanceToPreviousCoil, capacitanceToGround: capacitanceToGround, innerRadius: 0.0, eddyLossPercentage: eddyLossPercentage, phaseNum: 0)
