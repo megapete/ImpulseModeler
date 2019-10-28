@@ -169,6 +169,8 @@ class Coil:NSObject, NSCoding
         let Fks = KeySpacerFactor(numColumns: xlFileCoil.numAxialColumns, spacerW: xlFileCoil.axialSpacerWidth, lmt: xlFileCoil.lmt)
         let capBetweenDisks = CapacitanceBetweenDisks(diskID: xlFileCoil.coilID, diskOD: xlFileCoil.coilOD, keySpacerT: xlFileCoil.axialGaps, keySpacerFactor: Fks, paperBetweenTurns: xlFileCoil.paperOverOneTurn)
         
+        let capToStaticRing = (staticRingAtTop || staticRingAtCenter || staticRingAtTop ? CapacitanceBetweenDisks(diskID: xlFileCoil.coilID, diskOD: xlFileCoil.coilOD, keySpacerT: xlFileCoil.axialGaps / 2.0, keySpacerFactor: Fks, paperBetweenTurns: xlFileCoil.paperOverOneTurn / 2.0) : 0.0)
+        
         // Static-ring dimensional data
         let ringAxialGap = xlFileCoil.axialGaps / 2.0
         let endRingAxialDimn = meters(inches: 0.625) + ringAxialGap * 0.98
@@ -213,14 +215,59 @@ class Coil:NSObject, NSCoding
         var minorRange:[Range<Int>]? = nil
         if hasTaps
         {
-            
+            if !xlFileCoil.isDoubleStack
+            {
+                let mainLower = mainRange[0].lowerBound
+                let halfWay = mainRange[0].upperBound / 2
+                
+                minorRange = [mainLower..<halfWay, halfWay..<totalSections]
+            }
+            else
+            {
+                let mainLower1 = mainRange[0].lowerBound
+                let halfWay1 = mainRange[0].upperBound / 2
+                let mainMiddle = mainRange[0].upperBound
+                let halfWay2 = mainMiddle + halfWay1
+                
+                minorRange = [mainLower1..<halfWay1, halfWay1..<mainMiddle, mainMiddle..<halfWay2, halfWay2..<totalSections]
+            }
         }
         
         
         var axialSections:[AxialSection] = []
         var currentAxialPosition = 0
         var currentCumTurns = 0.0
-        var currentCumDisks = 0
+        var currentDisk = 0
+        
+        var currentSeriesCap = 0.0
+        if lineAtTop && isDelta && interleavedRange != nil
+        {
+            let turnsCap = InterleavedPairTurnsCapacitance(turnToTurnCap: turnCap, turnsPerDisk: turnsPerDisk)
+            
+            if staticRingAtBottom
+            {
+                currentSeriesCap = InterleavedEndDiskWithStaticRingCapacitance(turnsCap: turnsCap, capToOtherDisk: capBetweenDisks, capToStaticRing: capToStaticRing)
+            }
+            else
+            {
+                currentSeriesCap = InterleavedTerminalDiskCapacitance(turnsCap: turnsCap, capToOtherDisk: capBetweenDisks)
+            }
+        }
+        else
+        {
+            if staticRingAtBottom || (staticRingAtTop && isDelta)
+            {
+                currentSeriesCap = EndDiskWithStaticRingCapacitance(turnsCap: diskTurnsCap, capToOtherDisk: capBetweenDisks, capToStaticRing: capToStaticRing)
+            }
+            else
+            {
+                currentSeriesCap = TerminalDiskCapacitance(turnsCap: diskTurnsCap, capToOtherDisk: capBetweenDisks)
+            }
+        }
+        
+        var lastSeriesCap = 0.0
+        
+        
         
         
         return Coil(coilName: coilName, coilRadialPosition: 0, amps: 0.0, currentDirection: 0, capacitanceToPreviousCoil: capacitanceToPreviousCoil, capacitanceToGround: capacitanceToGround, innerRadius: 0.0, eddyLossPercentage: eddyLossPercentage, phaseNum: 0)
