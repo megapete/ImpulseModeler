@@ -150,8 +150,8 @@ class Coil:NSObject, NSCoding
         let _ = detailsDbox.runModal()
         
         let lineAtTop = detailsDbox.lineAtTop.state == .on
-        let lineAtCenter = detailsDbox.lineAtCenter.state = .on
-        let regWdg = detailsDbox.regulatingWdg.state = .on
+        let lineAtCenter = detailsDbox.lineAtCenter.state == .on
+        let regWdg = detailsDbox.regulatingWdg.state == .on
         
         let staticRingAtTop = detailsDbox.topStaticRing.state == .on
         let staticRingAtCenter = detailsDbox.centerStaticRing.state == .on
@@ -166,6 +166,7 @@ class Coil:NSObject, NSCoding
         let diskResistance = ResistanceCu20(conductorArea: xlFileCoil.condAreaPerTurn, length: turnsPerDisk * xlFileCoil.lmt)
         let turnCap = CapacitanceBetweenTurns(turnLength: xlFileCoil.lmt, condW: diskAxialDimn, paperBetweenTurns: xlFileCoil.paperOverOneTurn)
         let diskTurnsCap = CapacitanceOfDiskTurns(capBetweenTurns: turnCap, numTurns: turnsPerDisk)
+        let interleavedDiscTurnsCap = InterleavedPairTurnsCapacitance(turnToTurnCap: turnCap, turnsPerDisk: turnsPerDisk)
         let Fks = KeySpacerFactor(numColumns: xlFileCoil.numAxialColumns, spacerW: xlFileCoil.axialSpacerWidth, lmt: xlFileCoil.lmt)
         let capBetweenDisks = CapacitanceBetweenDisks(diskID: xlFileCoil.coilID, diskOD: xlFileCoil.coilOD, keySpacerT: xlFileCoil.axialGaps, keySpacerFactor: Fks, paperBetweenTurns: xlFileCoil.paperOverOneTurn)
         
@@ -177,11 +178,16 @@ class Coil:NSObject, NSCoding
         let wdgRingAxialDimn = meters(inches: 0.625) + 2.0 * ringAxialGap * 0.98
         
         let isDelta = connection == "D"
+        let isDoubleStack = xlFileCoil.isDoubleStack
+        let isInterleaved = detailsDbox.noInterleave.state == .off
+        
+        let totalSections = Int(xlFileCoil.numAxialSections)
+        var boundsSet:Set<Int> = [0, totalSections - 1]
         
         // handle interleaving
-        var interleavedRange:[Range<Int>]? = nil
-        let totalSections = Int(xlFileCoil.numAxialSections)
-        if detailsDbox.noInterleave.state == .off
+        var interleavedRange:[Range<Int>] = []
+        
+        if isInterleaved
         {
             if detailsDbox.fullInterleave.state == .on
             {
@@ -195,32 +201,62 @@ class Coil:NSObject, NSCoding
                     if isDelta
                     {
                         interleavedRange = [0..<partialDisks, (totalSections - partialDisks)..<totalSections]
+                        boundsSet.insert(partialDisks - 1)
+                        boundsSet.insert(totalSections - partialDisks)
                     }
-                    else if xlFileCoil.isDoubleStack && detailsDbox.lineAtCenter.state == .on
+                    else if isDoubleStack && lineAtCenter
                     {
                         let midpoint = totalSections / 2
                         interleavedRange = [(midpoint - partialDisks)..<(midpoint + partialDisks)]
+                        boundsSet.insert(midpoint - partialDisks)
+                        boundsSet.insert(midpoint + partialDisks - 1)
                     }
                     else
                     {
                         interleavedRange = [(totalSections - partialDisks)..<totalSections]
+                        boundsSet.insert(totalSections - partialDisks)
                     }
                 }
             }
         }
         
-        let mainRange:[Range<Int>] = (xlFileCoil.isDoubleStack ? [0..<(totalSections / 2), (totalSections / 2)..<totalSections] : [0..<totalSections])
+        let mainRange:[Range<Int>] = (isDoubleStack ? [0..<(totalSections / 2), (totalSections / 2)..<totalSections] : [0..<totalSections])
+        if isDoubleStack
+        {
+            boundsSet.insert(totalSections / 2 - 1)
+            boundsSet.insert(totalSections / 2)
+        }
         
         let hasTaps = xlFileCoil.nomTurns != xlFileCoil.maxTurns
-        var minorRange:[Range<Int>]? = nil
+        var minorRange:[Range<Int>] = []
+        
+        // assume that anything less than 3/4" is for a static ring
+        if xlFileCoil.axialCenterPack > meters(inches: 0.75)
+        {
+            let mainLower = mainRange[0].lowerBound
+            let halfWay = mainRange[0].upperBound / 2
+            
+            minorRange = [mainLower..<halfWay, halfWay..<totalSections]
+        }
+        
+        var tapRange:[Range<Int>] = []
         if hasTaps
         {
+            let tapTurns = xlFileCoil.maxTurns - xlFileCoil.minTurns
+            let tapSectionDisksExact = tapTurns / turnsPerDisk / 2.0
+            var tapSectionDisks = Int(round(tapSectionDisksExact))
+            
             if !xlFileCoil.isDoubleStack
             {
                 let mainLower = mainRange[0].lowerBound
                 let halfWay = mainRange[0].upperBound / 2
                 
                 minorRange = [mainLower..<halfWay, halfWay..<totalSections]
+                tapRange = [halfWay - tapSectionDisks..<halfWay, halfWay..<halfWay + tapSectionDisks]
+                boundsSet.insert(halfWay - tapSectionDisks)
+                boundsSet.insert(halfWay - 1)
+                boundsSet.insert(halfWay)
+                boundsSet.insert(halfWay + tapSectionDisks - 1)
             }
             else
             {
@@ -230,47 +266,266 @@ class Coil:NSObject, NSCoding
                 let halfWay2 = mainMiddle + halfWay1
                 
                 minorRange = [mainLower1..<halfWay1, halfWay1..<mainMiddle, mainMiddle..<halfWay2, halfWay2..<totalSections]
+                
+                tapSectionDisks = Int(round(tapSectionDisksExact / 2.0))
+                tapRange = [halfWay1 - tapSectionDisks..<halfWay1, halfWay1..<halfWay1 + tapSectionDisks, halfWay2 - tapSectionDisks..<halfWay2, halfWay2..<halfWay2 + tapSectionDisks]
+                
+                
+                for nextRange in minorRange
+                {
+                    boundsSet.insert(nextRange.lowerBound)
+                    boundsSet.insert(nextRange.upperBound - 1)
+                }
+                for nextRange in tapRange
+                {
+                    boundsSet.insert(nextRange.lowerBound)
+                    boundsSet.insert(nextRange.upperBound - 1)
+                }
             }
         }
-        
         
         var axialSections:[AxialSection] = []
         var currentAxialPosition = 0
         var currentCumTurns = 0.0
-        var currentDisk = 0
+        var currentCumDisks = 0
+        var hasBottomStaticRing = false
         
-        var currentSeriesCap = 0.0
-        if lineAtTop && isDelta && interleavedRange != nil
+        var bottomSeriesCap = 0.0
+        var commonSeriesCap = 0.0
+        var topSeriesCap = 0.0
+        
+        for diskIndex in 0..<totalSections
         {
-            let turnsCap = InterleavedPairTurnsCapacitance(turnToTurnCap: turnCap, turnsPerDisk: turnsPerDisk)
+            currentCumDisks += 1
+            currentCumTurns += turnsPerDisk
             
-            if staticRingAtBottom
+            // first check if this disk is one of our bounds
+            if boundsSet.contains(diskIndex)
             {
-                currentSeriesCap = InterleavedEndDiskWithStaticRingCapacitance(turnsCap: turnsCap, capToOtherDisk: capBetweenDisks, capToStaticRing: capToStaticRing)
-            }
-            else
-            {
-                currentSeriesCap = InterleavedTerminalDiskCapacitance(turnsCap: turnsCap, capToOtherDisk: capBetweenDisks)
+                let mainMemberType = CheckForBound(rangeArray: mainRange, boundToCheck: diskIndex)
+                let minorMemberType = CheckForBound(rangeArray: minorRange, boundToCheck: diskIndex)
+                let tapMemberType = CheckForBound(rangeArray: tapRange, boundToCheck: diskIndex)
+                let interleavedMemberType = CheckForBound(rangeArray: interleavedRange, boundToCheck: diskIndex)
+                
+                // Now go through all the possibilities
+                if mainMemberType == .FirstBound
+                {
+                    // This is either the lowest disk or the the first line disk at center
+                    
+                    let staticRingBelow = (diskIndex == 0 ? staticRingAtBottom : staticRingAtCenter)
+                    hasBottomStaticRing = staticRingBelow
+                    
+                    if interleavedMemberType != .NotAMember
+                    {
+                        if staticRingBelow
+                        {
+                            bottomSeriesCap = InterleavedEndDiskWithStaticRingCapacitance(turnsCap: interleavedDiscTurnsCap, capToOtherDisk: capBetweenDisks, capToStaticRing: capToStaticRing)
+                        }
+                        else
+                        {
+                            bottomSeriesCap = InterleavedTerminalDiskCapacitance(turnsCap: interleavedDiscTurnsCap, capToOtherDisk: capBetweenDisks)
+                        }
+                        
+                        commonSeriesCap = InterleavedCommonDiskCapacitance(turnsCap: interleavedDiscTurnsCap, capToDiskAbove: capBetweenDisks, capToDiskBelow: capBetweenDisks)
+                    }
+                    else
+                    {
+                        if staticRingBelow
+                        {
+                            bottomSeriesCap = EndDiskWithStaticRingCapacitance(turnsCap: diskTurnsCap, capToOtherDisk: capBetweenDisks, capToStaticRing: capToStaticRing)
+                        }
+                        else
+                        {
+                            bottomSeriesCap = TerminalDiskCapacitance(turnsCap: diskTurnsCap, capToOtherDisk: capBetweenDisks)
+                        }
+                        
+                        commonSeriesCap = CommonDiskCapacitance(turnsCap: diskTurnsCap, capToDiskAbove: capBetweenDisks, capToDiskBelow: capBetweenDisks)
+                    }
+                }
+                else if minorMemberType == .FirstBound && tapMemberType == .FirstBound
+                {
+                    // This is the first disk after a tapping break (either offload or delta-connected onload)
+                    let underGap = (isDoubleStack ? xlFileCoil.axialDVgap1 : xlFileCoil.axialCenterPack)
+                    let capToDiskBelow = CapacitanceBetweenDisks(diskID: xlFileCoil.coilID, diskOD: xlFileCoil.coilOD, keySpacerT: underGap, keySpacerFactor: Fks, paperBetweenTurns: xlFileCoil.paperOverOneTurn)
+                    
+                    if interleavedMemberType != .NotAMember
+                    {
+                        bottomSeriesCap = InterleavedCommonDiskCapacitance(turnsCap: interleavedDiscTurnsCap, capToDiskAbove: capBetweenDisks, capToDiskBelow: capToDiskBelow)
+                        
+                        commonSeriesCap = InterleavedCommonDiskCapacitance(turnsCap: interleavedDiscTurnsCap, capToDiskAbove: capBetweenDisks, capToDiskBelow: capBetweenDisks)
+                    }
+                    else
+                    {
+                        bottomSeriesCap = CommonDiskCapacitance(turnsCap: diskTurnsCap, capToDiskAbove: capBetweenDisks, capToDiskBelow: capToDiskBelow)
+                        
+                        commonSeriesCap = CommonDiskCapacitance(turnsCap: diskTurnsCap, capToDiskAbove: capBetweenDisks, capToDiskBelow: capBetweenDisks)
+                    }
+                }
+                else if minorMemberType != .FirstBound && tapMemberType == .FirstBound
+                {
+                    // This is the first disk of a tapping section within the winding (not after a tapping break)
+                    if interleavedMemberType != .NotAMember
+                    {
+                        bottomSeriesCap = InterleavedCommonDiskCapacitance(turnsCap: interleavedDiscTurnsCap, capToDiskAbove: capBetweenDisks, capToDiskBelow: capBetweenDisks)
+                    }
+                    else
+                    {
+                        bottomSeriesCap = CommonDiskCapacitance(turnsCap: diskTurnsCap, capToDiskAbove: capBetweenDisks, capToDiskBelow: capBetweenDisks)
+                    }
+                    
+                    commonSeriesCap = bottomSeriesCap
+                }
+                else if minorMemberType == .FirstBound
+                {
+                    // This is the first disk after the gap for a delta-connected LTC or a split regulating winding
+                    if staticRingAtCenter
+                    {
+                        if interleavedMemberType != .NotAMember
+                        {
+                            bottomSeriesCap = InterleavedEndDiskWithStaticRingCapacitance(turnsCap: interleavedDiscTurnsCap, capToOtherDisk: capBetweenDisks, capToStaticRing: capToStaticRing)
+                            
+                            commonSeriesCap = InterleavedCommonDiskCapacitance(turnsCap: interleavedDiscTurnsCap, capToDiskAbove: capBetweenDisks, capToDiskBelow: capBetweenDisks)
+                        }
+                        else
+                        {
+                            bottomSeriesCap = EndDiskWithStaticRingCapacitance(turnsCap: diskTurnsCap, capToOtherDisk: capBetweenDisks, capToStaticRing: capToStaticRing)
+                            
+                            commonSeriesCap = CommonDiskCapacitance(turnsCap: diskTurnsCap, capToDiskAbove: capBetweenDisks, capToDiskBelow: capBetweenDisks)
+                        }
+                        
+                        hasBottomStaticRing = true
+                    }
+                    else
+                    {
+                        let underGap = xlFileCoil.axialCenterPack
+                        let capToDiskBelow = CapacitanceBetweenDisks(diskID: xlFileCoil.coilID, diskOD: xlFileCoil.coilOD, keySpacerT: underGap, keySpacerFactor: Fks, paperBetweenTurns: xlFileCoil.paperOverOneTurn)
+                    
+                        if interleavedMemberType != .NotAMember
+                        {
+                            bottomSeriesCap = InterleavedCommonDiskCapacitance(turnsCap: interleavedDiscTurnsCap, capToDiskAbove: capBetweenDisks, capToDiskBelow: capToDiskBelow)
+                            
+                            commonSeriesCap = InterleavedCommonDiskCapacitance(turnsCap: interleavedDiscTurnsCap, capToDiskAbove: capBetweenDisks, capToDiskBelow: capBetweenDisks)
+                        }
+                        else
+                        {
+                            bottomSeriesCap = CommonDiskCapacitance(turnsCap: diskTurnsCap, capToDiskAbove: capBetweenDisks, capToDiskBelow: capToDiskBelow)
+                            
+                            commonSeriesCap = CommonDiskCapacitance(turnsCap: diskTurnsCap, capToDiskAbove: capBetweenDisks, capToDiskBelow: capBetweenDisks)
+                        }
+                    }
+                    
+                }
+                else if interleavedMemberType == .FirstBound
+                {
+                    // This is the first disk of an interleaved section
+                    bottomSeriesCap = InterleavedCommonDiskCapacitance(turnsCap: interleavedDiscTurnsCap, capToDiskAbove: capBetweenDisks, capToDiskBelow: capBetweenDisks)
+                    
+                    commonSeriesCap = bottomSeriesCap
+                }
+                else if mainMemberType == .LastBound
+                {
+                    // This is either the final disk or the last disk before the center-line lead
+                    let staticRingAbove = (diskIndex == totalSections - 1 ? staticRingAtTop : staticRingAtCenter)
+                    
+                    if interleavedMemberType != .NotAMember
+                    {
+                        if staticRingAbove
+                        {
+                            topSeriesCap = InterleavedEndDiskWithStaticRingCapacitance(turnsCap: interleavedDiscTurnsCap, capToOtherDisk: capBetweenDisks, capToStaticRing: capToStaticRing)
+                        }
+                        else
+                        {
+                            topSeriesCap = InterleavedTerminalDiskCapacitance(turnsCap: interleavedDiscTurnsCap, capToOtherDisk: capBetweenDisks)
+                        }
+                    }
+                    else
+                    {
+                        if staticRingAbove
+                        {
+                            topSeriesCap = EndDiskWithStaticRingCapacitance(turnsCap: diskTurnsCap, capToOtherDisk: capBetweenDisks, capToStaticRing: capToStaticRing)
+                        }
+                        else
+                        {
+                            topSeriesCap = TerminalDiskCapacitance(turnsCap: diskTurnsCap, capToOtherDisk: capBetweenDisks)
+                        }
+                    }
+                    
+                    let overTopDimn = (diskIndex == totalSections - 1 ? 0.0 : xlFileCoil.axialCenterPack)
+                    
+                    // add axial section
+                    let newAxialSection = AxialSection(sectionAxialPosition: currentAxialPosition, turns: currentCumTurns, numDisks: Double(currentCumDisks), topDiskSerialCapacitance: topSeriesCap, bottomDiskSerialCapacitance: bottomSeriesCap, commonDiskSerialCapacitance: commonSeriesCap, topStaticRing: staticRingAbove, bottomStaticRing: hasBottomStaticRing, isInterleaved: interleavedMemberType != .NotAMember, diskResistance: diskResistance, diskSize: diskSize, interDiskDimn: xlFileCoil.axialGaps, overTopDiskDimn: overTopDimn, phaseNum: 1)
+                    
+                    axialSections.append(newAxialSection)
+                    
+                    currentAxialPosition += 1
+                    currentCumTurns = 0
+                    currentCumDisks = 0
+                    hasBottomStaticRing = false
+                }
+                else if minorMemberType == .LastBound && tapMemberType == .LastBound
+                {
+                    // This is the last disk of a tapping section before a tapping break
+                    let overGap = (isDoubleStack ? xlFileCoil.axialDVgap1 : xlFileCoil.axialCenterPack)
+                    let capToDiskAbove = CapacitanceBetweenDisks(diskID: xlFileCoil.coilID, diskOD: xlFileCoil.coilOD, keySpacerT: overGap, keySpacerFactor: Fks, paperBetweenTurns: xlFileCoil.paperOverOneTurn)
+                    
+                    if interleavedMemberType != .NotAMember
+                    {
+                        topSeriesCap = InterleavedCommonDiskCapacitance(turnsCap: interleavedDiscTurnsCap, capToDiskAbove: capBetweenDisks, capToDiskBelow: capToDiskAbove)
+                    }
+                    else
+                    {
+                        topSeriesCap = CommonDiskCapacitance(turnsCap: diskTurnsCap, capToDiskAbove: capBetweenDisks, capToDiskBelow: capToDiskAbove)
+                    }
+                    
+                    // add axial section
+                    let newAxialSection = AxialSection(sectionAxialPosition: currentAxialPosition, turns: currentCumTurns, numDisks: Double(currentCumDisks), topDiskSerialCapacitance: topSeriesCap, bottomDiskSerialCapacitance: bottomSeriesCap, commonDiskSerialCapacitance: commonSeriesCap, topStaticRing: false, bottomStaticRing: hasBottomStaticRing, isInterleaved: interleavedMemberType != .NotAMember, diskResistance: diskResistance, diskSize: diskSize, interDiskDimn: xlFileCoil.axialGaps, overTopDiskDimn: overGap, phaseNum: 1)
+                    
+                    axialSections.append(newAxialSection)
+                    
+                    currentAxialPosition += 1
+                    currentCumTurns = 0
+                    currentCumDisks = 0
+                    hasBottomStaticRing = false
+                    
+                }
+                
             }
         }
-        else
-        {
-            if staticRingAtBottom || (staticRingAtTop && isDelta)
-            {
-                currentSeriesCap = EndDiskWithStaticRingCapacitance(turnsCap: diskTurnsCap, capToOtherDisk: capBetweenDisks, capToStaticRing: capToStaticRing)
-            }
-            else
-            {
-                currentSeriesCap = TerminalDiskCapacitance(turnsCap: diskTurnsCap, capToOtherDisk: capBetweenDisks)
-            }
-        }
-        
-        var lastSeriesCap = 0.0
-        
-        
         
         
         return Coil(coilName: coilName, coilRadialPosition: 0, amps: 0.0, currentDirection: 0, capacitanceToPreviousCoil: capacitanceToPreviousCoil, capacitanceToGround: capacitanceToGround, innerRadius: 0.0, eddyLossPercentage: eddyLossPercentage, phaseNum: 0)
+    }
+    
+    // Return types for the CheckForBound function (below)
+    enum RangeBoundMemberType
+    {
+        case NotAMember
+        case FirstBound
+        case LastBound
+        case ContainsBound
+    }
+    
+    fileprivate class func CheckForBound(rangeArray:[Range<Int>], boundToCheck:Int) -> RangeBoundMemberType
+    {
+        for nextRange in rangeArray
+        {
+            if nextRange.contains(boundToCheck)
+            {
+                if boundToCheck == nextRange.lowerBound
+                {
+                    return .FirstBound
+                }
+                
+                if boundToCheck == nextRange.upperBound - 1
+                {
+                    return .LastBound
+                }
+                
+                return .ContainsBound
+            }
+        }
+        
+        return .NotAMember
     }
     
     /// This function assumes that 'turnsCap' is for a "disk-pair". It then uses the the EndDiskWithStaticRingCapacitance function as though the double-disk is actually a single. Finally, it multiplies the resultant capacitance by 2 to get an "effective" capacitances (this sorta makes sense to me since teh static ring _is_ facing the interleave).
