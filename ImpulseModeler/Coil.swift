@@ -184,6 +184,9 @@ class Coil:NSObject, NSCoding
         let totalSections = Int(xlFileCoil.numAxialSections)
         var boundsSet:Set<Int> = [0, totalSections - 1]
         
+        var arbitraryStarts:Set<Int> = []
+        var aribitraryEnds:Set<Int> = []
+        
         // handle interleaving
         var interleavedRange:[Range<Int>] = []
         
@@ -202,19 +205,24 @@ class Coil:NSObject, NSCoding
                     {
                         interleavedRange = [0..<partialDisks, (totalSections - partialDisks)..<totalSections]
                         boundsSet.insert(partialDisks - 1)
+                        arbitraryStarts.insert(partialDisks)
                         boundsSet.insert(totalSections - partialDisks)
+                        aribitraryEnds.insert(totalSections - partialDisks - 1)
                     }
                     else if isDoubleStack && lineAtCenter
                     {
                         let midpoint = totalSections / 2
                         interleavedRange = [(midpoint - partialDisks)..<(midpoint + partialDisks)]
                         boundsSet.insert(midpoint - partialDisks)
+                        aribitraryEnds.insert(midpoint - partialDisks - 1)
                         boundsSet.insert(midpoint + partialDisks - 1)
+                        arbitraryStarts.insert(midpoint + partialDisks)
                     }
                     else
                     {
                         interleavedRange = [(totalSections - partialDisks)..<totalSections]
                         boundsSet.insert(totalSections - partialDisks)
+                        aribitraryEnds.insert(totalSections - partialDisks - 1)
                     }
                 }
             }
@@ -248,6 +256,7 @@ class Coil:NSObject, NSCoding
             
             minorRange.append(mainLower..<gapLoc)
             minorRange.append(gapLoc..<halfWayMain)
+            arbitraryStarts.insert(halfWayMain)
         }
         
         if xlFileCoil.axialDVgap2 > 0.001
@@ -255,6 +264,7 @@ class Coil:NSObject, NSCoding
             let halfWayMain = totalSections / 2
             let gapLoc = halfWayMain * 3 / 2
             
+            aribitraryEnds.insert(halfWayMain - 1)
             minorRange.append(halfWayMain..<gapLoc)
             minorRange.append(gapLoc..<totalSections)
         }
@@ -273,10 +283,12 @@ class Coil:NSObject, NSCoding
                 
                 minorRange = [mainLower..<halfWay, halfWay..<totalSections]
                 tapRange = [halfWay - tapSectionDisks..<halfWay, halfWay..<halfWay + tapSectionDisks]
+                aribitraryEnds.insert(halfWay - tapSectionDisks - 1)
                 boundsSet.insert(halfWay - tapSectionDisks)
                 boundsSet.insert(halfWay - 1)
                 boundsSet.insert(halfWay)
                 boundsSet.insert(halfWay + tapSectionDisks - 1)
+                arbitraryStarts.insert(halfWay + tapSectionDisks)
             }
             else
             {
@@ -290,6 +302,10 @@ class Coil:NSObject, NSCoding
                 tapSectionDisks = Int(round(tapSectionDisksExact / 2.0))
                 tapRange = [halfWay1 - tapSectionDisks..<halfWay1, halfWay1..<halfWay1 + tapSectionDisks, halfWay2 - tapSectionDisks..<halfWay2, halfWay2..<halfWay2 + tapSectionDisks]
                 
+                aribitraryEnds.insert(halfWay1 - tapSectionDisks - 1)
+                arbitraryStarts.insert(halfWay1 + tapSectionDisks)
+                aribitraryEnds.insert(halfWay2 - tapSectionDisks - 1)
+                arbitraryStarts.insert(halfWay2 + tapSectionDisks)
                 
                 for nextRange in minorRange
                 {
@@ -303,6 +319,14 @@ class Coil:NSObject, NSCoding
                 }
             }
         }
+        
+        if !arbitraryStarts.intersection(aribitraryEnds).isEmpty
+        {
+            ALog("Index is at start and end!")
+        }
+        
+        boundsSet.formUnion(arbitraryStarts)
+        boundsSet.formUnion(aribitraryEnds)
         
         var axialSections:[AxialSection] = []
         var currentAxialPosition = 0
@@ -601,6 +625,33 @@ class Coil:NSObject, NSCoding
                     currentCumTurns = 0
                     currentCumDisks = 0
                     hasBottomStaticRing = false
+                }
+                else if aribitraryEnds.contains(diskIndex)
+                {
+                    topSeriesCap = commonSeriesCap
+                    
+                    let newAxialSection = AxialSection(sectionAxialPosition: currentAxialPosition, turns: currentCumTurns, numDisks: Double(currentCumDisks), topDiskSerialCapacitance: topSeriesCap, bottomDiskSerialCapacitance: bottomSeriesCap, commonDiskSerialCapacitance: commonSeriesCap, topStaticRing: false, bottomStaticRing: false, isInterleaved: interleavedMemberType != .NotAMember, diskResistance: diskResistance, diskSize: diskSize, interDiskDimn: xlFileCoil.axialGaps, overTopDiskDimn: xlFileCoil.axialGaps, phaseNum: 1)
+                    
+                    axialSections.append(newAxialSection)
+                    
+                    // set/reset variables for next disk
+                    currentAxialPosition += 1
+                    currentCumTurns = 0
+                    currentCumDisks = 0
+                    hasBottomStaticRing = false
+                }
+                else if arbitraryStarts.contains(diskIndex)
+                {
+                    if interleavedMemberType != .NotAMember
+                    {
+                        bottomSeriesCap = InterleavedCommonDiskCapacitance(turnsCap: interleavedDiscTurnsCap, capToDiskAbove: capBetweenDisks, capToDiskBelow: capBetweenDisks)
+                    }
+                    else
+                    {
+                        bottomSeriesCap = CommonDiskCapacitance(turnsCap: diskTurnsCap, capToDiskAbove: capBetweenDisks, capToDiskBelow: capBetweenDisks)
+                    }
+                    
+                    commonSeriesCap = bottomSeriesCap
                 }
                 else
                 {

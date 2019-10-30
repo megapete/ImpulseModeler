@@ -316,6 +316,12 @@ class AppController: NSObject {
                     
                     lastCoil.capacitanceToGround = gndCap
                     
+                    self.phaseDefinition = Phase(core: newCore, coils: newCoils)
+                    
+                    self.theModel = []
+                    
+                    self.handleCreateModel(self)
+                    
                 }
                 catch
                 {
