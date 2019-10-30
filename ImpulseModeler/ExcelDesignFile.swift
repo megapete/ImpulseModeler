@@ -151,7 +151,7 @@ class ExcelDesignFile: NSObject
         var radialBuild:Double {
             get
             {
-                var result = self.numTurnsRadially * (self.radialStrandsPerTurn * self.strandR + self.totalPaperThicknessInOneTurnRadially) + self.numRadialDucts * self.radialDuctDimn * self.overbuildAllowance
+                var result = (self.numTurnsRadially * (self.radialStrandsPerTurn * (self.strandR + (self.condType == "CTC" ? meters(inches:0.0045) : 0.0)) + self.totalPaperThicknessInOneTurnRadially) + self.numRadialDucts * self.radialDuctDimn) * self.overbuildAllowance
                 
                 if self.isHelical || self.isMultipleStart
                 {
