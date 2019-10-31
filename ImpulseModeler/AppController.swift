@@ -301,8 +301,6 @@ class AppController: NSObject {
                             
                             let impCoil = Coil.CoilUsing(xlFileCoil: coil, coilName: coilNames[nextCoilIndex], coilPosition: nextCoilIndex, connection: terminal.connection, amps: terminal.phaseAmps, currentDirection: terminal.currentDirection, capacitanceToPreviousCoil: capToPreviousCoil, capacitanceToGround: 0.0, eddyLossPercentage: coil.eddyLossAvePU, phaseNum: 1)
                             
-                            // let tmpCoil = Coil(coilName: coilNames[nextCoilIndex], coilRadialPosition: nextCoilIndex, amps: terminal.phaseAmps, currentDirection: terminal.currentDirection, capacitanceToPreviousCoil: capToPreviousCoil, capacitanceToGround: 0.0, innerRadius: coil.coilID / 2.0, eddyLossPercentage: coil.eddyLossAvePU * 100.0, phaseNum: 1)
-                            
                             newCoils.append(impCoil)
                             
                             lastCoil = impCoil
@@ -320,7 +318,7 @@ class AppController: NSObject {
                     
                     self.theModel = []
                     
-                    self.handleCreateModel(self)
+                    // self.handleCreateModel(self)
                     
                 }
                 catch

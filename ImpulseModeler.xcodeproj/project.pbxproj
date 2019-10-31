@@ -41,6 +41,8 @@
 		D37146921DC3D5FC00823F20 /* CoilDlog.xib in Resources */ = {isa = PBXBuildFile; fileRef = D37146901DC3D5FC00823F20 /* CoilDlog.xib */; };
 		D37146941DC9161600823F20 /* PCH_BlueBookModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D37146931DC9161600823F20 /* PCH_BlueBookModel.swift */; };
 		D371469C1DC9284800823F20 /* PCH_Source.swift in Sources */ = {isa = PBXBuildFile; fileRef = D371469B1DC9284800823F20 /* PCH_Source.swift */; };
+		D398D401236B8A8D003D7950 /* PhaseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D398D3FF236B8A8D003D7950 /* PhaseView.swift */; };
+		D398D402236B8A8D003D7950 /* PhaseView.xib in Resources */ = {isa = PBXBuildFile; fileRef = D398D400236B8A8D003D7950 /* PhaseView.xib */; };
 		D3B8CCBE20A0828D00102039 /* GlobalDefs.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3B8CCBD20A0828D00102039 /* GlobalDefs.swift */; };
 		D3F3010B1DCFCA530039B04A /* PCH_BlueBookModelOutput.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3F3010A1DCFCA530039B04A /* PCH_BlueBookModelOutput.swift */; };
 /* End PBXBuildFile section */
@@ -83,6 +85,8 @@
 		D37146901DC3D5FC00823F20 /* CoilDlog.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CoilDlog.xib; sourceTree = "<group>"; };
 		D37146931DC9161600823F20 /* PCH_BlueBookModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PCH_BlueBookModel.swift; sourceTree = "<group>"; };
 		D371469B1DC9284800823F20 /* PCH_Source.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PCH_Source.swift; sourceTree = "<group>"; };
+		D398D3FF236B8A8D003D7950 /* PhaseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhaseView.swift; sourceTree = "<group>"; };
+		D398D400236B8A8D003D7950 /* PhaseView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PhaseView.xib; sourceTree = "<group>"; };
 		D3B8CCBD20A0828D00102039 /* GlobalDefs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GlobalDefs.swift; sourceTree = "<group>"; };
 		D3F3010A1DCFCA530039B04A /* PCH_BlueBookModelOutput.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PCH_BlueBookModelOutput.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -136,6 +140,8 @@
 				D34094871DC289FF00F1658B /* Core.swift */,
 				D34094891DC28A7000F1658B /* Coil.swift */,
 				D34094991DC2926E00F1658B /* Phase.swift */,
+				D398D3FF236B8A8D003D7950 /* PhaseView.swift */,
+				D398D400236B8A8D003D7950 /* PhaseView.xib */,
 				D309E3192358F5E300F10710 /* ExcelDesignFile.swift */,
 				D30C14541DDBB6A60046BC55 /* ConnectionDlog.swift */,
 				D30C14551DDBB6A60046BC55 /* ConnectionDlog.xib */,
@@ -238,6 +244,7 @@
 				D34094531DC14BA200F1658B /* MainMenu.xib in Resources */,
 				D32896971DC3888100984012 /* AxialSectionDlog.xib in Resources */,
 				D37146921DC3D5FC00823F20 /* CoilDlog.xib in Resources */,
+				D398D402236B8A8D003D7950 /* PhaseView.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -258,6 +265,7 @@
 				D34094881DC289FF00F1658B /* Core.swift in Sources */,
 				D322FBA82360FE1400B9F5C8 /* GetCoilDetailsDlogBox.swift in Sources */,
 				D340947E1DC2761400F1658B /* PCH_Defs.swift in Sources */,
+				D398D401236B8A8D003D7950 /* PhaseView.swift in Sources */,
 				D371469C1DC9284800823F20 /* PCH_Source.swift in Sources */,
 				D36142942360AC810060B31B /* PCH_BaseClass_DialogBox.swift in Sources */,
 				D34094851DC2855900F1658B /* CoreInputDlog.swift in Sources */,
