@@ -238,8 +238,8 @@ class Coil:NSObject, NSCoding
         let hasTaps = xlFileCoil.nomTurns != xlFileCoil.maxTurns
         var minorRange:[Range<Int>] = []
         
-        // assume that anything less than 7/8" is for a static ring (ie: center-fed winding)
-        if xlFileCoil.axialCenterPack > meters(inches: 0.875)
+        // assume that anything less than 1" is for a static ring (ie: center-fed winding)
+        if xlFileCoil.axialCenterPack > meters(inches: 0.99)
         {
             let mainLower = 0
             let halfWay = totalSections / 2
