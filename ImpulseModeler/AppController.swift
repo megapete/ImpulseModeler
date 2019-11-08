@@ -12,28 +12,45 @@ import Cocoa
 // A helper class to allow saving to and restoring from files
 class PhaseModel:NSObject, NSCoding
 {
+    enum Units:Int {
+        case inch
+        case mm
+        case meters
+    }
+    
     let phase:Phase
     let model:[PCH_DiskSection]
+    let units:Units
     
-    init(phase:Phase, model:[PCH_DiskSection])
+    init(phase:Phase, model:[PCH_DiskSection], units:Units)
     {
         self.phase = phase
         // let gndSectionArray = [AppController.gndSection]
         self.model = model // + gndSectionArray
+        self.units = units
     }
     
     convenience required init?(coder aDecoder: NSCoder) {
         
         let phase = aDecoder.decodeObject(forKey: "Phase") as! Phase
         let model = aDecoder.decodeObject(forKey: "Model") as! [PCH_DiskSection]
+        var units:Units = .inch
+        if aDecoder.containsValue(forKey: "Units")
+        {
+            if let tryUnits = Units(rawValue: aDecoder.decodeInteger(forKey: "Units"))
+            {
+                units = tryUnits
+            }
+        }
         
-        self.init(phase:phase, model:model)
+        self.init(phase:phase, model:model, units:units)
     }
     
     func encode(with aCoder: NSCoder) {
         
         aCoder.encode(self.phase, forKey: "Phase")
         aCoder.encode(self.model, forKey: "Model")
+        aCoder.encode(self.units.rawValue, forKey: "Units")
     }
 }
 
@@ -80,7 +97,10 @@ class AppController: NSObject {
     static let gndSection = PCH_DiskSection(coilRef: -1, diskRect: NSMakeRect(0, 0, 0, 0), N: 0, J: 0, windHt: 0, coreRadius: 0, secData: PCH_SectionData(sectionID: "GND", serNum: -1, inNode:-1, outNode:-1))
     
     @IBOutlet weak var inchItem: NSMenuItem!
-    @IBOutlet weak var metricItem: NSMenuItem!
+    @IBOutlet weak var metricItemMM: NSMenuItem!
+    @IBOutlet weak var metricItemM: NSMenuItem!
+    
+    
     var unitFactor = 25.4 / 1000.0
     
     @IBOutlet weak var createModelMenuItem: NSMenuItem!
@@ -314,6 +334,11 @@ class AppController: NSObject {
                     
                     lastCoil.capacitanceToGround = gndCap
                     
+                    self.inchItem.state = .off
+                    self.metricItemMM.state = .off
+                    self.metricItemM.state = .on
+                    self.unitFactor = 1.0
+                    
                     self.phaseDefinition = Phase(core: newCore, coils: newCoils)
                     
                     self.theModel = []
@@ -335,8 +360,6 @@ class AppController: NSObject {
         }
         
     }
-    
-    
     
     @IBAction func handleOpenModel(_ sender: AnyObject)
     {
@@ -371,6 +394,28 @@ class AppController: NSObject {
                 self.theModel = []
                 self.phaseDefinition = archive.phase
                 
+                if archive.units == .inch
+                {
+                    self.inchItem.state = .on
+                    self.metricItemMM.state = .off
+                    self.metricItemM.state = .off
+                    self.unitFactor = 25.4 / 1000.0
+                }
+                else if archive.units == .mm
+                {
+                    self.inchItem.state = .off
+                    self.metricItemMM.state = .on
+                    self.metricItemM.state = .off
+                    self.unitFactor = 1.0 / 1000.0
+                }
+                else
+                {
+                    self.inchItem.state = .off
+                    self.metricItemMM.state = .off
+                    self.metricItemM.state = .on
+                    self.unitFactor = 1.0
+                }
+                
                 for nextSection in archive.model
                 {
                     if nextSection.N == 0.0
@@ -382,7 +427,7 @@ class AppController: NSObject {
                         self.theModel!.append(nextSection)
                     }
                 }
-                
+        
                 NSDocumentController.shared.noteNewRecentDocumentURL(openFilePanel.url!)
                 
                 self.currentModelIsDirty = false
@@ -408,7 +453,17 @@ class AppController: NSObject {
                 return
             }
             
-            let archive = PhaseModel(phase: self.phaseDefinition!, model: self.theModel!)
+            var units:PhaseModel.Units = .inch
+            if self.metricItemMM.state == .on
+            {
+                units = .mm
+            }
+            else if self.metricItemM.state == .on
+            {
+                units = .meters
+            }
+            
+            let archive = PhaseModel(phase: self.phaseDefinition!, model: self.theModel!, units:units)
             
             if NSKeyedArchiver.archiveRootObject(archive, toFile: newFileURL.path)
             {
@@ -1183,14 +1238,23 @@ class AppController: NSObject {
         if wMenu == self.inchItem
         {
             self.inchItem.state = .on
-            self.metricItem.state = .off
+            self.metricItemMM.state = .off
+            self.metricItemM.state = .off
             self.unitFactor = 25.4 / 1000.0
         }
-        else if wMenu == self.metricItem
+        else if wMenu == self.metricItemMM
         {
             self.inchItem.state = .off
-            self.metricItem.state = .on
+            self.metricItemMM.state = .on
+            self.metricItemM.state = .off
             self.unitFactor = 1.0 / 1000.0
+        }
+        else if wMenu == self.metricItemM
+        {
+            self.inchItem.state = .off
+            self.metricItemMM.state = .off
+            self.metricItemM.state = .on
+            self.unitFactor = 1.0
         }
     }
     

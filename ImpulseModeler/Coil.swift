@@ -162,9 +162,10 @@ class Coil:NSObject, NSCoding
         let numStdGaps = xlFileCoil.numAxialSections - 1.0 - (xlFileCoil.axialCenterPack > 0.001 ? 1.0 : 0.0) - (xlFileCoil.axialDVgap1 > 0.001 ? 1.0 : 0.0) - (xlFileCoil.axialDVgap2 > 0.001 ? 1.0 : 0.0)
         let totalAxialGapsDimn = (numStdGaps * xlFileCoil.axialGaps + xlFileCoil.axialCenterPack + xlFileCoil.axialDVgap1 + xlFileCoil.axialDVgap2) * 0.98
         let diskAxialDimn = (xlFileCoil.elecHt - totalAxialGapsDimn) / xlFileCoil.numAxialSections
+        let diskAxialCondDimn = diskAxialDimn - xlFileCoil.paperOverOneTurn * 0.8
         let diskSize = NSSize(width: xlFileCoil.radialBuild, height: diskAxialDimn)
         let diskResistance = ResistanceCu20(conductorArea: xlFileCoil.condAreaPerTurn, length: turnsPerDisk * xlFileCoil.lmt)
-        let turnCap = CapacitanceBetweenTurns(turnLength: xlFileCoil.lmt, condW: diskAxialDimn, paperBetweenTurns: xlFileCoil.paperOverOneTurn)
+        let turnCap = CapacitanceBetweenTurns(turnLength: xlFileCoil.lmt, condW: diskAxialCondDimn, paperBetweenTurns: xlFileCoil.paperOverOneTurn)
         let diskTurnsCap = CapacitanceOfDiskTurns(capBetweenTurns: turnCap, numTurns: turnsPerDisk)
         let interleavedDiscTurnsCap = InterleavedPairTurnsCapacitance(turnToTurnCap: turnCap, turnsPerDisk: turnsPerDisk)
         let Fks = KeySpacerFactor(numColumns: xlFileCoil.numAxialColumns, spacerW: xlFileCoil.axialSpacerWidth, lmt: xlFileCoil.lmt)
