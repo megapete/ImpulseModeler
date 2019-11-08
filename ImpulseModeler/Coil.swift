@@ -171,7 +171,7 @@ class Coil:NSObject, NSCoding
         let Fks = KeySpacerFactor(numColumns: xlFileCoil.numAxialColumns, spacerW: xlFileCoil.axialSpacerWidth, lmt: xlFileCoil.lmt)
         let capBetweenDisks = CapacitanceBetweenDisks(diskID: xlFileCoil.coilID, diskOD: xlFileCoil.coilOD, keySpacerT: xlFileCoil.axialGaps, keySpacerFactor: Fks, paperBetweenTurns: xlFileCoil.paperOverOneTurn)
         
-        let capToStaticRing = (staticRingAtTop || staticRingAtCenter || staticRingAtTop ? CapacitanceBetweenDisks(diskID: xlFileCoil.coilID, diskOD: xlFileCoil.coilOD, keySpacerT: xlFileCoil.axialGaps / 2.0, keySpacerFactor: Fks, paperBetweenTurns: xlFileCoil.paperOverOneTurn / 2.0) : 0.0)
+        let capToStaticRing = (staticRingAtTop || staticRingAtCenter || staticRingAtTop ? CapacitanceToStaticRing(diskID: xlFileCoil.coilID, diskOD: xlFileCoil.coilOD, keySpacerT: xlFileCoil.axialGaps, keySpacerFactor: Fks, paperOverTurns: xlFileCoil.paperOverOneTurn, paperOverStaticRing: meters(inches:0.125)) : 0.0)
         
         // Static-ring dimensional data
         let ringAxialGap = xlFileCoil.axialGaps / 2.0
@@ -759,6 +759,23 @@ class Coil:NSObject, NSCoding
         return result
     }
     
+    /// Note: the argument paperOverTurn is the TOTAL paper (diametric) over one turn of a disk
+    class func CapacitanceToStaticRing(diskID:Double, diskOD:Double, keySpacerT:Double, keySpacerFactor:Double, paperOverTurns:Double, paperOverStaticRing:Double) -> Double
+    {
+        // I developed this calculation myself based on DelVecchio's calculation of Cdd
+        let rIn = diskID / 2.0
+        let rOut = diskOD / 2.0
+        
+        let totPaper = paperOverTurns / 2.0 + paperOverStaticRing
+        
+        let fSpacer = keySpacerFactor / (totPaper / εPaper + keySpacerT / εBoard)
+        let fOil = (1.0 - keySpacerFactor) / (totPaper / εPaper + keySpacerT / εOil)
+        
+        let result = ε0 * π * (rOut * rOut - rIn * rIn) * (fSpacer + fOil)
+        
+        return result
+    }
+    
     class func CapacitanceBetweenDisks(diskID:Double, diskOD:Double, keySpacerT:Double, keySpacerFactor:Double, paperBetweenTurns:Double) -> Double
     {
         let rIn = diskID / 2.0
@@ -805,7 +822,7 @@ class Coil:NSObject, NSCoding
         
         let R_gap = (innerOD + outerID) / 4.0
         let H = (innerH + outerH) / 2.0
-        let W_s = 0.75 * meterPerInch
+        let W_s = meters(inches: 0.75)
         let N_s = Double(numSpacers)
         let f_s = N_s * W_s / (2.0 * π * R_gap)
         let N_press = floor(((outerID - innerOD) / 2.0) / 0.0084)

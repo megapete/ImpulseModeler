@@ -35,6 +35,7 @@ class ConnectionDlogView: NSView
     let offsetFromBottom = 50.0
     let horizontalOffsetToFirstCoil = 250.0
     let horizontalOffsetBetweenCoils = 150.0
+    let horizontalOffsetForConnections = 40.0
     
     // We keep around the rectangles for the ground and impulse generator
     var groundConnectionRect:NSRect?
@@ -151,9 +152,30 @@ class ConnectionDlogView: NSView
             }
             else
             {
-                thePath.line(to: nextConnection.toNode.location)
-                self.connectorBlue.set()
-                thePath.stroke()
+                if abs(nextConnection.fromNode.idNum - nextConnection.toNode.idNum) == 1 || nextConnection.fromNode.location.x != nextConnection.toNode.location.x
+                {
+                    // simple connection between adjacent nodes or for nodes between coils
+                    thePath.line(to: nextConnection.toNode.location)
+                    self.connectorBlue.set()
+                    thePath.stroke()
+                }
+                else
+                {
+                    // connection between non-adjacent nodes
+                    let startYoffset = (nextConnection.fromNode.location.y < nextConnection.toNode.location.y ? horizontalOffsetForConnections : -horizontalOffsetForConnections) / 4.0
+                    // let endYoffset = -startYoffset
+                    var verticalLength = fabs(Double(nextConnection.fromNode.location.y - nextConnection.toNode.location.y)) - 0.5 * horizontalOffsetForConnections
+                    if startYoffset < 0.0
+                    {
+                        verticalLength *= -1.0
+                    }
+                    
+                    thePath.relativeLine(to: NSPoint(x: -horizontalOffsetForConnections, y: startYoffset))
+                    thePath.relativeLine(to: NSPoint(x: 0.0, y: verticalLength))
+                    thePath.line(to: nextConnection.toNode.location)
+                    self.connectorBlue.set()
+                    thePath.stroke()
+                }
             }
         }
         

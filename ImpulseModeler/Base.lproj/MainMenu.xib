@@ -420,6 +420,13 @@
                                     <action selector="handleModifyModel:" target="Ubf-fF-CrH" id="DBE-XK-m4E"/>
                                 </connections>
                             </menuItem>
+                            <menuItem isSeparatorItem="YES" id="BhW-2C-PMd"/>
+                            <menuItem title="Save Section Data..." id="BYm-vM-FSl">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="handleSaveSectionData:" target="Ubf-fF-CrH" id="Nci-GD-3uh"/>
+                                </connections>
+                            </menuItem>
                         </items>
                     </menu>
                 </menuItem>
@@ -518,7 +525,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="335" y="390" width="980" height="687"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1027"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1417"/>
             <view key="contentView" wantsLayer="YES" id="EiT-Mj-1SZ">
                 <rect key="frame" x="0.0" y="0.0" width="980" height="687"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -527,11 +534,11 @@
                         <rect key="frame" x="-1" y="-1" width="982" height="689"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <clipView key="contentView" ambiguous="YES" id="uJ3-WV-9XZ">
-                            <rect key="frame" x="1" y="1" width="980" height="687"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <rect key="frame" x="1" y="1" width="965" height="672"/>
+                            <autoresizingMask key="autoresizingMask"/>
                             <subviews>
                                 <view ambiguous="YES" id="jc0-pb-jFb">
-                                    <rect key="frame" x="0.0" y="0.0" width="965" height="672"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="950" height="657"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 </view>
                             </subviews>

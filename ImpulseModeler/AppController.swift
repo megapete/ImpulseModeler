@@ -317,7 +317,9 @@ class AppController: NSObject {
                         let coil = designFile.coils[nextCoilIndex]
                         if terminal.coilIndex < 8
                         {
-                            let capToPreviousCoil = Coil.CapacitanceBetweenCoils(innerOD: lastOD, outerID: coil.coilID, innerH: lastHt, outerH: coil.elecHt, numSpacers: Int(coil.numRadialColumns))
+                            let capToPreviousCoil = Coil.CapacitanceBetweenCoils(innerOD: lastOD, outerID: coil.coilID, innerH: lastHt, outerH: coil.effectiveHt, numSpacers: Int(coil.numRadialColumns))
+                            
+                            DLog("Cap to prev coil: \(capToPreviousCoil)")
                             
                             let impCoil = Coil.CoilUsing(xlFileCoil: coil, coilName: coilNames[nextCoilIndex], coilPosition: nextCoilIndex, connection: terminal.connection, amps: terminal.phaseAmps, currentDirection: terminal.currentDirection, capacitanceToPreviousCoil: capToPreviousCoil, capacitanceToGround: 0.0, eddyLossPercentage: coil.eddyLossAvePU, phaseNum: 1)
                             
@@ -332,6 +334,7 @@ class AppController: NSObject {
                     // calculate lastCoil's capacitances to other phases and to the tank
                     let gndCap = Coil.CapacitanceBetweenPhases(legCenters: newCore.legCenters, coilOD: lastOD, coilHt: lastHt) + Coil.CapacitanceFromCoilToTank(coilOD: lastOD, coilHt: lastHt, tankDim: designFile.tankDepth)
                     
+                    DLog("Outer Coil Sum of Cap between coils and Cap to tank: \(gndCap)")
                     lastCoil.capacitanceToGround = gndCap
                     
                     self.inchItem.state = .off
@@ -434,6 +437,56 @@ class AppController: NSObject {
             }
         }
     }
+    
+    @IBAction func handleSaveSectionData(_ sender: Any)
+    {
+        let saveFilePanel = NSSavePanel()
+        
+        saveFilePanel.title = "Save Section Data"
+        saveFilePanel.canCreateDirectories = true
+        saveFilePanel.allowedFileTypes = ["txt"]
+        saveFilePanel.allowsOtherFileTypes = false
+        
+        if saveFilePanel.runModal() == .OK
+        {
+            guard let newFileURL = saveFilePanel.url
+            else
+            {
+                DLog("Bad file name")
+                return
+            }
+            
+            guard let sectionModel = self.theModel else
+            {
+                DLog("Model does not exist!")
+                return
+            }
+            
+            if sectionModel.count == 0
+            {
+                DLog("Model has no sections")
+                return
+            }
+            
+            var fileString = "Section Data\n\n"
+            for nextSection in sectionModel
+            {
+                fileString += "\(nextSection)\n"
+            }
+            
+            do
+            {
+                try fileString.write(to: newFileURL, atomically: true, encoding: .utf16)
+            }
+            catch
+            {
+                let alert = NSAlert(error: error)
+                let _ = alert.runModal()
+                return
+            }
+        }
+    }
+    
     
     @IBAction func handleSaveModel(_ sender: AnyObject)
     {

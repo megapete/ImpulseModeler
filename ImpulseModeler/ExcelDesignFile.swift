@@ -881,7 +881,7 @@ class ExcelDesignFile: NSObject
         // Tank depth
         if let nextNum = Double(currentLine[0])
         {
-            self.tankDepth = nextNum
+            self.tankDepth = meters(inches: nextNum)
         }
         else
         {
