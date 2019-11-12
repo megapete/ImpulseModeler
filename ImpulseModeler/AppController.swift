@@ -1002,7 +1002,7 @@ class AppController: NSObject {
                         continue
                     }
                     
-                    let mutInd = fabs(nDisk.MutualInductanceTo(otherDisk, windHtFactor:phase.core.htFactor))
+                    let mutInd = fabs(nDisk.MutualInductanceTo(otherDisk))
                     
                     let mutIndCoeff = mutInd / sqrt(nDisk.data.selfInductance * otherDisk.data.selfInductance)
                     if (mutIndCoeff < 0.0 || mutIndCoeff > 1.0)
