@@ -10,6 +10,13 @@ import Cocoa
 
 class GetCoilDetailsDlogBox: PCH_DialogBox {
 
+    @IBOutlet weak var oneSectionPerDisk: NSButton!
+    @IBOutlet weak var twoSections: NSButton!
+    @IBOutlet weak var fourSections: NSButton!
+    @IBOutlet weak var customSections: NSButton!
+    @IBOutlet weak var numCustomSections: NSTextField!
+    
+    
     @IBOutlet weak var topStaticRing: NSButton!
     @IBOutlet weak var centerStaticRing: NSButton!
     @IBOutlet weak var bottomStaticRing: NSButton!
@@ -43,6 +50,7 @@ class GetCoilDetailsDlogBox: PCH_DialogBox {
             // set default starting values for the radio button groups
             self.lineAtTop.state = .on
             self.noInterleave.state = .on
+            self.oneSectionPerDisk.state = .on
 
             self.SetControlEnables()
         }
@@ -78,6 +86,20 @@ class GetCoilDetailsDlogBox: PCH_DialogBox {
             self.ringDisk2.isEnabled = false
             self.betweenAndLabel.isEnabled = false
         }
+        
+        if self.customSections.state == .on
+        {
+            self.numCustomSections.isEnabled = true
+        }
+        else
+        {
+            self.numCustomSections.isEnabled = false
+        }
+    }
+    
+    @IBAction func handleNumSections(_ sender: Any)
+    {
+        self.SetControlEnables()
     }
     
     @IBAction func handleBetweenDisks(_ sender: Any)
@@ -85,12 +107,10 @@ class GetCoilDetailsDlogBox: PCH_DialogBox {
         self.SetControlEnables()
     }
     
-    
     @IBAction func handleInterleave(_ sender: Any)
     {
         self.SetControlEnables()
     }
-    
     
     @IBAction func handleLineLocation(_ sender: Any)
     {

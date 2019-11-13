@@ -149,6 +149,8 @@ class Coil:NSObject, NSCoding
         
         let _ = detailsDbox.runModal()
         
+        // TODO: Implement disc/helical windings that will not be modeled using "one section per disk"
+        
         let lineAtTop = detailsDbox.lineAtTop.state == .on
         let lineAtCenter = detailsDbox.lineAtCenter.state == .on
         let regWdg = detailsDbox.regulatingWdg.state == .on
