@@ -22,7 +22,6 @@
 		D340944E1DC14BA200F1658B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D340944D1DC14BA200F1658B /* AppDelegate.swift */; };
 		D34094501DC14BA200F1658B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D340944F1DC14BA200F1658B /* Assets.xcassets */; };
 		D34094531DC14BA200F1658B /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = D34094511DC14BA200F1658B /* MainMenu.xib */; };
-		D340947E1DC2761400F1658B /* PCH_Defs.swift in Sources */ = {isa = PBXBuildFile; fileRef = D340947C1DC2761400F1658B /* PCH_Defs.swift */; };
 		D34094801DC2762600F1658B /* AppController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D340947F1DC2762600F1658B /* AppController.swift */; };
 		D34094851DC2855900F1658B /* CoreInputDlog.swift in Sources */ = {isa = PBXBuildFile; fileRef = D34094831DC2855900F1658B /* CoreInputDlog.swift */; };
 		D34094861DC2855900F1658B /* CoreInputDlog.xib in Resources */ = {isa = PBXBuildFile; fileRef = D34094841DC2855900F1658B /* CoreInputDlog.xib */; };
@@ -43,8 +42,9 @@
 		D371469C1DC9284800823F20 /* PCH_Source.swift in Sources */ = {isa = PBXBuildFile; fileRef = D371469B1DC9284800823F20 /* PCH_Source.swift */; };
 		D398D401236B8A8D003D7950 /* PhaseView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D398D3FF236B8A8D003D7950 /* PhaseView.swift */; };
 		D398D402236B8A8D003D7950 /* PhaseView.xib in Resources */ = {isa = PBXBuildFile; fileRef = D398D400236B8A8D003D7950 /* PhaseView.xib */; };
-		D3B8CCBE20A0828D00102039 /* GlobalDefs.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3B8CCBD20A0828D00102039 /* GlobalDefs.swift */; };
 		D3F3010B1DCFCA530039B04A /* PCH_BlueBookModelOutput.swift in Sources */ = {isa = PBXBuildFile; fileRef = D3F3010A1DCFCA530039B04A /* PCH_BlueBookModelOutput.swift */; };
+		F5970199237DE83400D621C3 /* GlobalDefs.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5970198237DE83400D621C3 /* GlobalDefs.swift */; };
+		F597019B237DE9EC00D621C3 /* PCH_Defs.swift in Sources */ = {isa = PBXBuildFile; fileRef = F597019A237DE9EC00D621C3 /* PCH_Defs.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -65,7 +65,6 @@
 		D340944F1DC14BA200F1658B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		D34094521DC14BA200F1658B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		D34094541DC14BA200F1658B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		D340947C1DC2761400F1658B /* PCH_Defs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PCH_Defs.swift; sourceTree = "<group>"; };
 		D340947F1DC2762600F1658B /* AppController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppController.swift; sourceTree = "<group>"; };
 		D34094831DC2855900F1658B /* CoreInputDlog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreInputDlog.swift; sourceTree = "<group>"; };
 		D34094841DC2855900F1658B /* CoreInputDlog.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CoreInputDlog.xib; sourceTree = "<group>"; };
@@ -87,8 +86,9 @@
 		D371469B1DC9284800823F20 /* PCH_Source.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PCH_Source.swift; sourceTree = "<group>"; };
 		D398D3FF236B8A8D003D7950 /* PhaseView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhaseView.swift; sourceTree = "<group>"; };
 		D398D400236B8A8D003D7950 /* PhaseView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = PhaseView.xib; sourceTree = "<group>"; };
-		D3B8CCBD20A0828D00102039 /* GlobalDefs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GlobalDefs.swift; sourceTree = "<group>"; };
 		D3F3010A1DCFCA530039B04A /* PCH_BlueBookModelOutput.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PCH_BlueBookModelOutput.swift; sourceTree = "<group>"; };
+		F5970198237DE83400D621C3 /* GlobalDefs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GlobalDefs.swift; path = ../../../../Dropbox/MyProjects/GlobalDefs.swift; sourceTree = "<group>"; };
+		F597019A237DE9EC00D621C3 /* PCH_Defs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PCH_Defs.swift; path = ../../../../Dropbox/MyProjects/PCH_Defs.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -124,8 +124,8 @@
 			isa = PBXGroup;
 			children = (
 				D340944D1DC14BA200F1658B /* AppDelegate.swift */,
-				D3B8CCBD20A0828D00102039 /* GlobalDefs.swift */,
-				D340947C1DC2761400F1658B /* PCH_Defs.swift */,
+				F597019A237DE9EC00D621C3 /* PCH_Defs.swift */,
+				F5970198237DE83400D621C3 /* GlobalDefs.swift */,
 				D36142932360AC800060B31B /* PCH_BaseClass_DialogBox.swift */,
 				D340947F1DC2762600F1658B /* AppController.swift */,
 				D301D8B02041EC0500A6B453 /* PCH_ProgressIndicatorWindow.swift */,
@@ -257,6 +257,7 @@
 			files = (
 				D30C14591DDBB79A0046BC55 /* ConnectionDlogView.swift in Sources */,
 				D309E31A2358F5E300F10710 /* ExcelDesignFile.swift in Sources */,
+				F5970199237DE83400D621C3 /* GlobalDefs.swift in Sources */,
 				D34094981DC2904F00F1658B /* PCH_SectionData.swift in Sources */,
 				D37146941DC9161600823F20 /* PCH_BlueBookModel.swift in Sources */,
 				D34094971DC2904F00F1658B /* PCH_Matrix.swift in Sources */,
@@ -264,12 +265,10 @@
 				D34094961DC2904F00F1658B /* PCH_DiskSection.swift in Sources */,
 				D34094881DC289FF00F1658B /* Core.swift in Sources */,
 				D322FBA82360FE1400B9F5C8 /* GetCoilDetailsDlogBox.swift in Sources */,
-				D340947E1DC2761400F1658B /* PCH_Defs.swift in Sources */,
 				D398D401236B8A8D003D7950 /* PhaseView.swift in Sources */,
 				D371469C1DC9284800823F20 /* PCH_Source.swift in Sources */,
 				D36142942360AC810060B31B /* PCH_BaseClass_DialogBox.swift in Sources */,
 				D34094851DC2855900F1658B /* CoreInputDlog.swift in Sources */,
-				D3B8CCBE20A0828D00102039 /* GlobalDefs.swift in Sources */,
 				D34094951DC2904F00F1658B /* PCH_BlueBookFunctions.swift in Sources */,
 				D36142982360C25A0060B31B /* GetCoilNamesDlogBox.swift in Sources */,
 				D37146911DC3D5FC00823F20 /* CoilDlog.swift in Sources */,
@@ -277,6 +276,7 @@
 				D3F3010B1DCFCA530039B04A /* PCH_BlueBookModelOutput.swift in Sources */,
 				D340944E1DC14BA200F1658B /* AppDelegate.swift in Sources */,
 				D340948A1DC28A7000F1658B /* Coil.swift in Sources */,
+				F597019B237DE9EC00D621C3 /* PCH_Defs.swift in Sources */,
 				D34094801DC2762600F1658B /* AppController.swift in Sources */,
 				D32896961DC3888100984012 /* AxialSectionDlog.swift in Sources */,
 				D340949A1DC2926E00F1658B /* Phase.swift in Sources */,

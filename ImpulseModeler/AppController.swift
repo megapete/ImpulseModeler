@@ -1123,7 +1123,7 @@ class AppController: NSObject {
             let nextSectionID = nextDisk.data.sectionID
             dSections.append(nextSectionID)
             
-            let coilName = PCH_StrLeft(nextSectionID, length: 2)
+            let coilName = String(nextSectionID.prefix(2))
             
             // let diskNum = PCH_StrRight(nextSectionID, length: 3)
             

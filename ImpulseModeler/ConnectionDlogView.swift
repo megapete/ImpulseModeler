@@ -551,8 +551,9 @@ class ConnectionDlogView: NSView
             
             if let prevSection = previousSection
             {
-                let prevSectionCoilName = PCH_StrLeft(prevSection.data.sectionID, length: 2)
-                let currSectionCoilName = PCH_StrLeft(currSection.data.sectionID, length: 2)
+                let prevSectionCoilName = prevSection.data.sectionID.prefix(2)
+                // let prevSectionCoilName = PCH_StrLeft(prevSection.data.sectionID, length: 2)
+                let currSectionCoilName = currSection.data.sectionID.prefix(2)
                 
                 if (prevSectionCoilName == currSectionCoilName)
                 {
@@ -646,8 +647,8 @@ class ConnectionDlogView: NSView
         {
             if lastSection != nil
             {
-                let lastSectionCoil = PCH_StrLeft(lastSection!.data.sectionID, length: 2)
-                let nextSectionCoil = PCH_StrLeft(nextSection.data.sectionID, length: 2)
+                let lastSectionCoil = lastSection!.data.sectionID.prefix(2)
+                let nextSectionCoil = nextSection.data.sectionID.prefix(2)
                 
                 if (lastSectionCoil == nextSectionCoil)
                 {
