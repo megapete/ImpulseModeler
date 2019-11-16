@@ -19,6 +19,7 @@
                 <outlet property="noInterleave" destination="zkB-jU-m8e" id="fyw-Wq-3BM"/>
                 <outlet property="numCustomSections" destination="FgS-Wj-w0i" id="UjQ-fz-Kcm"/>
                 <outlet property="numPartialDisks" destination="Yqd-Jk-Ce6" id="Uwf-t9-U8x"/>
+                <outlet property="oneSection" destination="RDq-sj-nvw" id="Lfm-vP-9ji"/>
                 <outlet property="oneSectionPerDisk" destination="b7d-1M-q2f" id="oTe-TW-6tf"/>
                 <outlet property="partialDiskLabel" destination="YYn-bA-HVR" id="MHs-gt-c3V"/>
                 <outlet property="partialInterleave" destination="ftM-lC-DSe" id="rfs-mb-Bq9"/>
@@ -26,7 +27,7 @@
                 <outlet property="ringDisk1" destination="UJG-3r-5Bb" id="YME-EI-w2g"/>
                 <outlet property="ringDisk2" destination="Lqu-EB-Ir8" id="wFi-wH-AoQ"/>
                 <outlet property="topStaticRing" destination="yz5-x6-vvr" id="25f-0j-cvB"/>
-                <outlet property="twoSections" destination="RDq-sj-nvw" id="XQD-0a-P3P"/>
+                <outlet property="twoSections" destination="wWv-Xc-NtH" id="YC3-qS-KLU"/>
                 <outlet property="wdgRing" destination="eTf-m5-1vr" id="qQl-Ii-gq8"/>
                 <outlet property="windingRing" destination="eTf-m5-1vr" id="NOH-VO-pVB"/>
             </connections>
@@ -38,7 +39,7 @@
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <box fixedFrame="YES" title="Static Rings" translatesAutoresizingMaskIntoConstraints="NO" id="nyt-Tc-jru">
-                    <rect key="frame" x="17" y="184" width="177" height="114"/>
+                    <rect key="frame" x="17" y="172" width="177" height="114"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <view key="contentView" id="Ezw-0I-s5U">
                         <rect key="frame" x="3" y="3" width="171" height="96"/>
@@ -49,7 +50,7 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="check" title="Top" bezelStyle="regularSquare" imagePosition="left" inset="2" id="hRH-2u-fvv">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
+                                    <font key="font" metaFont="label" size="13"/>
                                 </buttonCell>
                             </button>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6ZS-dK-dcD">
@@ -57,7 +58,7 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="check" title="Center" bezelStyle="regularSquare" imagePosition="left" inset="2" id="MCK-Kh-Smr">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
+                                    <font key="font" metaFont="label" size="13"/>
                                 </buttonCell>
                             </button>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="8T9-Ng-XN0">
@@ -65,14 +66,14 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="check" title="Bottom" bezelStyle="regularSquare" imagePosition="left" inset="2" id="ecB-kJ-mZw">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
+                                    <font key="font" metaFont="label" size="13"/>
                                 </buttonCell>
                             </button>
                         </subviews>
                     </view>
                 </box>
                 <box fixedFrame="YES" title="Winding Rings" translatesAutoresizingMaskIntoConstraints="NO" id="Sxv-rt-ibG">
-                    <rect key="frame" x="17" y="62" width="177" height="114"/>
+                    <rect key="frame" x="17" y="50" width="177" height="114"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <view key="contentView" id="1se-g8-aXx">
                         <rect key="frame" x="3" y="3" width="171" height="96"/>
@@ -83,7 +84,7 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="check" title="Between disks:" bezelStyle="regularSquare" imagePosition="left" inset="2" id="ec5-ZJ-D4d">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
+                                    <font key="font" metaFont="label" size="13"/>
                                 </buttonCell>
                                 <connections>
                                     <action selector="handleBetweenDisks:" target="-2" id="qji-7P-yIk"/>
@@ -93,7 +94,7 @@
                                 <rect key="frame" x="20" y="33" width="29" height="21"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="Qo5-UA-4Wz">
-                                    <font key="font" metaFont="system"/>
+                                    <font key="font" metaFont="label" size="13"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
@@ -102,7 +103,7 @@
                                 <rect key="frame" x="84" y="33" width="29" height="21"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="tab-lK-tOB">
-                                    <font key="font" metaFont="system"/>
+                                    <font key="font" metaFont="label" size="13"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
@@ -111,7 +112,7 @@
                                 <rect key="frame" x="55" y="36" width="27" height="16"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="and" id="khT-4o-9os">
-                                    <font key="font" metaFont="system"/>
+                                    <font key="font" metaFont="label" size="13"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
@@ -120,7 +121,7 @@
                     </view>
                 </box>
                 <box fixedFrame="YES" title="Line location" translatesAutoresizingMaskIntoConstraints="NO" id="4Mt-ju-65O">
-                    <rect key="frame" x="196" y="184" width="177" height="114"/>
+                    <rect key="frame" x="196" y="172" width="177" height="114"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <view key="contentView" id="NdA-hG-WEC">
                         <rect key="frame" x="3" y="3" width="171" height="96"/>
@@ -131,7 +132,7 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="radio" title="Line at top (bottom)" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="TLl-CW-Ig6">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
+                                    <font key="font" metaFont="label" size="13"/>
                                 </buttonCell>
                                 <connections>
                                     <action selector="handleLineLocation:" target="-2" id="kZq-M9-A9p"/>
@@ -142,7 +143,7 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="radio" title="Line at center" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="Z2f-3M-pHU">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
+                                    <font key="font" metaFont="label" size="13"/>
                                 </buttonCell>
                                 <connections>
                                     <action selector="handleLineLocation:" target="-2" id="9O3-aD-23e"/>
@@ -153,7 +154,7 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="radio" title="Regulating winding" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="umG-US-uBz">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
+                                    <font key="font" metaFont="label" size="13"/>
                                 </buttonCell>
                                 <connections>
                                     <action selector="handleLineLocation:" target="-2" id="ebA-mW-tvn"/>
@@ -163,7 +164,7 @@
                     </view>
                 </box>
                 <box fixedFrame="YES" title="Interleave" translatesAutoresizingMaskIntoConstraints="NO" id="NZy-nl-oIV">
-                    <rect key="frame" x="196" y="62" width="177" height="114"/>
+                    <rect key="frame" x="196" y="50" width="177" height="114"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <view key="contentView" id="GvY-P6-Hlg">
                         <rect key="frame" x="3" y="3" width="171" height="96"/>
@@ -174,7 +175,7 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="radio" title="None" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="CnW-l6-qKU">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
+                                    <font key="font" metaFont="label" size="13"/>
                                 </buttonCell>
                                 <connections>
                                     <action selector="handleInterleave:" target="-2" id="QId-nE-MTN"/>
@@ -185,7 +186,7 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="radio" title="Full" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="8Fh-LC-jR4">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
+                                    <font key="font" metaFont="label" size="13"/>
                                 </buttonCell>
                                 <connections>
                                     <action selector="handleInterleave:" target="-2" id="X8i-aU-KHc"/>
@@ -196,7 +197,7 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="radio" title="Partial:" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="Mf9-6Z-IfW">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
+                                    <font key="font" metaFont="label" size="13"/>
                                 </buttonCell>
                                 <connections>
                                     <action selector="handleInterleave:" target="-2" id="anm-O4-51T"/>
@@ -206,7 +207,7 @@
                                 <rect key="frame" x="83" y="13" width="35" height="21"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="Vwk-Zg-TbI">
-                                    <font key="font" metaFont="system"/>
+                                    <font key="font" metaFont="label" size="13"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
@@ -215,7 +216,7 @@
                                 <rect key="frame" x="121" y="16" width="37" height="16"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Disks" id="OuW-yd-K5c">
-                                    <font key="font" metaFont="system"/>
+                                    <font key="font" metaFont="label" size="13"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
@@ -224,76 +225,76 @@
                     </view>
                 </box>
                 <box fixedFrame="YES" title="Sections to model" translatesAutoresizingMaskIntoConstraints="NO" id="F8d-mo-U10">
-                    <rect key="frame" x="18" y="305" width="355" height="110"/>
+                    <rect key="frame" x="18" y="297" width="355" height="118"/>
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                     <view key="contentView" id="VxX-zo-nXW">
-                        <rect key="frame" x="3" y="3" width="349" height="92"/>
+                        <rect key="frame" x="3" y="3" width="349" height="100"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="b7d-1M-q2f">
-                                <rect key="frame" x="19" y="55" width="74" height="18"/>
+                                <rect key="frame" x="19" y="63" width="74" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="radio" title="All DIsks" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="jMa-am-P3E">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
+                                    <font key="font" metaFont="label" size="13"/>
                                 </buttonCell>
                                 <connections>
                                     <action selector="handleNumSections:" target="-2" id="Q1C-5S-zSB"/>
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="RDq-sj-nvw">
-                                <rect key="frame" x="19" y="31" width="86" height="19"/>
+                                <rect key="frame" x="19" y="40" width="86" height="19"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
-                                <buttonCell key="cell" type="radio" title="2 Sections" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="AlR-rc-D2W">
+                                <buttonCell key="cell" type="radio" title="1 Section" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="AlR-rc-D2W">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
+                                    <font key="font" metaFont="label" size="13"/>
                                 </buttonCell>
                                 <connections>
                                     <action selector="handleNumSections:" target="-2" id="1U2-1z-bWd"/>
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="PFS-jO-rHn">
-                                <rect key="frame" x="19" y="8" width="87" height="20"/>
+                                <rect key="frame" x="19" y="16" width="87" height="20"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="radio" title="4 Sections" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="sbC-u2-gB7">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
+                                    <font key="font" metaFont="label" size="13"/>
                                 </buttonCell>
                                 <connections>
                                     <action selector="handleNumSections:" target="-2" id="PK4-1q-TOo"/>
                                 </connections>
                             </button>
                             <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="4PC-4o-SzC">
-                                <rect key="frame" x="136" y="9" width="73" height="18"/>
+                                <rect key="frame" x="136" y="17" width="73" height="18"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                 <buttonCell key="cell" type="radio" title="Custom:" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="DUi-f1-btJ">
                                     <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
-                                    <font key="font" metaFont="system"/>
+                                    <font key="font" metaFont="label" size="13"/>
                                 </buttonCell>
                                 <connections>
                                     <action selector="handleNumSections:" target="-2" id="y8U-b6-JKJ"/>
                                 </connections>
                             </button>
                             <textField verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="FgS-Wj-w0i">
-                                <rect key="frame" x="209" y="7" width="35" height="21"/>
+                                <rect key="frame" x="209" y="15" width="35" height="21"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" borderStyle="bezel" drawsBackground="YES" id="Aog-Ik-r0G">
-                                    <font key="font" metaFont="system"/>
+                                    <font key="font" metaFont="label" size="13"/>
                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3GL-fG-VDf">
-                                <rect key="frame" x="248" y="10" width="57" height="16"/>
+                                <rect key="frame" x="248" y="18" width="57" height="16"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="Sections" id="GQQ-xM-jl0">
-                                    <font key="font" metaFont="system"/>
+                                    <font key="font" metaFont="label" size="13"/>
                                     <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
                             <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tIp-re-Lro">
-                                <rect key="frame" x="95" y="54" width="177" height="16"/>
+                                <rect key="frame" x="95" y="62" width="177" height="16"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <textFieldCell key="cell" lineBreakMode="clipping" title="(not recommended for LV windings)" id="e4h-OP-AuA">
                                     <font key="font" metaFont="system" size="10"/>
@@ -301,6 +302,17 @@
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
+                            <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wWv-Xc-NtH">
+                                <rect key="frame" x="136" y="40" width="96" height="20"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                                <buttonCell key="cell" type="radio" title="2 Sections" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="sWD-0f-gqL">
+                                    <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
+                                    <font key="font" metaFont="label" size="13"/>
+                                </buttonCell>
+                                <connections>
+                                    <action selector="handleNumSections:" target="-2" id="e8m-AA-niY"/>
+                                </connections>
+                            </button>
                         </subviews>
                     </view>
                 </box>

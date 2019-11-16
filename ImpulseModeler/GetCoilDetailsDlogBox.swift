@@ -11,11 +11,11 @@ import Cocoa
 class GetCoilDetailsDlogBox: PCH_DialogBox {
 
     @IBOutlet weak var oneSectionPerDisk: NSButton!
+    @IBOutlet weak var oneSection: NSButton!
     @IBOutlet weak var twoSections: NSButton!
     @IBOutlet weak var fourSections: NSButton!
     @IBOutlet weak var customSections: NSButton!
     @IBOutlet weak var numCustomSections: NSTextField!
-    
     
     @IBOutlet weak var topStaticRing: NSButton!
     @IBOutlet weak var centerStaticRing: NSButton!

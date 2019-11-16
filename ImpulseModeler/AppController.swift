@@ -867,7 +867,7 @@ class AppController: NSObject {
                     sectionData.resistance = diskResistance
                     
                     let turnsPerDisk = nextAxialSection.turns / nextAxialSection.numDisks
-                    let theNewSection = PCH_DiskSection(coilRef: nextCoil.coilRadialPosition, diskRect: diskRect, N: turnsPerDisk, J: turnsPerDisk * nextCoil.amps / diskArea, windHt: phase.core.height * unitFactor, coreRadius: phase.core.diameter * unitFactor / 2.0, secData: sectionData)
+                    let theNewSection = PCH_DiskSection(coilRef: nextCoil.coilRadialPosition, diskRect: diskRect, N: turnsPerDisk, J: turnsPerDisk * nextCoil.amps * (nextCoil.currentDirection < 0 ? -1.0 : 1.0) / diskArea, windHt: phase.core.height * unitFactor, coreRadius: phase.core.diameter * unitFactor / 2.0, secData: sectionData)
                     
                     theNewSection.data.selfInductance = theNewSection.SelfInductance(phase.core.htFactor)
                     
@@ -1002,12 +1002,12 @@ class AppController: NSObject {
                         continue
                     }
                     
-                    let mutInd = fabs(nDisk.MutualInductanceTo(otherDisk))
+                    let mutInd = nDisk.MutualInductanceTo(otherDisk)
                     
                     let mutIndCoeff = mutInd / sqrt(nDisk.data.selfInductance * otherDisk.data.selfInductance)
-                    if (mutIndCoeff < 0.0 || mutIndCoeff > 1.0)
+                    if ( /* mutIndCoeff < 0.0 || */ mutIndCoeff > 1.0)
                     {
-                        DLog("Illegal Mutual Inductance:\(mutInd); this.SelfInd:\(nDisk.data.selfInductance); that.SelfInd:\(otherDisk.data.selfInductance)")
+                        ALog("Illegal Mutual Inductance:\(mutInd); this.SelfInd:\(nDisk.data.selfInductance); that.SelfInd:\(otherDisk.data.selfInductance)")
                     }
                     
                     nDisk.data.mutualInductances[otherDisk.data.sectionID] = mutInd
