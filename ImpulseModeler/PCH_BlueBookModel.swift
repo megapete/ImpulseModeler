@@ -286,7 +286,8 @@ class PCH_BlueBookModel: NSObject {
                 return nil
             }
             
-            let fromRow = newC.Submatrix(fromRow: nextConnection.fromNode, toRow: nextConnection.fromNode, fromCol: 0, toCol: newC.numCols - 1)
+            // Fix#1
+            let fromRow = self.C.Submatrix(fromRow: nextConnection.fromNode, toRow: nextConnection.fromNode, fromCol: 0, toCol: newC.numCols - 1)
             var addRow = PCH_Matrix(numRows: 1, numCols: newC.numCols, matrixPrecision: PCH_Matrix.precisions.doublePrecision, matrixType: PCH_Matrix.types.generalMatrix)
             
             var connectToGround = false
@@ -299,7 +300,8 @@ class PCH_BlueBookModel: NSObject {
                 }
                 
                 // get the equation for toNode and add it to the running sum
-                let newRowToAdd = newC.Submatrix(fromRow: toNode, toRow: toNode, fromCol: 0, toCol: newC.numCols - 1)
+                // Fix#2
+                let newRowToAdd = self.C.Submatrix(fromRow: toNode, toRow: toNode, fromCol: 0, toCol: newC.numCols - 1)
                 addRow += newRowToAdd
                 
                 // now we change row 's' so that dVs/dt - dVi/dt = 0 (the zero will be handled in the AI calculation below)
@@ -345,7 +347,7 @@ class PCH_BlueBookModel: NSObject {
         newRow[sourceConnection.toNode] = 1.0
         newC.SetRow(sourceConnection.toNode, buffer: newRow)
         
-        // self.OutputMatrix(wMatrix: newC, fileName: "Matrix_Cprime.txt")
+        self.OutputMatrix(wMatrix: newC, fileName: "Matrix_Cprime.txt")
         
         let sectionCount = self.A.numCols
         let nodeCount = self.A.numRows
