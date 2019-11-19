@@ -614,6 +614,30 @@ class AppController: NSObject {
             newConnectionArray.append((from:sourceConnNode, to:genNodeArray))
         }
         
+        // We need to make sure that each non-ground connected node only turns up once in each connection set (either as the from: or one of the to: nodes)
+        // start by setting up a set for each connection
+        var connSetArray:[Set<Int>] = []
+        for nextConn in newConnectionArray
+        {
+            var newSet:Set<Int> = [nextConn.from]
+            for nextTo in nextConn.to
+            {
+                newSet.insert(nextTo)
+            }
+            
+            connSetArray.append(newSet)
+        }
+        
+        // combine the sets as needed
+        var combinedSetArray:[Set<Int>] = []
+        while connSetArray.count > 0
+        {
+            var combSet = connSetArray.removeFirst()
+            
+            
+            
+            combinedSetArray.append(combSet)
+        }
         
         
         var tConnArray:[(fromNode: Int, toNodes: [Int])] = []
