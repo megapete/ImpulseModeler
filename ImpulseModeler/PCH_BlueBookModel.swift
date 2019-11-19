@@ -286,32 +286,31 @@ class PCH_BlueBookModel: NSObject {
                 return nil
             }
             
-            // Fix#1
-            let fromRow = self.C.Submatrix(fromRow: nextConnection.fromNode, toRow: nextConnection.fromNode, fromCol: 0, toCol: newC.numCols - 1)
-            var addRow = PCH_Matrix(numRows: 1, numCols: newC.numCols, matrixPrecision: PCH_Matrix.precisions.doublePrecision, matrixType: PCH_Matrix.types.generalMatrix)
-            
-            var connectToGround = false
-            for toNode in nextConnection.toNodes
+            if !nextConnection.toNodes.contains(-1)
             {
-                if toNode == -1 || groundedNodes.contains(toNode)
+                // Fix#1
+                let fromRow = self.C.Submatrix(fromRow: nextConnection.fromNode, toRow: nextConnection.fromNode, fromCol: 0, toCol: newC.numCols - 1)
+                var addRow = PCH_Matrix(numRows: 1, numCols: newC.numCols, matrixPrecision: PCH_Matrix.precisions.doublePrecision, matrixType: PCH_Matrix.types.generalMatrix)
+                
+                for toNode in nextConnection.toNodes
                 {
-                    connectToGround = true
-                    break
+                    
+                    
+                    // get the equation for toNode and add it to the running sum
+                    // Fix#2
+                    let newRowToAdd = self.C.Submatrix(fromRow: toNode, toRow: toNode, fromCol: 0, toCol: newC.numCols - 1)
+                    addRow += newRowToAdd
+                    
+                    // now we change row 's' so that dVs/dt - dVi/dt = 0 (the zero will be handled in the AI calculation below)
+                    var newSrow = [Double](repeatElement(0.0, count: C.numCols))
+                    newSrow[toNode] = 1.0
+                    newSrow[nextConnection.fromNode] = -1.0
+                    newC.SetRow(toNode, buffer: newSrow)
                 }
                 
-                // get the equation for toNode and add it to the running sum
-                // Fix#2
-                let newRowToAdd = self.C.Submatrix(fromRow: toNode, toRow: toNode, fromCol: 0, toCol: newC.numCols - 1)
-                addRow += newRowToAdd
-                
-                // now we change row 's' so that dVs/dt - dVi/dt = 0 (the zero will be handled in the AI calculation below)
-                var newSrow = [Double](repeatElement(0.0, count: C.numCols))
-                newSrow[toNode] = 1.0
-                newSrow[nextConnection.fromNode] = -1.0
-                newC.SetRow(toNode, buffer: newSrow)
+                newC.SetRow(nextConnection.fromNode, vector: fromRow + addRow)
             }
-            
-            if connectToGround
+            else
             {
                 // If any one of the toNodes is ground, them ALL the other toNodes will also go to ground
                 // first set the fromNode
@@ -334,13 +333,8 @@ class PCH_BlueBookModel: NSObject {
                     }
                 }
             }
-            else
-            {
-                newC.SetRow(nextConnection.fromNode, vector: fromRow + addRow)
-            }
+            
         }
-        
-        
         
         // Set the row for the node connected to the source
         var newRow = [Double](repeatElement(0.0, count: C.numCols))

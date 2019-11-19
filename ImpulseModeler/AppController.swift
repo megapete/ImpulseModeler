@@ -614,7 +614,7 @@ class AppController: NSObject {
             newConnectionArray.append((from:sourceConnNode, to:genNodeArray))
         }
         
-        // We need to make sure that each non-ground connected node only turns up once in each connection set (either as the from: or one of the to: nodes)
+        // We need to make sure that each non-ground connected node only turns up once in each connection set (either as the from: or one of the to: nodes). Note that this is all quite a bit more convoluted than it would be if it had been properly designed in the first place
         // start by setting up a set for each connection
         var connSetArray:[Set<Int>] = []
         for nextConn in newConnectionArray
@@ -634,17 +634,67 @@ class AppController: NSObject {
         {
             var combSet = connSetArray.removeFirst()
             
+            var i = 0
+            while i < connSetArray.count
+            {
+                let checkSet = connSetArray[i]
+                
+                if combSet.intersection(checkSet).count != 0
+                {
+                    combSet.formUnion(checkSet)
+                    connSetArray.remove(at: i)
+                }
+                else
+                {
+                    i += 1
+                }
+            }
             
-            
-            combinedSetArray.append(combSet)
+            if combSet.count > 1
+            {
+                combinedSetArray.append(combSet)
+            }
         }
         
+        // Now, because of a badly thought-out original design, we need to split the grounded nodes into separate connection arrays.
         
         var tConnArray:[(fromNode: Int, toNodes: [Int])] = []
-        for nextConn in newConnectionArray
+        for nextConn in combinedSetArray
         {
-            let nextInt = nextConn.from
-            let nextArray = nextConn.to
+            var nextInt = -10
+            var nextArray:[Int] = []
+            
+            if nextConn.contains(-1)
+            {
+                // things are more complicated for grounded nodes
+                var groundSet = Array(nextConn)
+                // get rid of the -1 (in case it happens to be the first entry
+                groundSet.removeAll(where: {$0 < 0})
+                
+                if groundSet.count > 0
+                {
+                    nextInt = groundSet.removeFirst()
+                    nextArray = groundSet
+                    nextArray.append(-1)
+                }
+                
+            }
+            else
+            {
+                var didFirst = false
+                for nextNode in nextConn
+                {
+                    if !didFirst
+                    {
+                        nextInt = nextNode
+                        didFirst = true
+                    }
+                    else
+                    {
+                        nextArray.append(nextNode)
+                    }
+                }
+            }
             
             tConnArray.append((nextInt, nextArray))
         }
