@@ -117,7 +117,7 @@ class Coil:NSObject, NSCoding
         // take care of the 'simple' case where the coil is a helix, layer, or sheet winding (any time numAxialSections <= 2)
         // TODO: Develop a better method to represent helix, layer, and sheet windings
         let isSheet = !xlFileCoil.isHelical && !xlFileCoil.isMultipleStart && xlFileCoil.numAxialSections <= 2
-        if xlFileCoil.isHelical || xlFileCoil.isMultipleStart || (xlFileCoil.numAxialSections <= 2)
+        if xlFileCoil.isMultipleStart || (xlFileCoil.numAxialSections <= 2)
         {
             // choose a sufficiently low number for series capacitance - ultimately, I don't think this will matter anyway for a single coil section
             var seriesCap = 1.0E-12
@@ -183,6 +183,11 @@ class Coil:NSObject, NSCoding
         let isDelta = connection == "D"
         let isDoubleStack = xlFileCoil.isDoubleStack
         let isInterleaved = detailsDbox.noInterleave.state == .off
+        
+        if detailsDbox.oneSectionPerDisk.state == .off
+        {
+            // Things are simplified significantly for series capacitance for coils that are not fully modeled. The strategy is to calculate the full series capacitance of the coil, then simply multiply by the number of sections for the "per-section" series capacitance.
+        }
         
         let totalSections = Int(xlFileCoil.numAxialSections)
         var boundsSet:Set<Int> = [0, totalSections - 1]

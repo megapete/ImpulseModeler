@@ -525,7 +525,11 @@ class ExcelDesignFile: NSObject
         // Num Axial Sections
         for i in 0..<8
         {
-            if let nAxSect = Double(currentLine[i])
+            if self.coils[i].isHelical
+            {
+                self.coils[i].numAxialSections = self.coils[i].maxTurns
+            }
+            else if let nAxSect = Double(currentLine[i])
             {
                 self.coils[i].numAxialSections = nAxSect
             }
