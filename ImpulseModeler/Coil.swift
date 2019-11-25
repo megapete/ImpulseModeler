@@ -173,7 +173,7 @@ class Coil:NSObject, NSCoding
         let Fks = KeySpacerFactor(numColumns: xlFileCoil.numAxialColumns, spacerW: xlFileCoil.axialSpacerWidth, lmt: xlFileCoil.lmt)
         let capBetweenDisks = CapacitanceBetweenDisks(diskID: xlFileCoil.coilID, diskOD: xlFileCoil.coilOD, keySpacerT: xlFileCoil.axialGaps, keySpacerFactor: Fks, paperBetweenTurns: xlFileCoil.paperOverOneTurn)
         
-        let capToStaticRing = (staticRingAtTop || staticRingAtCenter || staticRingAtTop ? CapacitanceToStaticRing(diskID: xlFileCoil.coilID, diskOD: xlFileCoil.coilOD, keySpacerT: xlFileCoil.axialGaps, keySpacerFactor: Fks, paperOverTurns: xlFileCoil.paperOverOneTurn, paperOverStaticRing: meters(inches:0.125)) : 0.0)
+        let capToStaticRing = (staticRingAtTop || staticRingAtCenter || staticRingAtBottom ? CapacitanceToStaticRing(diskID: xlFileCoil.coilID, diskOD: xlFileCoil.coilOD, keySpacerT: xlFileCoil.axialGaps, keySpacerFactor: Fks, paperOverTurns: xlFileCoil.paperOverOneTurn, paperOverStaticRing: meters(inches:0.125)) : 0.0)
         
         // Static-ring dimensional data
         let ringAxialGap = xlFileCoil.axialGaps / 2.0
@@ -184,9 +184,61 @@ class Coil:NSObject, NSCoding
         let isDoubleStack = xlFileCoil.isDoubleStack
         let isInterleaved = detailsDbox.noInterleave.state == .off
         
-        if detailsDbox.oneSectionPerDisk.state == .off
+        if xlFileCoil.isHelical
+        {
+            // per BB (12.41)
+            let commonDiskCap = 4.0 / 3.0 * capBetweenDisks
+            
+        }
+        else if detailsDbox.oneSectionPerDisk.state == .off
         {
             // Things are simplified significantly for series capacitance for coils that are not fully modeled. The strategy is to calculate the full series capacitance of the coil, then simply multiply by the number of sections for the "per-section" series capacitance.
+            
+            var lowestDiskCap = 0.0
+            if staticRingAtBottom && (detailsDbox.fullInterleave.state == .on || (isDelta && isInterleaved))
+            {
+                lowestDiskCap = InterleavedEndDiskWithStaticRingCapacitance(turnsCap: interleavedDiscTurnsCap, capToOtherDisk: capBetweenDisks, capToStaticRing: capToStaticRing)
+            }
+            else if staticRingAtBottom
+            {
+                lowestDiskCap = EndDiskWithStaticRingCapacitance(turnsCap: diskTurnsCap, capToOtherDisk: capBetweenDisks, capToStaticRing: capToStaticRing)
+            }
+            else if detailsDbox.fullInterleave.state == .on || (isDelta && isInterleaved)
+            {
+                lowestDiskCap = InterleavedTerminalDiskCapacitance(turnsCap: interleavedDiscTurnsCap, capToOtherDisk: capBetweenDisks)
+            }
+            else
+            {
+                lowestDiskCap = TerminalDiskCapacitance(turnsCap: diskTurnsCap, capToOtherDisk: capBetweenDisks)
+            }
+            
+            var highestDiskCap = 0.0
+            if lineAtCenter
+            {
+                highestDiskCap = lowestDiskCap
+            }
+            else if staticRingAtTop && isInterleaved
+            {
+                highestDiskCap = InterleavedEndDiskWithStaticRingCapacitance(turnsCap: interleavedDiscTurnsCap, capToOtherDisk: capBetweenDisks, capToStaticRing: capToStaticRing)
+            }
+            else if staticRingAtTop
+            {
+                highestDiskCap = EndDiskWithStaticRingCapacitance(turnsCap: diskTurnsCap, capToOtherDisk: capBetweenDisks, capToStaticRing: capToStaticRing)
+            }
+            else if isInterleaved
+            {
+                highestDiskCap = InterleavedTerminalDiskCapacitance(turnsCap: interleavedDiscTurnsCap, capToOtherDisk: capBetweenDisks)
+            }
+            else
+            {
+                highestDiskCap = TerminalDiskCapacitance(turnsCap: diskTurnsCap, capToOtherDisk: capBetweenDisks)
+            }
+            
+            let interleavedCommonDiskCap = InterleavedCommonDiskCapacitance(turnsCap: interleavedDiscTurnsCap, capToDiskAbove: capBetweenDisks, capToDiskBelow: capBetweenDisks)
+            
+            let commonDiskCap = CommonDiskCapacitance(turnsCap: diskTurnsCap, capToDiskAbove: capBetweenDisks, capToDiskBelow: capBetweenDisks)
+            
+            
         }
         
         let totalSections = Int(xlFileCoil.numAxialSections)
