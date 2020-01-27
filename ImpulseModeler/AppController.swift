@@ -287,7 +287,7 @@ class AppController: NSObject {
                     let coilNameAlert = NSAlert()
                     coilNameAlert.alertStyle = .informational
                     coilNameAlert.messageText = "The design file shows \(designFile.numCoils) coils."
-                    coilNameAlert.informativeText = "Do you wish to use default names (\(defaultNameString)) or deine your own custom names?"
+                    coilNameAlert.informativeText = "Do you wish to use default names (\(defaultNameString)) or define your own custom names?"
                     coilNameAlert.addButton(withTitle: "Default")
                     coilNameAlert.addButton(withTitle: "Custom")
                     

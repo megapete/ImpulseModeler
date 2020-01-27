@@ -192,7 +192,7 @@ class Coil:NSObject, NSCoding
         }
         else if detailsDbox.oneSectionPerDisk.state == .off
         {
-            // Things are simplified significantly for series capacitance for coils that are not fully modeled. The strategy is to calculate the full series capacitance of the coil, then simply multiply by the number of sections for the "per-section" series capacitance.
+            // Things are simplified significantly for series capacitance for disc coils that are not fully modeled. The strategy is to calculate the full series capacitance of the coil, then simply multiply by the number of sections for the "per-section" series capacitance.
             
             var lowestDiskCap = 0.0
             if staticRingAtBottom && (detailsDbox.fullInterleave.state == .on || (isDelta && isInterleaved))
@@ -238,7 +238,23 @@ class Coil:NSObject, NSCoding
             
             let commonDiskCap = CommonDiskCapacitance(turnsCap: diskTurnsCap, capToDiskAbove: capBetweenDisks, capToDiskBelow: capBetweenDisks)
             
+            var centerDisksCap = commonDiskCap;
+            var gapDisksCap = commonDiskCap;
             
+            if isInterleaved
+            {
+                if detailsDbox.fullInterleave.state == .on
+                {
+                    
+                }
+                else
+                {
+                    if let partialDisks = Int(detailsDbox.numPartialDisks.stringValue)
+                    {
+                    
+                    }
+                }
+            }
         }
         
         let totalSections = Int(xlFileCoil.numAxialSections)
