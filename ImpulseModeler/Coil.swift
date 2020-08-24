@@ -117,7 +117,7 @@ class Coil:NSObject, NSCoding
         // take care of the 'simple' case where the coil is a helix, layer, or sheet winding (any time numAxialSections <= 2)
         // TODO: Develop a better method to represent helix, layer, and sheet windings
         let isSheet = !xlFileCoil.isHelical && !xlFileCoil.isMultipleStart && xlFileCoil.numAxialSections <= 2
-        if xlFileCoil.isMultipleStart || (xlFileCoil.numAxialSections <= 2)
+        if xlFileCoil.isMultipleStart || (xlFileCoil.numAxialSections <= 2) || coilName == "LV"
         {
             // choose a sufficiently low number for series capacitance - ultimately, I don't think this will matter anyway for a single coil section
             var seriesCap = 1.0E-12
@@ -184,78 +184,6 @@ class Coil:NSObject, NSCoding
         let isDoubleStack = xlFileCoil.isDoubleStack
         let isInterleaved = detailsDbox.noInterleave.state == .off
         
-        if xlFileCoil.isHelical
-        {
-            // per BB (12.41)
-            let commonDiskCap = 4.0 / 3.0 * capBetweenDisks
-            
-        }
-        else if detailsDbox.oneSectionPerDisk.state == .off
-        {
-            // Things are simplified significantly for series capacitance for disc coils that are not fully modeled. The strategy is to calculate the full series capacitance of the coil, then simply multiply by the number of sections for the "per-section" series capacitance.
-            
-            var lowestDiskCap = 0.0
-            if staticRingAtBottom && (detailsDbox.fullInterleave.state == .on || (isDelta && isInterleaved))
-            {
-                lowestDiskCap = InterleavedEndDiskWithStaticRingCapacitance(turnsCap: interleavedDiscTurnsCap, capToOtherDisk: capBetweenDisks, capToStaticRing: capToStaticRing)
-            }
-            else if staticRingAtBottom
-            {
-                lowestDiskCap = EndDiskWithStaticRingCapacitance(turnsCap: diskTurnsCap, capToOtherDisk: capBetweenDisks, capToStaticRing: capToStaticRing)
-            }
-            else if detailsDbox.fullInterleave.state == .on || (isDelta && isInterleaved)
-            {
-                lowestDiskCap = InterleavedTerminalDiskCapacitance(turnsCap: interleavedDiscTurnsCap, capToOtherDisk: capBetweenDisks)
-            }
-            else
-            {
-                lowestDiskCap = TerminalDiskCapacitance(turnsCap: diskTurnsCap, capToOtherDisk: capBetweenDisks)
-            }
-            
-            var highestDiskCap = 0.0
-            if lineAtCenter
-            {
-                highestDiskCap = lowestDiskCap
-            }
-            else if staticRingAtTop && isInterleaved
-            {
-                highestDiskCap = InterleavedEndDiskWithStaticRingCapacitance(turnsCap: interleavedDiscTurnsCap, capToOtherDisk: capBetweenDisks, capToStaticRing: capToStaticRing)
-            }
-            else if staticRingAtTop
-            {
-                highestDiskCap = EndDiskWithStaticRingCapacitance(turnsCap: diskTurnsCap, capToOtherDisk: capBetweenDisks, capToStaticRing: capToStaticRing)
-            }
-            else if isInterleaved
-            {
-                highestDiskCap = InterleavedTerminalDiskCapacitance(turnsCap: interleavedDiscTurnsCap, capToOtherDisk: capBetweenDisks)
-            }
-            else
-            {
-                highestDiskCap = TerminalDiskCapacitance(turnsCap: diskTurnsCap, capToOtherDisk: capBetweenDisks)
-            }
-            
-            let interleavedCommonDiskCap = InterleavedCommonDiskCapacitance(turnsCap: interleavedDiscTurnsCap, capToDiskAbove: capBetweenDisks, capToDiskBelow: capBetweenDisks)
-            
-            let commonDiskCap = CommonDiskCapacitance(turnsCap: diskTurnsCap, capToDiskAbove: capBetweenDisks, capToDiskBelow: capBetweenDisks)
-            
-            var centerDisksCap = commonDiskCap;
-            var gapDisksCap = commonDiskCap;
-            
-            if isInterleaved
-            {
-                if detailsDbox.fullInterleave.state == .on
-                {
-                    
-                }
-                else
-                {
-                    if let partialDisks = Int(detailsDbox.numPartialDisks.stringValue)
-                    {
-                    
-                    }
-                }
-            }
-        }
         
         let totalSections = Int(xlFileCoil.numAxialSections)
         var boundsSet:Set<Int> = [0, totalSections - 1]
