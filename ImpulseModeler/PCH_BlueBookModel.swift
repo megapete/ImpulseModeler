@@ -494,6 +494,24 @@ class PCH_BlueBookModel: NSObject {
                 }
             }
             
+            // check the current values of newV for illegal values
+            for nextNode in 0..<(newV.numRows - 1)
+            {
+                if fabs(newV[nextNode, 0]) > 1.0E100
+                {
+                    DispatchQueue.main.async {
+    
+                        let alert = NSAlert()
+                        alert.messageText = "Found an illegal value in the voltage vector at node \(nextNode). The absolute value is \(fabs(newV[nextNode, 0]))"
+                        alert.informativeText = "The app will now quit."
+                        let _ = alert.runModal()
+                        NSApp.terminate(nil)
+                    }
+                    
+                    return nil // (savedTimes, savedValuesV, savedValuesI, deltaV)
+                }
+            }
+            
             V = newV
             I = newI
             

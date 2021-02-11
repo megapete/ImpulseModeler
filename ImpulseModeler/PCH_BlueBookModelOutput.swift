@@ -85,6 +85,10 @@ class PCH_BlueBookModelOutput: NSObject, NSCoding {
         {
             for nextCol in 0..<voltsMatrix.numCols
             {
+                if fabs(voltsMatrix[nextRow, nextCol]) > 1.0E10
+                {
+                    DLog("got one")
+                }
                 voltsArray[nextRow][nextCol] = voltsMatrix[nextRow,nextCol]
             }
         }
@@ -126,6 +130,16 @@ class PCH_BlueBookModelOutput: NSObject, NSCoding {
         DLog("Done!\n\nDecoding Voltages...")
         // let voltageNodes = aDecoder.decodeObject(forKey: "VoltageNodes") as! [String]
         let voltsArray = aDecoder.decodeObject(forKey: "Volts") as! [[Double]]
+        for nextOuter in voltsArray
+        {
+            for nextInner in nextOuter
+            {
+                if fabs(nextInner) > 1.0E10
+                {
+                    DLog("got one!")
+                }
+            }
+        }
         DLog("Done!\n\nDecoding Currents...")
         // let deviceIDs = aDecoder.decodeObject(forKey: "DeviceIDs") as! [String]
         let ampsArray = aDecoder.decodeObject(forKey: "Amps") as! [[Double]]

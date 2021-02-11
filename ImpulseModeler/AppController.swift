@@ -91,7 +91,7 @@ class AppController: NSObject {
     var eddyLossFactors:[Double]?
     
     // The Bluebook talks about multiplying the DC resistance by "around 3000" to reflect the higher effective resistance at high frequencies of the eddy loss. I have (for now) decided to use an assumed "equivalent" frequency of 10kHz, which yields a factor of (10000/50)^2 = 40000x the eddy loss component of the resistance at 60Hz.
-    let initialEddyLossFactor = 40000.0
+    let initialEddyLossFactor = 40000.0 * 2.4
     
     // The special "Ground" section used in the model. By convention, its coilRef, serNum, inNode, and outNode are equal to "-1". It's sectionID is "GND".
     static let gndSection = PCH_DiskSection(coilRef: -1, diskRect: NSMakeRect(0, 0, 0, 0), N: 0, J: 0, windHt: 0, coreRadius: 0, secData: PCH_SectionData(sectionID: "GND", serNum: -1, inNode:-1, outNode:-1))

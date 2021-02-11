@@ -28,6 +28,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     {
         return true
     }
+    
+    func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
+        
+        return .terminateNow
+    }
 
     // This function is required to use the Open Recent menu item as well as to launch the program from th Finder by double-clicking a file.
     func application(_ sender: NSApplication, openFile filename: String) -> Bool
